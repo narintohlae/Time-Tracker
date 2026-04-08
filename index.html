@@ -3,31 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบลงเวลา - เข้าสู่ระบบ</title>
+    <title>ระบบลงเวลาพนักงาน</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap');
         body { font-family: 'Sarabun', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         .app-container { background: white; padding: 30px 20px; border-radius: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); width: 100%; max-width: 350px; text-align: center; }
         h1 { font-size: 1.2em; color: #555; margin-top: 0; margin-bottom: 20px; }
         
-        /* สไตล์ช่องกรอกข้อมูล Login */
         .login-box { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
         input { width: 90%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1em; font-family: 'Sarabun'; text-align: center; margin: 0 auto; box-sizing: border-box; }
         .btn-login { background-color: #2563eb; color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: bold; font-family: 'Sarabun'; width: 90%; margin: 0 auto; transition: background 0.2s; }
-        .btn-login:active { background-color: #1d4ed8; }
         
-        /* สไตล์หน้าลงเวลา */
         #userGreeting { color: #2563eb; font-weight: bold; margin-bottom: 5px; }
         .clock { font-size: 3em; font-weight: bold; color: #222; margin: 15px 0; }
-        .btn-group { display: flex; gap: 15px; margin-bottom: 20px; }
+        
+        /* ปุ่มเข้า-ออกงานหลัก */
+        .btn-group { display: flex; gap: 15px; margin-bottom: 15px; }
         button { flex: 1; padding: 15px; border: none; border-radius: 12px; font-size: 1em; font-family: 'Sarabun', sans-serif; font-weight: bold; color: white; cursor: pointer; transition: transform 0.1s; }
         button:active { transform: scale(0.95); }
         button:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-in { background-color: #10b981; } 
         .btn-out { background-color: #ef4444; } 
+        
+        /* ปุ่มฟีเจอร์เสริม (โอที/ลางาน) */
+        .btn-group-sub { display: flex; gap: 15px; margin-bottom: 20px; }
+        .btn-ot { background-color: #f59e0b; padding: 10px; font-size: 0.9em; }
+        .btn-leave { background-color: #8b5cf6; padding: 10px; font-size: 0.9em; }
+        
         .btn-logout { background-color: #f3f4f6; color: #6b7280; padding: 10px; border-radius: 8px; font-size: 0.9em; margin-top: 10px; width: 100%; }
         
-        .log-container { text-align: left; background: #f9fafb; padding: 15px; border-radius: 12px; font-size: 0.9em; max-height: 180px; overflow-y: auto; }
+        .log-container { text-align: left; background: #f9fafb; padding: 15px; border-radius: 12px; font-size: 0.9em; max-height: 150px; overflow-y: auto; }
         .log-title { font-weight: bold; color: #666; margin-bottom: 10px; display: block; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         .log-item { border-bottom: 1px dashed #e5e7eb; padding: 8px 0; display: flex; flex-direction: column; gap: 4px;}
         .log-item:last-child { border-bottom: none; }
@@ -50,12 +55,17 @@
         <div class="clock" id="clockDisplay">00:00</div>
         
         <div class="btn-group">
-            <button class="btn-in" id="btnIn" onclick="handleTimeRecord('เข้างาน', this)">เข้างาน</button>
-            <button class="btn-out" id="btnOut" onclick="handleTimeRecord('ออกงาน', this)">ออกงาน</button>
+            <button class="btn-in" onclick="processRecord('เข้างาน', this, true)">เข้างาน</button>
+            <button class="btn-out" onclick="processRecord('ออกงาน', this, true)">ออกงาน</button>
+        </div>
+        
+        <div class="btn-group-sub">
+            <button class="btn-ot" onclick="processRecord('โอที', this, true)">เริ่มโอที</button>
+            <button class="btn-leave" onclick="processRecord('ลางาน', this, false)">แจ้งลางาน</button>
         </div>
 
         <div class="log-container">
-            <span class="log-title">ประวัติการลงเวลา (เครื่องนี้)</span>
+            <span class="log-title">ประวัติการทำงาน</span>
             <div id="logList"></div>
         </div>
 
@@ -63,113 +73,133 @@
     </div>
 
     <script>
-        // --- 🔴 ใส่ URL ของ Google Apps Script ของคุณตรงนี้ ---
+        // --- 🔴 ตั้งค่าระบบตรงนี้ ---
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyXuioI9v6FsX3lXZXej1_NXb-Mi8JYC_8JKSQH_8laQSud39ThLGm6X_1j38MiMNPv/exec';
+        
+        // พิกัดออฟฟิศของคุณ (ละติจูด, ลองจิจูด)
+        const OFFICE_LAT = 13.736717; 
+        const OFFICE_LON = 100.523186; 
+        const ALLOWED_RADIUS = 100; // รัศมีที่อนุญาต (เมตร)
 
         let currentUser = "";
         let currentPin = "";
 
-        // 1. ระบบ Login
+        // --- ระบบ Login/Logout (เหมือนเดิม) ---
         function login() {
             const id = document.getElementById('inputId').value.trim();
             const pin = document.getElementById('inputPin').value.trim();
-
-            if(id === "" || pin === "") {
-                alert("กรุณากรอกรหัสพนักงานและ PIN ให้ครบถ้วน");
-                return;
-            }
-
-            // เก็บค่าไว้ในตัวแปรชั่วคราว (หายไปเมื่อปิดเว็บ)
-            currentUser = id;
-            currentPin = pin;
-
-            // สลับหน้าจอ
+            if(id === "" || pin === "") { alert("กรุณากรอกข้อมูลให้ครบถ้วน"); return; }
+            currentUser = id; currentPin = pin;
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainScreen').style.display = 'block';
             document.getElementById('displayId').innerText = currentUser;
         }
 
-        // 2. ระบบ Logout
         function logout() {
-            currentUser = "";
-            currentPin = "";
-            document.getElementById('inputId').value = "";
-            document.getElementById('inputPin').value = "";
-            
+            currentUser = ""; currentPin = "";
+            document.getElementById('inputId').value = ""; document.getElementById('inputPin').value = "";
             document.getElementById('mainScreen').style.display = 'none';
             document.getElementById('loginScreen').style.display = 'block';
         }
 
-        // 3. ระบบนาฬิกา
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('clockDisplay').innerText = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        }
-        setInterval(updateTime, 1000);
-        updateTime();
+        // --- ระบบนาฬิกา ---
+        setInterval(() => {
+            document.getElementById('clockDisplay').innerText = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }, 1000);
 
-        // 4. ระบบบันทึกเวลา
-        function handleTimeRecord(type, btnElement) {
+        // --- ฟังก์ชันคำนวณระยะทาง GPS (Haversine Formula) ---
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; // รัศมีโลกเป็นเมตร
+            const φ1 = lat1 * Math.PI/180;
+            const φ2 = lat2 * Math.PI/180;
+            const Δφ = (lat2-lat1) * Math.PI/180;
+            const Δλ = (lon2-lon1) * Math.PI/180;
+            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c; // คืนค่าเป็นเมตร
+        }
+
+        // --- ระบบประมวลผลเมื่อกดปุ่ม ---
+        function processRecord(type, btnElement, requireGeofence) {
+            let remark = "";
+            
+            // ถ้ากด "ลางาน" ให้เด้งหน้าต่างถามเหตุผล (และไม่ต้องเช็ค GPS)
+            if(type === 'ลางาน') {
+                remark = prompt("ระบุเหตุผลการลางาน (เช่น ป่วย, ลากิจ):");
+                if(remark === null || remark.trim() === "") return; // ถ้ายกเลิกหรือไม่พิมพ์อะไร ให้หยุดการทำงาน
+            }
+
             const originalText = btnElement.innerText;
-            btnElement.innerText = "กำลังบันทึก...";
+            btnElement.innerText = "กำลังตรวจพิกัด...";
             btnElement.disabled = true;
 
-            const now = new Date();
-            const dateString = now.toLocaleDateString('th-TH');
-            const timeString = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-            
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
-                        const lat = position.coords.latitude.toFixed(5);
-                        const lon = position.coords.longitude.toFixed(5);
-                        saveData(type, dateString, timeString, `${lat}, ${lon}`, btnElement, originalText);
+                        const userLat = position.coords.latitude;
+                        const userLon = position.coords.longitude;
+                        
+                        // ตรวจสอบ Geofence (ถ้าปุ่มนั้นบังคับว่าต้องอยู่ออฟฟิศ)
+                        if(requireGeofence) {
+                            const distance = getDistance(OFFICE_LAT, OFFICE_LON, userLat, userLon);
+                            if(distance > ALLOWED_RADIUS) {
+                                alert(`คุณอยู่นอกพื้นที่ออฟฟิศ! (ห่างออกไป ${Math.round(distance)} เมตร)`);
+                                btnElement.innerText = originalText;
+                                btnElement.disabled = false;
+                                return; // หยุดการทำงาน ไม่บันทึก
+                            }
+                        }
+
+                        // ถ้าผ่านเงื่อนไข ให้บันทึกข้อมูล
+                        const locText = `${userLat.toFixed(5)}, ${userLon.toFixed(5)}`;
+                        saveData(type, locText, remark, btnElement, originalText);
                     },
                     (error) => {
-                        saveData(type, dateString, timeString, "ไม่สามารถดึงพิกัดได้", btnElement, originalText);
-                    }
+                        alert("โปรดอนุญาตการเข้าถึงตำแหน่ง (GPS) ในการตั้งค่าเบราว์เซอร์");
+                        btnElement.innerText = originalText;
+                        btnElement.disabled = false;
+                    },
+                    { enableHighAccuracy: true } // บังคับดึง GPS แบบแม่นยำสูง
                 );
             } else {
-                saveData(type, dateString, timeString, "ไม่รองรับ GPS", btnElement, originalText);
+                alert("อุปกรณ์ของคุณไม่รองรับ GPS");
+                btnElement.innerText = originalText;
+                btnElement.disabled = false;
             }
         }
 
-        function saveData(type, date, time, location, btnElement, originalText) {
-            const logList = document.getElementById('logList');
-            const color = type === 'เข้างาน' ? '#10b981' : '#ef4444';
-            const newLog = `
-                <div class="log-item">
-                    <div><strong style="color: ${color};">${type}</strong> เวลา ${time} น.</div>
-                    <div class="loc">🆔 ${currentUser} | 📍 ${location}</div>
-                </div>`;
-            logList.innerHTML = newLog + logList.innerHTML;
+        // --- ส่งข้อมูลไป Google Sheets ---
+        function saveData(type, location, remark, btnElement, originalText) {
+            btnElement.innerText = "กำลังบันทึก...";
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('th-TH');
+            const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
 
-            // ส่งข้อมูลไป Google Sheets (เพิ่ม empId และ pin)
+            const payload = { 
+                date: dateStr, time: timeStr, type: type, 
+                location: location, empId: currentUser, pin: currentPin, remark: remark 
+            };
+
             fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
+                method: 'POST', mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    date: date, 
-                    time: time, 
-                    type: type, 
-                    location: location, 
-                    empId: currentUser,
-                    pin: currentPin
-                })
+                body: JSON.stringify(payload)
             }).then(() => {
-                btnElement.innerText = originalText;
-                btnElement.disabled = false;
-                
-                // แจ้งเตือนเมื่อลงเวลาสำเร็จและเด้งกลับหน้า Login (เอาออกได้ถ้าไม่ต้องการ)
-                alert(`บันทึก${type}สำเร็จ`);
-                logout(); 
+                // อัปเดตหน้าจอ
+                const logList = document.getElementById('logList');
+                const logItem = `<div class="log-item">
+                    <div><strong>${type}</strong> เวลา ${timeStr} น. ${remark ? `(${remark})` : ''}</div>
+                </div>`;
+                logList.innerHTML = logItem + logList.innerHTML;
 
-            }).catch((error) => {
-                console.error('Error:', error);
+                alert(`บันทึก [${type}] เรียบร้อยแล้ว`);
                 btnElement.innerText = originalText;
                 btnElement.disabled = false;
-                alert("มีข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่");
+                logout(); // บันทึกเสร็จแล้วเด้งออกทันที
+            }).catch((err) => {
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อ");
+                btnElement.innerText = originalText;
+                btnElement.disabled = false;
             });
         }
     </script>
