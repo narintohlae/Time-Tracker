@@ -17,7 +17,6 @@
         #userGreeting { color: #2563eb; font-weight: bold; margin-bottom: 5px; }
         .clock { font-size: 3em; font-weight: bold; color: #222; margin: 15px 0; }
         
-        /* ปุ่มเข้า-ออกงานหลัก */
         .btn-group { display: flex; gap: 15px; margin-bottom: 15px; }
         button { flex: 1; padding: 15px; border: none; border-radius: 12px; font-size: 1em; font-family: 'Sarabun', sans-serif; font-weight: bold; color: white; cursor: pointer; transition: transform 0.1s; }
         button:active { transform: scale(0.95); }
@@ -25,18 +24,18 @@
         .btn-in { background-color: #10b981; } 
         .btn-out { background-color: #ef4444; } 
         
-        /* ปุ่มฟีเจอร์เสริม (โอที/ลางาน) */
         .btn-group-sub { display: flex; gap: 15px; margin-bottom: 20px; }
         .btn-ot { background-color: #f59e0b; padding: 10px; font-size: 0.9em; }
         .btn-leave { background-color: #8b5cf6; padding: 10px; font-size: 0.9em; }
         
-        .btn-logout { background-color: #f3f4f6; color: #6b7280; padding: 10px; border-radius: 8px; font-size: 0.9em; margin-top: 10px; width: 100%; }
+        .btn-action { background-color: #f3f4f6; color: #374151; padding: 10px; border-radius: 8px; font-size: 0.9em; margin-top: 10px; width: 100%; border: 1px solid #d1d5db; }
+        .btn-logout { background-color: #fee2e2; color: #ef4444; padding: 10px; border-radius: 8px; font-size: 0.9em; margin-top: 10px; width: 100%; }
         
-        .log-container { text-align: left; background: #f9fafb; padding: 15px; border-radius: 12px; font-size: 0.9em; max-height: 150px; overflow-y: auto; }
-        .log-title { font-weight: bold; color: #666; margin-bottom: 10px; display: block; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .log-item { border-bottom: 1px dashed #e5e7eb; padding: 8px 0; display: flex; flex-direction: column; gap: 4px;}
-        .log-item:last-child { border-bottom: none; }
-        .loc { font-size: 0.8em; color: #888; }
+        /* สไตล์สำหรับหน้า Dashboard */
+        .dash-content { text-align: left; background: #f9fafb; padding: 15px; border-radius: 12px; font-size: 0.9em; min-height: 200px; max-height: 300px; overflow-y: auto; margin-bottom: 15px; }
+        .dash-summary { display: flex; justify-content: space-between; background: #e0f2fe; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-weight: bold; color: #0369a1; }
+        .dash-item { border-bottom: 1px dashed #e5e7eb; padding: 8px 0; }
+        .dash-item:last-child { border-bottom: none; }
     </style>
 </head>
 <body>
@@ -64,27 +63,30 @@
             <button class="btn-leave" onclick="processRecord('ลางาน', this, false)">แจ้งลางาน</button>
         </div>
 
-        <div class="log-container">
-            <span class="log-title">ประวัติการทำงาน</span>
-            <div id="logList"></div>
-        </div>
+        <button class="btn-action" onclick="openDashboard()">📊 ดูสรุปข้อมูลวันนี้</button>
+        <button class="btn-logout" onclick="logout()">🚪 ออกจากระบบ</button>
+    </div>
 
-        <button class="btn-logout" onclick="logout()">ออกจากระบบ</button>
+    <div class="app-container" id="dashboardScreen" style="display: none;">
+        <h1>สรุปข้อมูลประจำวัน</h1>
+        <div class="dash-content" id="dashContent">
+            กำลังโหลดข้อมูล...
+        </div>
+        <button class="btn-action" onclick="closeDashboard()">🔙 กลับหน้าลงเวลา</button>
     </div>
 
     <script>
         // --- 🔴 ตั้งค่าระบบตรงนี้ ---
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyXuioI9v6FsX3lXZXej1_NXb-Mi8JYC_8JKSQH_8laQSud39ThLGm6X_1j38MiMNPv/exec';
         
-        // พิกัดออฟฟิศของคุณ (ละติจูด, ลองจิจูด)
         const OFFICE_LAT = 13.736717; 
         const OFFICE_LON = 100.523186; 
-        const ALLOWED_RADIUS = 100; // รัศมีที่อนุญาต (เมตร)
+        const ALLOWED_RADIUS = 100;
 
         let currentUser = "";
         let currentPin = "";
 
-        // --- ระบบ Login/Logout (เหมือนเดิม) ---
+        // --- ควบคุมหน้าจอ ---
         function login() {
             const id = document.getElementById('inputId').value.trim();
             const pin = document.getElementById('inputPin').value.trim();
@@ -102,31 +104,27 @@
             document.getElementById('loginScreen').style.display = 'block';
         }
 
-        // --- ระบบนาฬิกา ---
+        // --- นาฬิกา ---
         setInterval(() => {
             document.getElementById('clockDisplay').innerText = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         }, 1000);
 
-        // --- ฟังก์ชันคำนวณระยะทาง GPS (Haversine Formula) ---
         function getDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371e3; // รัศมีโลกเป็นเมตร
+            const R = 6371e3; 
             const φ1 = lat1 * Math.PI/180;
             const φ2 = lat2 * Math.PI/180;
             const Δφ = (lat2-lat1) * Math.PI/180;
             const Δλ = (lon2-lon1) * Math.PI/180;
             const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c; // คืนค่าเป็นเมตร
+            return R * c; 
         }
 
-        // --- ระบบประมวลผลเมื่อกดปุ่ม ---
         function processRecord(type, btnElement, requireGeofence) {
             let remark = "";
-            
-            // ถ้ากด "ลางาน" ให้เด้งหน้าต่างถามเหตุผล (และไม่ต้องเช็ค GPS)
             if(type === 'ลางาน') {
                 remark = prompt("ระบุเหตุผลการลางาน (เช่น ป่วย, ลากิจ):");
-                if(remark === null || remark.trim() === "") return; // ถ้ายกเลิกหรือไม่พิมพ์อะไร ให้หยุดการทำงาน
+                if(remark === null || remark.trim() === "") return; 
             }
 
             const originalText = btnElement.innerText;
@@ -139,18 +137,16 @@
                         const userLat = position.coords.latitude;
                         const userLon = position.coords.longitude;
                         
-                        // ตรวจสอบ Geofence (ถ้าปุ่มนั้นบังคับว่าต้องอยู่ออฟฟิศ)
                         if(requireGeofence) {
                             const distance = getDistance(OFFICE_LAT, OFFICE_LON, userLat, userLon);
                             if(distance > ALLOWED_RADIUS) {
                                 alert(`คุณอยู่นอกพื้นที่ออฟฟิศ! (ห่างออกไป ${Math.round(distance)} เมตร)`);
                                 btnElement.innerText = originalText;
                                 btnElement.disabled = false;
-                                return; // หยุดการทำงาน ไม่บันทึก
+                                return; 
                             }
                         }
 
-                        // ถ้าผ่านเงื่อนไข ให้บันทึกข้อมูล
                         const locText = `${userLat.toFixed(5)}, ${userLon.toFixed(5)}`;
                         saveData(type, locText, remark, btnElement, originalText);
                     },
@@ -159,7 +155,7 @@
                         btnElement.innerText = originalText;
                         btnElement.disabled = false;
                     },
-                    { enableHighAccuracy: true } // บังคับดึง GPS แบบแม่นยำสูง
+                    { enableHighAccuracy: true } 
                 );
             } else {
                 alert("อุปกรณ์ของคุณไม่รองรับ GPS");
@@ -168,16 +164,13 @@
             }
         }
 
-        // --- ส่งข้อมูลไป Google Sheets ---
         function saveData(type, location, remark, btnElement, originalText) {
             btnElement.innerText = "กำลังบันทึก...";
             const now = new Date();
-            const dateStr = now.toLocaleDateString('th-TH');
-            const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-
             const payload = { 
-                date: dateStr, time: timeStr, type: type, 
-                location: location, empId: currentUser, pin: currentPin, remark: remark 
+                date: now.toLocaleDateString('th-TH'), 
+                time: now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }), 
+                type: type, location: location, empId: currentUser, pin: currentPin, remark: remark 
             };
 
             fetch(SCRIPT_URL, {
@@ -185,22 +178,75 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             }).then(() => {
-                // อัปเดตหน้าจอ
-                const logList = document.getElementById('logList');
-                const logItem = `<div class="log-item">
-                    <div><strong>${type}</strong> เวลา ${timeStr} น. ${remark ? `(${remark})` : ''}</div>
-                </div>`;
-                logList.innerHTML = logItem + logList.innerHTML;
-
                 alert(`บันทึก [${type}] เรียบร้อยแล้ว`);
                 btnElement.innerText = originalText;
                 btnElement.disabled = false;
-                logout(); // บันทึกเสร็จแล้วเด้งออกทันที
-            }).catch((err) => {
+            }).catch(() => {
                 alert("เกิดข้อผิดพลาดในการเชื่อมต่อ");
                 btnElement.innerText = originalText;
                 btnElement.disabled = false;
             });
+        }
+
+        // --- ระบบ Dashboard (ดึงข้อมูล) ---
+        function openDashboard() {
+            document.getElementById('mainScreen').style.display = 'none';
+            document.getElementById('dashboardScreen').style.display = 'block';
+            const dashContent = document.getElementById('dashContent');
+            dashContent.innerHTML = "<div style='text-align:center; padding: 20px;'>กำลังโหลดข้อมูล...⏳</div>";
+
+            fetch(SCRIPT_URL)
+            .then(response => response.json())
+            .then(data => {
+                if(data.error) {
+                    dashContent.innerHTML = "เกิดข้อผิดพลาด: " + data.error;
+                    return;
+                }
+
+                if(data.length === 0) {
+                    dashContent.innerHTML = "<div style='text-align:center; padding: 20px; color: #888;'>ยังไม่มีข้อมูลการลงเวลาในวันนี้</div>";
+                    return;
+                }
+
+                // นับจำนวนคนเข้างานและลางาน
+                let countIn = data.filter(d => d.type === 'เข้างาน').length;
+                let countLeave = data.filter(d => d.type === 'ลางาน').length;
+
+                let html = `
+                    <div class="dash-summary">
+                        <span>✅ เข้างาน: ${countIn}</span>
+                        <span style="color:#ef4444;">❌ ลางาน: ${countLeave}</span>
+                    </div>
+                `;
+
+                // สร้างรายการแต่ละคน (ย้อนกลับให้คนล่าสุดอยู่บนสุด)
+                data.reverse().forEach(item => {
+                    let color = '#555';
+                    if(item.type === 'เข้างาน') color = '#10b981';
+                    if(item.type === 'ออกงาน') color = '#ef4444';
+                    if(item.type === 'ลางาน') color = '#8b5cf6';
+                    if(item.type === 'โอที') color = '#f59e0b';
+
+                    html += `
+                        <div class="dash-item">
+                            <div>🆔 <b>${item.empId}</b> | <span style="color:${color}; font-weight:bold;">${item.type}</span></div>
+                            <div style="font-size: 0.8em; color: #666; margin-top: 3px;">
+                                ⏱️ ${item.time} น. ${item.remark && item.remark !== "-" ? `<br>📝 ${item.remark}` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                dashContent.innerHTML = html;
+            })
+            .catch(error => {
+                dashContent.innerHTML = "<div style='text-align:center; padding: 20px; color: red;'>ไม่สามารถเชื่อมต่อฐานข้อมูลได้</div>";
+            });
+        }
+
+        function closeDashboard() {
+            document.getElementById('dashboardScreen').style.display = 'none';
+            document.getElementById('mainScreen').style.display = 'block';
         }
     </script>
 </body>
