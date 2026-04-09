@@ -136,7 +136,7 @@
                 <div id="user-upcoming-holidays"></div>
                 <div id="user-leaves-container" class="space-y-3 mt-2"></div>
             </div>
-            <button onclick="switchScreen('screen-leave-form')" class="absolute bottom-6 right-6 w-14 h-14 bg-orange-500 text-white rounded-full shadow-xl shadow-orange-200 flex items-center justify-center active:scale-95 transition-all">
+            <button onclick="switchScreen('screen-leave-form'); toggleLeaveType();" class="absolute bottom-6 right-6 w-14 h-14 bg-orange-500 text-white rounded-full shadow-xl shadow-orange-200 flex items-center justify-center active:scale-95 transition-all">
                 <i data-lucide="plus" class="w-6 h-6"></i>
             </button>
         </div>
@@ -147,31 +147,55 @@
                 <button onclick="switchScreen('screen-leaves')" class="p-2 rounded-full hover:bg-gray-100 transition">
                     <i data-lucide="arrow-left" class="w-6 h-6 text-gray-700"></i>
                 </button>
-                <h2 class="text-lg font-bold text-gray-900">ยื่นใบลางาน</h2>
+                <h2 class="text-lg font-bold text-gray-900">ยื่นคำร้อง</h2>
                 <div class="w-10"></div>
             </div>
             <div class="flex-1 overflow-y-auto p-6 space-y-5">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทการลา</label>
-                    <select id="leave-type" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500">
-                        <option value="sick">ลาป่วย</option>
-                        <option value="personal">ลากิจ</option>
-                        <option value="vacation">ลาพักร้อน</option>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทรายการ</label>
+                    <select id="leave-type" onchange="toggleLeaveType()" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 font-medium">
+                        <option value="sick">ลาป่วย (Sick Leave)</option>
+                        <option value="personal">ลากิจ (Personal Leave)</option>
+                        <option value="vacation">ลาพักร้อน (Vacation)</option>
+                        <option value="swap" class="text-blue-600 font-bold">สลับวันหยุด / หยุดชดเชย</option>
                     </select>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
+                
+                <!-- ฟอร์มสำหรับ ลาปกติ -->
+                <div id="normal-date-container" class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">วันที่เริ่มต้น</label>
-                        <input type="date" id="leave-start" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <label class="block text-[13px] font-bold text-gray-700 mb-1">วันที่เริ่มต้น</label>
+                        <input type="date" id="leave-start" class="w-full px-3 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">ถึงวันที่</label>
-                        <input type="date" id="leave-end" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <label class="block text-[13px] font-bold text-gray-700 mb-1">ถึงวันที่</label>
+                        <input type="date" id="leave-end" class="w-full px-3 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm">
                     </div>
                 </div>
+                
+                <!-- ฟอร์มสำหรับ สลับวันหยุด (โชว์เฉพาะตอนเลือกสลับวันหยุด) -->
+                <div id="swap-date-container" class="hidden bg-blue-50 p-5 rounded-2xl border border-blue-200">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                            <i data-lucide="arrow-right-left" class="w-4 h-4"></i>
+                        </div>
+                        <h3 class="font-bold text-blue-800 text-sm">ข้อมูลสลับวันหยุด</h3>
+                    </div>
+                    
+                    <div class="bg-white p-3 rounded-xl border border-blue-100 text-[13px] text-gray-700 mb-4 shadow-sm text-center">
+                        วันหยุดประจำสัปดาห์ของคุณคือ: <span id="swap-default-day" class="font-bold text-blue-600 text-base ml-1">--</span>
+                    </div>
+
+                    <div>
+                        <label class="block text-[12px] font-bold text-blue-700 mb-1">วันที่ต้องการสลับ (วันที่จะหยุด)</label>
+                        <input type="date" id="leave-start-swap" class="w-full px-3 py-3 bg-white border border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm shadow-sm">
+                        <p class="text-[10px] text-blue-500 mt-2 text-center">* ระบบจะนำวันหยุดประจำสัปดาห์มาทำแทนอัตโนมัติ</p>
+                    </div>
+                </div>
+
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">เหตุผลการลา</label>
-                    <textarea id="leave-reason" rows="3" placeholder="ระบุเหตุผล..." class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">เหตุผล</label>
+                    <textarea id="leave-reason" rows="3" placeholder="ระบุเหตุผล (เช่น สลับวันหยุดเพื่อไปทำธุระ)" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
                 </div>
             </div>
             <div class="p-4 bg-white border-t border-gray-100">
@@ -210,7 +234,7 @@
             <!-- Scrollable Tabs -->
             <div class="flex bg-white border-b border-gray-200 z-10 shadow-sm overflow-x-auto hide-scrollbar whitespace-nowrap px-2">
                 <button onclick="switchAdminTab('logs')" id="tab-logs" class="px-5 py-3 text-sm font-bold border-b-2 border-blue-600 text-blue-600 transition-colors">เข้า-ออก</button>
-                <button onclick="switchAdminTab('leaves')" id="tab-leaves" class="px-5 py-3 text-sm font-bold border-b-2 border-transparent text-gray-500 transition-colors">ลางาน</button>
+                <button onclick="switchAdminTab('leaves')" id="tab-leaves" class="px-5 py-3 text-sm font-bold border-b-2 border-transparent text-gray-500 transition-colors">คำร้อง</button>
                 <button onclick="switchAdminTab('holidays')" id="tab-holidays" class="px-5 py-3 text-sm font-bold border-b-2 border-transparent text-gray-500 transition-colors">วันหยุด</button>
                 <button onclick="switchAdminTab('payroll')" id="tab-payroll" class="px-5 py-3 text-sm font-bold border-b-2 border-transparent text-gray-500 transition-colors">เงินเดือน</button>
                 <button onclick="switchAdminTab('users')" id="tab-users" class="px-5 py-3 text-sm font-bold border-b-2 border-transparent text-gray-500 transition-colors">พนักงาน</button>
@@ -218,7 +242,12 @@
             </div>
 
             <div class="flex-1 overflow-y-auto p-4 relative bg-gray-50">
-                <div id="admin-content-logs" class="space-y-3"></div>
+                
+                <!-- Logs Tab -->
+                <div id="admin-content-logs" class="space-y-3">
+                    <!-- Logs list injected here -->
+                </div>
+                
                 <div id="admin-content-leaves" class="space-y-3 hidden"></div>
                 
                 <!-- Holidays Tab -->
@@ -386,6 +415,43 @@
             </div>
         </div>
 
+        <!-- Edit/Add Log Modal (Manual Entry) -->
+        <div id="modal-edit-log" class="absolute inset-0 z-[55] hidden items-center justify-center modal-bg p-4 opacity-0 transition-opacity duration-300">
+            <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl transform scale-95 transition-transform duration-300" id="modal-edit-log-content">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2" id="modal-log-title"><i data-lucide="clock" class="w-5 h-5 text-blue-600"></i> จัดการเวลา</h3>
+                    <button onclick="closeEditLogModal()" class="text-gray-400 hover:text-gray-700"><i data-lucide="x" class="w-5 h-5"></i></button>
+                </div>
+                <div class="space-y-3 mb-5">
+                    <input type="hidden" id="edit-log-id">
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-700 mb-1 ml-1">พนักงาน</label>
+                        <select id="edit-log-emp" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <!-- Options injected via JS -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-700 mb-1 ml-1">ประเภท</label>
+                        <select id="edit-log-type" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="in">เข้างาน</option>
+                            <option value="out">ออกงาน</option>
+                        </select>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="w-1/2">
+                            <label class="block text-[11px] font-bold text-gray-700 mb-1 ml-1">วันที่</label>
+                            <input type="date" id="edit-log-date" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm">
+                        </div>
+                        <div class="w-1/2">
+                            <label class="block text-[11px] font-bold text-gray-700 mb-1 ml-1">เวลา</label>
+                            <input type="time" id="edit-log-time" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm">
+                        </div>
+                    </div>
+                </div>
+                <button id="btn-save-log" onclick="saveEditLog()" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-200 active:scale-[0.98] transition-all flex items-center justify-center gap-2">บันทึกข้อมูล</button>
+            </div>
+        </div>
+
     </div>
 
     <!-- Firebase Script & App Logic -->
@@ -413,7 +479,7 @@
         let payrollWeekStart = new Date(currDate.setDate(diffDate));
         payrollWeekStart.setHours(0, 0, 0, 0);
 
-        const leaveTypes = { 'sick': 'ลาป่วย', 'personal': 'ลากิจ', 'vacation': 'ลาพักร้อน' };
+        const leaveTypes = { 'sick': 'ลาป่วย', 'personal': 'ลากิจ', 'vacation': 'ลาพักร้อน', 'swap': 'สลับวันหยุด / หยุดชดเชย' };
         const statusConfig = {
             'pending': { label: 'รออนุมัติ', bg: 'bg-orange-100', text: 'text-orange-700', icon: 'clock' },
             'approved': { label: 'อนุมัติแล้ว', bg: 'bg-green-100', text: 'text-green-700', icon: 'check-circle' },
@@ -466,7 +532,7 @@
                 document.getElementById('display-name').textContent = profile.name;
                 document.getElementById('display-emp-id').textContent = profile.empId;
                 window.showToast("เข้าสู่ระบบสำเร็จ", "success");
-                updateUserDashboardState(); renderUserLogs(); renderUserLeaves();
+                updateUserDashboardState(); renderUserLogs(); renderUserLeaves(); window.toggleLeaveType();
                 window.switchScreen('screen-dashboard');
                 inputEl.value = '';
             } catch(e) { window.showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error"); } 
@@ -545,6 +611,18 @@
             return Math.ceil(Math.abs(e - s) / (1000 * 60 * 60 * 24)) + 1;
         }
 
+        function populateEmpDropdown(selectedId = '') {
+            const select = document.getElementById('edit-log-emp');
+            select.innerHTML = '<option value="">-- เลือกพนักงาน --</option>';
+            allProfiles.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.empId;
+                opt.textContent = `${p.name} (${p.empId})`;
+                if (p.empId === selectedId) opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
+
         // --- Core Actions ---
         window.handleClockAction = async () => {
             if (!currentUser || !userProfile || currentStatus === 'unknown') return;
@@ -582,27 +660,91 @@
             } catch (error) { window.showToast("เกิดข้อผิดพลาดในการบันทึก", "error"); btnAction.innerHTML = originalHTML; btnAction.disabled = false; lucide.createIcons(); }
         };
 
+        window.toggleLeaveType = () => {
+            const type = document.getElementById('leave-type').value;
+            const containerNormal = document.getElementById('normal-date-container');
+            const containerSwap = document.getElementById('swap-date-container');
+
+            if (type === 'swap') {
+                containerNormal.classList.add('hidden');
+                containerSwap.classList.remove('hidden');
+                
+                const offDay = userProfile ? parseInt(userProfile.weeklyDayOff || 0) : 0;
+                document.getElementById('swap-default-day').textContent = `วัน${dayNames[offDay]}`;
+            } else {
+                containerNormal.classList.remove('hidden');
+                containerSwap.classList.add('hidden');
+            }
+        };
+
         window.submitLeave = async () => {
             if(!currentUser || !userProfile) return;
             const btnSubmit = document.getElementById('btn-submit-leave');
-            const type = document.getElementById('leave-type').value, startDate = document.getElementById('leave-start').value, endDate = document.getElementById('leave-end').value, reason = document.getElementById('leave-reason').value.trim();
-            if(!startDate || !endDate || !reason) { window.showToast("กรุณากรอกข้อมูลให้ครบ", "error"); return; }
-            if(new Date(endDate) < new Date(startDate)) { window.showToast("วันที่สิ้นสุดต้องไม่น้อยกว่าวันที่เริ่ม", "error"); return; }
+            const type = document.getElementById('leave-type').value;
+            const reason = document.getElementById('leave-reason').value.trim();
 
-            // เช็คโควตาก่อนส่ง
-            const usedLeaves = allLeaves.filter(l => l.empId === userProfile.empId && l.status === 'approved').reduce((sum, l) => sum + calculateLeaveDays(l.startDate, l.endDate), 0);
-            const reqDays = calculateLeaveDays(startDate, endDate);
-            const remain = Math.max(0, (userProfile.leaveQuota || 10) - usedLeaves);
-            
-            if (reqDays > remain) {
-                return window.showToast(`ไม่สามารถลาได้ (ขอลา ${reqDays} วัน, โควตาเหลือ ${remain} วัน)`, "error");
+            let startDate, endDate, replacementDate = null;
+
+            if (type === 'swap') {
+                startDate = document.getElementById('leave-start-swap').value;
+                endDate = startDate; // สลับวันต่อวัน
+
+                if(!startDate || !reason) { window.showToast("กรุณากรอกข้อมูลสลับวันหยุดให้ครบ", "error"); return; }
+                
+                const offDay = parseInt(userProfile.weeklyDayOff || 0);
+                const swapDateObj = new Date(startDate);
+                
+                if (swapDateObj.getDay() === offDay) {
+                    return window.showToast(`วันที่เลือกตรงกับวันหยุดประจำสัปดาห์อยู่แล้ว`, "error");
+                }
+                
+                // Auto-calculate the original day off within the same week
+                const currentDay = swapDateObj.getDay() === 0 ? 7 : swapDateObj.getDay();
+                const targetDay = offDay === 0 ? 7 : offDay;
+                const diff = targetDay - currentDay;
+                
+                const repDateObj = new Date(swapDateObj);
+                repDateObj.setDate(repDateObj.getDate() + diff);
+                
+                const year = repDateObj.getFullYear();
+                const month = String(repDateObj.getMonth() + 1).padStart(2, '0');
+                const day = String(repDateObj.getDate()).padStart(2, '0');
+                replacementDate = `${year}-${month}-${day}`;
+
+            } else {
+                startDate = document.getElementById('leave-start').value;
+                endDate = document.getElementById('leave-end').value;
+
+                if(!startDate || !endDate || !reason) { window.showToast("กรุณากรอกข้อมูลให้ครบ", "error"); return; }
+                if(new Date(endDate) < new Date(startDate)) { window.showToast("วันที่สิ้นสุดต้องไม่น้อยกว่าวันที่เริ่ม", "error"); return; }
+
+                const reqDays = calculateLeaveDays(startDate, endDate);
+
+                // เช็คโควตาก่อนส่ง เฉพาะกรณีที่ไม่ใช่การ "สลับวันหยุด/ชดเชย"
+                const usedLeaves = allLeaves.filter(l => l.empId === userProfile.empId && l.status === 'approved' && l.type !== 'swap').reduce((sum, l) => sum + calculateLeaveDays(l.startDate, l.endDate), 0);
+                const remain = Math.max(0, (userProfile.leaveQuota || 10) - usedLeaves);
+                
+                if (reqDays > remain) {
+                    return window.showToast(`ไม่สามารถลาได้ (ขอลา ${reqDays} วัน, โควตาเหลือ ${remain} วัน)`, "error");
+                }
             }
 
             btnSubmit.disabled = true; btnSubmit.innerHTML = 'กำลังบันทึก...';
             try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'leave_requests'), { empId: userProfile.empId, employeeName: userProfile.name, type, startDate, endDate, reason, status: 'pending', timestamp: Date.now() });
-                window.showToast("ยื่นคำขอลาสำเร็จ", "success");
-                document.getElementById('leave-start').value = ''; document.getElementById('leave-end').value = ''; document.getElementById('leave-reason').value = '';
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'leave_requests'), { 
+                    empId: userProfile.empId, employeeName: userProfile.name, 
+                    type, startDate, endDate, replacementDate, 
+                    reason, status: 'pending', timestamp: Date.now() 
+                });
+                window.showToast("ยื่นคำขอสำเร็จ", "success");
+                
+                // ล้างค่าฟอร์ม
+                document.getElementById('leave-start').value = ''; 
+                document.getElementById('leave-end').value = ''; 
+                document.getElementById('leave-start-swap').value = ''; 
+                document.getElementById('leave-reason').value = '';
+                document.getElementById('leave-type').value = 'sick'; 
+                window.toggleLeaveType();
                 window.switchScreen('screen-leaves');
             } catch(e) { window.showToast("เกิดข้อผิดพลาด", "error"); } finally { btnSubmit.disabled = false; btnSubmit.innerHTML = 'ยื่นคำขอ'; }
         };
@@ -732,6 +874,124 @@
             finally { btn.disabled = false; btn.innerHTML = 'บันทึกการแก้ไข'; }
         };
 
+        // --- Add/Edit Log System (Manual Time Entry) ---
+        window.openAddLogModal = () => {
+            document.getElementById('modal-log-title').innerHTML = '<i data-lucide="clock" class="w-5 h-5 text-blue-600"></i> เพิ่มเวลา (Manual)';
+            document.getElementById('edit-log-id').value = '';
+            document.getElementById('edit-log-type').value = 'in';
+            
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const mins = String(now.getMinutes()).padStart(2, '0');
+            
+            document.getElementById('edit-log-date').value = `${year}-${month}-${day}`;
+            document.getElementById('edit-log-time').value = `${hours}:${mins}`;
+
+            populateEmpDropdown();
+            
+            const m = document.getElementById('modal-edit-log'), c = document.getElementById('modal-edit-log-content');
+            m.classList.remove('hidden'); m.classList.add('flex');
+            requestAnimationFrame(() => { m.classList.remove('opacity-0'); c.classList.remove('scale-95'); });
+            lucide.createIcons();
+        };
+
+        window.openEditLogModal = (logId) => {
+            const log = allLogs.find(l => l.id === logId);
+            if(!log) return;
+
+            document.getElementById('modal-log-title').innerHTML = '<i data-lucide="edit" class="w-5 h-5 text-blue-600"></i> แก้ไขเวลา';
+            document.getElementById('edit-log-id').value = log.id;
+            document.getElementById('edit-log-type').value = log.type;
+            
+            const d = new Date(log.timestamp);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            const hours = String(d.getHours()).padStart(2, '0');
+            const mins = String(d.getMinutes()).padStart(2, '0');
+
+            document.getElementById('edit-log-date').value = `${year}-${month}-${day}`;
+            document.getElementById('edit-log-time').value = `${hours}:${mins}`;
+
+            populateEmpDropdown(log.empId);
+
+            const m = document.getElementById('modal-edit-log'), c = document.getElementById('modal-edit-log-content');
+            m.classList.remove('hidden'); m.classList.add('flex');
+            requestAnimationFrame(() => { m.classList.remove('opacity-0'); c.classList.remove('scale-95'); });
+            lucide.createIcons();
+        };
+
+        window.closeEditLogModal = () => {
+            const m = document.getElementById('modal-edit-log'), c = document.getElementById('modal-edit-log-content');
+            m.classList.add('opacity-0'); c.classList.add('scale-95');
+            setTimeout(() => { m.classList.remove('flex'); m.classList.add('hidden'); }, 300);
+        };
+
+        window.saveEditLog = async () => {
+            const empId = document.getElementById('edit-log-emp').value;
+            const type = document.getElementById('edit-log-type').value;
+            const dateStr = document.getElementById('edit-log-date').value;
+            const timeStr = document.getElementById('edit-log-time').value;
+            const logId = document.getElementById('edit-log-id').value;
+
+            if(!empId || !dateStr || !timeStr) return window.showToast("กรุณากรอกข้อมูลให้ครบ", "error");
+
+            const profile = allProfiles.find(p => p.empId === empId);
+            if(!profile) return window.showToast("ไม่พบข้อมูลพนักงาน", "error");
+
+            const btn = document.getElementById('btn-save-log');
+            btn.disabled = true; btn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> บันทึก...'; lucide.createIcons();
+
+            // Create timestamp
+            const logDate = new Date(`${dateStr}T${timeStr}`);
+            const timestamp = logDate.getTime();
+
+            let isLate = false;
+            let otHours = 0;
+            let otPay = 0;
+
+            const currentTotalMins = logDate.getHours() * 60 + logDate.getMinutes();
+
+            if (type === 'in' && profile.workStartTime) {
+                const [startH, startM] = profile.workStartTime.split(':').map(Number);
+                if (currentTotalMins > (startH * 60 + startM)) isLate = true;
+            } else if (type === 'out' && profile.workEndTime) {
+                const [endH, endM] = profile.workEndTime.split(':').map(Number);
+                const endTotalMins = endH * 60 + endM;
+                if (currentTotalMins > endTotalMins) {
+                    otHours = Math.round(((currentTotalMins - endTotalMins) / 60) * 10) / 10;
+                    otPay = Math.round(otHours * (profile.otRate || 0));
+                }
+            }
+
+            const logData = {
+                empId: profile.empId,
+                employeeName: profile.name,
+                type,
+                isLate,
+                otHours,
+                otPay,
+                timestamp
+            };
+
+            try {
+                if (logId) {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'time_logs', logId), logData);
+                } else {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'time_logs'), logData);
+                }
+                window.showToast("บันทึกเวลาสำเร็จ", "success");
+                window.closeEditLogModal();
+            } catch(e) { 
+                window.showToast("เกิดข้อผิดพลาดในการบันทึก", "error"); 
+            } finally { 
+                btn.disabled = false; btn.innerHTML = 'บันทึกข้อมูล'; 
+            }
+        };
+
         // --- Export CSV ---
         window.exportLogsToCSV = () => {
             if (allLogs.length === 0) return window.showToast("ไม่มีข้อมูลให้ส่งออก", "error");
@@ -805,15 +1065,15 @@
             const container = document.getElementById('user-leaves-container');
             const userLeaves = allLeaves.filter(l => l.empId === userProfile.empId);
             
-            // สรุปโควตา
-            const usedLeaves = userLeaves.filter(l => l.status === 'approved').reduce((sum, l) => sum + calculateLeaveDays(l.startDate, l.endDate), 0);
+            // สรุปโควตา โดยไม่นับประเภท 'swap'
+            const usedLeaves = userLeaves.filter(l => l.status === 'approved' && l.type !== 'swap').reduce((sum, l) => sum + calculateLeaveDays(l.startDate, l.endDate), 0);
             const quota = userProfile.leaveQuota || 10;
             const remain = Math.max(0, quota - usedLeaves);
 
             let html = `
                 <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 flex justify-between items-center mb-2">
                     <div>
-                        <p class="text-xs text-blue-600 font-medium">โควตาวันลาต่อปี</p>
+                        <p class="text-xs text-blue-600 font-medium">โควตาวันลาต่อปี (ไม่นับชดเชย)</p>
                         <p class="text-[10px] text-blue-500 mt-1">ใช้ไปแล้ว ${usedLeaves} วัน</p>
                     </div>
                     <div class="text-right">
@@ -823,13 +1083,25 @@
             `;
 
             if(userLeaves.length === 0) { 
-                container.innerHTML = html + `<div class="flex flex-col items-center justify-center h-[40vh] text-gray-400"><div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4"><i data-lucide="file-text" class="w-8 h-8 text-gray-300"></i></div><p>ยังไม่มีประวัติการลางาน</p></div>`; 
+                container.innerHTML = html + `<div class="flex flex-col items-center justify-center h-[40vh] text-gray-400"><div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4"><i data-lucide="file-text" class="w-8 h-8 text-gray-300"></i></div><p>ยังไม่มีประวัติการทำรายการ</p></div>`; 
                 lucide.createIcons(); return; 
             }
             
             userLeaves.forEach(leave => {
                 const conf = statusConfig[leave.status];
-                html += `<div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 relative"><div class="flex justify-between items-start mb-2"><div><h3 class="font-bold text-gray-900">${leaveTypes[leave.type]}</h3><p class="text-xs text-gray-500">${new Date(leave.startDate).toLocaleDateString('th-TH', { day:'numeric', month:'short' })} - ${new Date(leave.endDate).toLocaleDateString('th-TH', { day:'numeric', month:'short' })}</p></div><span class="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-md ${conf.bg} ${conf.text}"><i data-lucide="${conf.icon}" class="w-3 h-3"></i> ${conf.label}</span></div><p class="text-sm text-gray-600 bg-gray-50 p-2 rounded-lg mt-2">${leave.reason}</p></div>`;
+                let dateDisplay = '';
+                let swapInfo = '';
+                if (leave.type === 'swap') {
+                    dateDisplay = `สลับไปหยุด: ${new Date(leave.startDate).toLocaleDateString('th-TH', { day:'numeric', month:'short' })}`;
+                    if (leave.replacementDate) {
+                        const repStr = new Date(leave.replacementDate).toLocaleDateString('th-TH', { day:'numeric', month:'short' });
+                        swapInfo = `<div class="bg-blue-50 text-blue-700 text-[10px] font-bold px-2 py-1 rounded mt-1.5 flex items-center gap-1 w-max"><i data-lucide="arrow-right-left" class="w-3 h-3"></i> วันหยุดเดิม: ${repStr}</div>`;
+                    }
+                } else {
+                    dateDisplay = `${new Date(leave.startDate).toLocaleDateString('th-TH', { day:'numeric', month:'short' })} - ${new Date(leave.endDate).toLocaleDateString('th-TH', { day:'numeric', month:'short' })}`;
+                }
+
+                html += `<div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 relative"><div class="flex justify-between items-start mb-2"><div><h3 class="font-bold text-gray-900">${leaveTypes[leave.type]}</h3><p class="text-xs text-gray-500">${dateDisplay}</p>${swapInfo}</div><span class="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-md ${conf.bg} ${conf.text}"><i data-lucide="${conf.icon}" class="w-3 h-3"></i> ${conf.label}</span></div><p class="text-sm text-gray-600 bg-gray-50 p-2 rounded-lg mt-2">${leave.reason}</p></div>`;
             });
             container.innerHTML = html; lucide.createIcons();
         }
@@ -860,26 +1132,49 @@
 
         function renderAdminLogs() {
             const container = document.getElementById('admin-content-logs');
-            if (allLogs.length === 0) { container.innerHTML = `<p class="text-center text-gray-400 py-10 text-sm">ยังไม่มีข้อมูล</p>`; return; }
-            let html = '';
+            let html = `
+                <div class="mb-4">
+                    <button onclick="openAddLogModal()" class="w-full bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 text-sm font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm">
+                        <i data-lucide="plus-circle" class="w-5 h-5"></i> เพิ่มรายการเวลา (Manual Entry)
+                    </button>
+                </div>
+            `;
+            if (allLogs.length === 0) { 
+                container.innerHTML = html + `<p class="text-center text-gray-400 py-10 text-sm">ยังไม่มีข้อมูล</p>`; 
+                lucide.createIcons();
+                return; 
+            }
+            
             allLogs.slice(0, 50).forEach(log => {
                 const isOpIn = log.type === 'in';
                 const dStr = new Date(log.timestamp).toLocaleDateString('th-TH', {day:'numeric', month:'short'}) + ' ' + new Date(log.timestamp).toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'});
                 const lateBadge = log.isLate ? '<span class="ml-1 text-[10px] bg-red-100 text-red-600 px-1 rounded font-bold">สาย</span>' : '';
                 const otBadge = (log.otHours > 0) ? `<span class="ml-1 text-[10px] bg-purple-100 text-purple-600 px-1 rounded font-bold">OT ${log.otHours}h</span>` : '';
-                html += `<div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center"><div class="flex items-center gap-3"><div class="w-2 h-10 rounded-full ${isOpIn ? 'bg-green-400' : 'bg-orange-400'}"></div><div><h4 class="font-bold text-sm text-gray-900">${log.employeeName || '?'} <span class="text-gray-400 font-normal">(${log.empId})</span></h4><p class="text-xs text-gray-500"><span class="${isOpIn ? 'text-green-600' : 'text-orange-500'} font-medium">${isOpIn ? 'เข้า' : 'ออก'}</span>${lateBadge}${otBadge} • ${dStr}</p></div></div><button onclick="deleteLog('${log.id}')" class="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-100"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`;
+                html += `<div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center"><div class="flex items-center gap-3"><div class="w-2 h-10 rounded-full ${isOpIn ? 'bg-green-400' : 'bg-orange-400'}"></div><div><h4 class="font-bold text-sm text-gray-900">${log.employeeName || '?'} <span class="text-gray-400 font-normal">(${log.empId})</span></h4><p class="text-xs text-gray-500"><span class="${isOpIn ? 'text-green-600' : 'text-orange-500'} font-medium">${isOpIn ? 'เข้า' : 'ออก'}</span>${lateBadge}${otBadge} • ${dStr}</p></div></div><div class="flex gap-1"><button onclick="openEditLogModal('${log.id}')" class="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-100"><i data-lucide="edit-3" class="w-4 h-4"></i></button><button onclick="deleteLog('${log.id}')" class="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-100"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></div>`;
             });
             container.innerHTML = html; lucide.createIcons();
         }
 
         function renderAdminLeaves() {
             const container = document.getElementById('admin-content-leaves');
-            if (allLeaves.length === 0) { container.innerHTML = `<p class="text-center text-gray-400 py-10 text-sm">ยังไม่มีคำขอลางาน</p>`; return; }
+            if (allLeaves.length === 0) { container.innerHTML = `<p class="text-center text-gray-400 py-10 text-sm">ยังไม่มีคำขอลางาน/สลับวันหยุด</p>`; return; }
             let html = '';
             allLeaves.forEach(leave => {
                 const conf = statusConfig[leave.status];
+                let dateDisplay = '';
+                let swapInfo = '';
+                if (leave.type === 'swap') {
+                    dateDisplay = `สลับไปหยุด: ${new Date(leave.startDate).toLocaleDateString('th-TH', { day:'numeric', month:'short' })}`;
+                    if (leave.replacementDate) {
+                        const repStr = new Date(leave.replacementDate).toLocaleDateString('th-TH', { day:'numeric', month:'short' });
+                        swapInfo = `<div class="bg-blue-50 text-blue-700 text-[10px] font-bold px-2 py-1 rounded mt-1.5 flex items-center gap-1 w-max"><i data-lucide="arrow-right-left" class="w-3 h-3"></i> วันหยุดเดิม: ${repStr}</div>`;
+                    }
+                } else {
+                    dateDisplay = `${new Date(leave.startDate).toLocaleDateString('th-TH', { day:'numeric', month:'short' })} - ${new Date(leave.endDate).toLocaleDateString('th-TH', { day:'numeric', month:'short' })}`;
+                }
+
                 let actions = leave.status === 'pending' ? `<div class="flex gap-2 mt-3 pt-3 border-t border-gray-100"><button onclick="updateLeaveStatus('${leave.id}', 'rejected')" class="flex-1 py-1.5 bg-red-50 text-red-600 text-xs font-bold rounded-lg hover:bg-red-100">ไม่อนุมัติ</button><button onclick="updateLeaveStatus('${leave.id}', 'approved')" class="flex-1 py-1.5 bg-green-50 text-green-600 text-xs font-bold rounded-lg hover:bg-green-100">อนุมัติ</button></div>` : '';
-                html += `<div class="bg-white p-4 rounded-xl shadow-sm border ${leave.status === 'pending' ? 'border-orange-300' : 'border-gray-100'} relative"><div class="flex justify-between items-start mb-2"><div><h4 class="font-bold text-sm text-gray-900">${leave.employeeName} <span class="text-gray-400 font-normal">(${leave.empId})</span></h4><p class="text-xs font-medium text-blue-600">${leaveTypes[leave.type]} <span class="text-gray-400 font-normal">(${new Date(leave.startDate).toLocaleDateString('th-TH', { day:'numeric', month:'short' })} - ${new Date(leave.endDate).toLocaleDateString('th-TH', { day:'numeric', month:'short' })})</span></p></div><span class="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-md ${conf.bg} ${conf.text}"><i data-lucide="${conf.icon}" class="w-3 h-3"></i> ${conf.label}</span></div><p class="text-xs text-gray-600 bg-gray-50 p-2 rounded">${leave.reason}</p>${actions}</div>`;
+                html += `<div class="bg-white p-4 rounded-xl shadow-sm border ${leave.status === 'pending' ? 'border-orange-300' : 'border-gray-100'} relative"><div class="flex justify-between items-start mb-2"><div><h4 class="font-bold text-sm text-gray-900">${leave.employeeName} <span class="text-gray-400 font-normal">(${leave.empId})</span></h4><p class="text-xs font-medium text-blue-600">${leaveTypes[leave.type]}</p><p class="text-xs text-gray-500">${dateDisplay}</p>${swapInfo}</div><span class="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-md ${conf.bg} ${conf.text}"><i data-lucide="${conf.icon}" class="w-3 h-3"></i> ${conf.label}</span></div><p class="text-xs text-gray-600 bg-gray-50 p-2 rounded">${leave.reason}</p>${actions}</div>`;
             });
             container.innerHTML = html; lucide.createIcons();
         }
@@ -927,7 +1222,7 @@
 
             const container = document.getElementById('payroll-list');
             if (allProfiles.length === 0) { container.innerHTML = `<p class="text-center text-gray-400 py-10 text-sm">ไม่มีข้อมูลพนักงาน</p>`; return; }
-            
+
             let html = ''; let totalCompanyPay = 0;
             allProfiles.forEach(profile => {
                 const empLogsIn = allLogs.filter(l => l.empId === profile.empId && l.type === 'in' && l.timestamp >= payrollWeekStart.getTime() && l.timestamp <= weekEnd.getTime());
@@ -936,9 +1231,10 @@
                 let workedDaysCount = 0;
                 let holidayCount = 0;
                 let weeklyOffCount = 0;
+                let leaveCount = 0;
                 let paidDaysCount = 0;
 
-                // คำนวณรายวันในรอบ 7 วัน เพื่อเช็คว่าวันไหนมาทำงาน, วันหยุดบริษัท หรือ วันหยุดสัปดาห์
+                // คำนวณรายวันในรอบ 7 วัน เพื่อเช็คว่าวันไหนมาทำงาน, วันหยุดบริษัท, วันหยุดสัปดาห์ หรือลาที่อนุมัติแล้ว
                 for (let d = 0; d < 7; d++) {
                     let loopDate = new Date(payrollWeekStart);
                     loopDate.setDate(loopDate.getDate() + d);
@@ -948,6 +1244,11 @@
                     let isWorked = empLogsIn.some(l => new Date(l.timestamp).setHours(0,0,0,0) === loopTime);
                     let isHoliday = allHolidays.some(h => new Date(h.date).setHours(0,0,0,0) === loopTime);
                     let isWeeklyOff = loopDate.getDay() === parseInt(profile.weeklyDayOff || 0);
+                    let leaveRecord = allLeaves.find(l => l.empId === profile.empId && l.status === 'approved' && loopTime >= new Date(l.startDate).setHours(0,0,0,0) && loopTime <= new Date(l.endDate).setHours(0,0,0,0));
+
+                    // ยกเลิกวันหยุดประจำสัปดาห์เดิม หากมีใบคำร้องสลับวันหยุดบอกว่าจะ "มาทำแทน" ในวันนี้
+                    const swappedToWork = allLeaves.some(l => l.empId === profile.empId && l.status === 'approved' && l.type === 'swap' && new Date(l.replacementDate).setHours(0,0,0,0) === loopTime);
+                    if (swappedToWork) isWeeklyOff = false;
 
                     // หากมาทำงาน ได้ค่าแรง (นับรวม)
                     if (isWorked) {
@@ -964,6 +1265,11 @@
                         weeklyOffCount++;
                         paidDaysCount++;
                     }
+                    // หากไม่ได้มาทำ แต่เป็นวันลาที่อนุมัติแล้ว หรือ สลับวันหยุดไปพัก (ได้ค่าแรง)
+                    else if (leaveRecord) {
+                        leaveCount++;
+                        paidDaysCount++;
+                    }
                 }
 
                 const dailyRate = profile.dailyRate || 0;
@@ -975,8 +1281,9 @@
                 totalCompanyPay += totalPay;
 
                 let dayText = `ทำงาน ${workedDaysCount} วัน`;
-                if(weeklyOffCount > 0) dayText += ` + หยุด ${weeklyOffCount} วัน`;
+                if(weeklyOffCount > 0) dayText += ` + หยุดปกติ ${weeklyOffCount} วัน`;
                 if(holidayCount > 0) dayText += ` + นักขัต ${holidayCount} วัน`;
+                if(leaveCount > 0) dayText += ` + ลา/ชดเชย ${leaveCount} วัน`;
 
                 html += `<div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden"><div class="flex justify-between items-center mb-1"><h4 class="font-bold text-sm text-gray-900">${profile.name} <span class="text-xs text-gray-400 font-normal">(${profile.empId})</span></h4><span class="font-bold text-green-600">฿${totalPay.toLocaleString()}</span></div><div class="flex justify-between items-center text-[10px] text-gray-500 mb-2"><p>ค่าแรง: ฿${dailyRate}/วัน • OT: ฿${profile.otRate || 0}/ชม.</p></div><div class="flex flex-wrap gap-2"><span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-bold text-[10px]">${dayText} (฿${totalRegularPay.toLocaleString()})</span>${totalOtHours > 0 ? `<span class="bg-purple-50 text-purple-600 px-2 py-0.5 rounded font-bold text-[10px]">OT ${totalOtHours.toFixed(1)} ชม. (฿${totalOtPay.toLocaleString()})</span>` : ''}</div></div>`;
             });
@@ -995,8 +1302,8 @@
             const totalLate = monthLogs.filter(l => l.type === 'in' && l.isLate).length;
             const totalOT = monthLogs.reduce((sum, l) => sum + (l.otHours || 0), 0);
             
-            // ใช้ calculateLeaveDays เพื่อรวมจำนวนวันลาจริงๆ ในเดือนนี้
-            const totalLeaveDays = monthLeaves.reduce((sum, l) => sum + calculateLeaveDays(l.startDate, l.endDate), 0);
+            // สรุปวันลาในสถิติ จะไม่นับรวม "สลับวันหยุด"
+            const totalLeaveDays = monthLeaves.filter(l => l.type !== 'swap').reduce((sum, l) => sum + calculateLeaveDays(l.startDate, l.endDate), 0);
 
             let html = `
                 <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 mb-2">
@@ -1014,7 +1321,7 @@
                             <h4 class="text-3xl font-black text-purple-700">${totalOT.toFixed(1)}</h4>
                         </div>
                         <div class="bg-orange-50 p-4 rounded-xl border border-orange-100 flex flex-col justify-center items-center text-center">
-                            <p class="text-[11px] text-orange-500 font-bold mb-1">วันลางาน (วัน)</p>
+                            <p class="text-[11px] text-orange-500 font-bold mb-1">ลางาน/ใช้โควตา (วัน)</p>
                             <h4 class="text-3xl font-black text-orange-700">${totalLeaveDays}</h4>
                         </div>
                         <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 flex flex-col justify-center items-center text-center">
