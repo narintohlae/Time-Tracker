@@ -167,16 +167,30 @@
                 <!-- Section: ขอลางาน -->
                 <div id="section-emp-leave" class="hide space-y-6">
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-                        <h3 class="font-bold text-gray-800 mb-4 text-lg">แบบฟอร์มขอลางาน</h3>
+                        <h3 class="font-bold text-gray-800 mb-2 text-lg">แบบฟอร์มขอลางาน</h3>
+                        
+                        <!-- โควตาคงเหลือ -->
+                        <div class="grid grid-cols-3 gap-2 mb-4 text-center">
+                            <div class="bg-indigo-50 p-2 rounded-lg border border-indigo-100"><p class="text-[10px] text-gray-500 font-bold">ลาป่วยเหลือ</p><p class="font-bold text-indigo-600 text-sm" id="quota-sick">-</p></div>
+                            <div class="bg-indigo-50 p-2 rounded-lg border border-indigo-100"><p class="text-[10px] text-gray-500 font-bold">ลากิจเหลือ</p><p class="font-bold text-indigo-600 text-sm" id="quota-personal">-</p></div>
+                            <div class="bg-indigo-50 p-2 rounded-lg border border-indigo-100"><p class="text-[10px] text-gray-500 font-bold">พักร้อนเหลือ</p><p class="font-bold text-indigo-600 text-sm" id="quota-vacation">-</p></div>
+                        </div>
+
                         <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทการลา</label>
-                                <select id="leave-type" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                                    <option value="ลาป่วย">ลาป่วย</option>
-                                    <option value="ลากิจ">ลากิจ</option>
-                                    <option value="ลาพักร้อน">ลาพักร้อน</option>
-                                    <option value="อื่นๆ">อื่นๆ</option>
-                                </select>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทการลา</label>
+                                    <select id="leave-type" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                                        <option value="ลาป่วย">ลาป่วย</option>
+                                        <option value="ลากิจ">ลากิจ</option>
+                                        <option value="ลาพักร้อน">ลาพักร้อน</option>
+                                        <option value="อื่นๆ">อื่นๆ</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">จำนวนวัน (ใส่ 0.5 ได้)</label>
+                                    <input type="number" id="leave-days" step="0.5" min="0.5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="เช่น 1 หรือ 1.5">
+                                </div>
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
@@ -297,7 +311,7 @@
                                         <th class="p-4">พนักงาน</th>
                                         <th class="p-4">ประเภท/หมายเหตุ</th>
                                         <th class="p-4">รูปถ่าย</th>
-                                        <th class="p-4">พิกัด GPS</th>
+                                        <th class="p-4">สาขา/พิกัด GPS</th>
                                         <th class="p-4 text-center">จัดการ</th>
                                     </tr>
                                 </thead>
@@ -372,16 +386,14 @@
                 <!-- Section: ตั้งค่าระบบ (Settings) -->
                 <div id="section-admin-settings" class="hide space-y-6">
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fa-solid fa-map-location-dot text-blue-500 mr-2"></i>ตั้งค่าพิกัดออฟฟิศ (Geofencing)</h3>
-                        <p class="text-sm text-gray-500 mb-4">พนักงานจะสามารถกดเข้า-ออกงานได้ก็ต่อเมื่ออยู่ในรัศมีที่กำหนดเท่านั้น (ปล่อยว่างถ้าไม่ต้องการจำกัดพื้นที่)</p>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div><label class="block text-sm font-medium text-gray-700 mb-1">ละติจูด (Latitude)</label><input type="number" id="setting-lat" step="any" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></div>
-                            <div><label class="block text-sm font-medium text-gray-700 mb-1">ลองจิจูด (Longitude)</label><input type="number" id="setting-lng" step="any" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-gray-800"><i class="fa-solid fa-map-location-dot text-blue-500 mr-2"></i>ตั้งค่าสาขา (Multi-Branch)</h3>
+                            <button id="btn-add-branch" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1.5 rounded-lg text-sm font-medium transition shadow-sm"><i class="fa-solid fa-plus"></i> เพิ่มสาขา</button>
                         </div>
-                        <div class="flex gap-2 mb-6">
-                            <div class="flex-1"><label class="block text-sm font-medium text-gray-700 mb-1">รัศมีที่อนุญาต (เมตร)</label><input type="number" id="setting-radius" value="100" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></div>
-                            <div class="flex items-end"><button id="btn-get-current-location" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-3 rounded-lg font-medium transition shadow-sm h-[46px]"><i class="fa-solid fa-location-crosshairs mr-1"></i> ดึงพิกัดปัจจุบัน</button></div>
+                        <p class="text-sm text-gray-500 mb-4">พนักงานจะสามารถกดเข้างานได้ เมื่ออยู่ในรัศมีของสาขาใดสาขาหนึ่งด้านล่างนี้ (หากลบออกหมด พนักงานจะกดได้ทุกที่)</p>
+                        
+                        <div id="branches-list" class="space-y-4 mb-6">
+                            <!-- รายการสาขาจะถูกสร้างที่นี่ -->
                         </div>
 
                         <hr class="my-6 border-gray-100">
@@ -398,8 +410,8 @@
                             </div>
                         </div>
 
-                        <button id="btn-save-settings" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold shadow transition flex items-center justify-center">
-                            <i class="fa-solid fa-save mr-2"></i> บันทึกการตั้งค่า
+                        <button id="btn-save-settings" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold shadow transition flex items-center justify-center w-full md:w-auto">
+                            <i class="fa-solid fa-save mr-2"></i> บันทึกการตั้งค่าทั้งหมด
                         </button>
                     </div>
                 </div>
@@ -432,15 +444,16 @@
         let currentEmployee = null; 
         let currentLat = null;
         let currentLng = null;
+        let currentBranchName = null; // เก็บชื่อสาขาที่พนักงานอยู่ใกล้ที่สุด
         let capturedPhotoData = null;
         let stream = null;
         
-        let systemSettings = { officeLat: null, officeLng: null, radius: 100, workHours: 8, coreTime: "09:00" };
+        let systemSettings = { branches: [], workHours: 8, coreTime: "09:00" };
         let allLogsRaw = []; 
         let allLogsForExport = [];
         let allEmployeesList = []; 
         
-        let listeners = { empTimelogs: null, empLeaves: null, adminTimelogs: null, adminLeaves: null, adminEmployees: null };
+        let listeners = { empSelf: null, empTimelogs: null, empLeaves: null, adminTimelogs: null, adminLeaves: null, adminEmployees: null };
 
         const views = { login: document.getElementById('view-login'), employee: document.getElementById('view-employee'), admin: document.getElementById('view-admin') };
         const navUserInfo = document.getElementById('user-info');
@@ -469,7 +482,13 @@
         async function loadSystemSettings() {
             try {
                 const docSnap = await getDoc(doc(db, "settings", "general"));
-                if (docSnap.exists()) systemSettings = { ...systemSettings, ...docSnap.data() };
+                if (docSnap.exists()) {
+                    systemSettings = { ...systemSettings, ...docSnap.data() };
+                    // Convert old single location to branches array for backward compatibility
+                    if (docSnap.data().officeLat && (!systemSettings.branches || systemSettings.branches.length === 0)) {
+                        systemSettings.branches = [{ id: Date.now(), name: 'สำนักงานใหญ่', lat: docSnap.data().officeLat, lng: docSnap.data().officeLng, radius: docSnap.data().radius || 100 }];
+                    }
+                }
             } catch (e) { console.error("Could not load settings", e); }
         }
         
@@ -552,19 +571,36 @@
             .then((result) => { if (result.isConfirmed) { sessionStorage.removeItem('currentEmployeeData'); currentEmployee = null; signOut(auth); showView('login'); } });
         });
 
-        // Employee
+        // Employee Multi-Branch Location
         function initLocation() {
             const statusEl = document.getElementById('gps-status');
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         currentLat = position.coords.latitude; currentLng = position.coords.longitude;
-                        let isInside = true; let distText = '';
+                        let isInside = false; let distText = '';
+                        currentBranchName = null;
                         
-                        if (systemSettings.officeLat && systemSettings.officeLng) {
-                            const dist = getDistanceFromLatLonInM(currentLat, currentLng, systemSettings.officeLat, systemSettings.officeLng);
-                            if (dist > systemSettings.radius) { isInside = false; distText = ` (เกินรัศมี: ห่าง ${Math.round(dist)} ม.)`; } 
-                            else distText = ` (ห่าง ${Math.round(dist)} ม.)`;
+                        if (systemSettings.branches && systemSettings.branches.length > 0) {
+                            let closestBranch = null;
+                            let minDist = Infinity;
+                            
+                            systemSettings.branches.forEach(b => {
+                                const dist = getDistanceFromLatLonInM(currentLat, currentLng, b.lat, b.lng);
+                                if (dist < minDist) { minDist = dist; closestBranch = b; }
+                            });
+
+                            if (closestBranch) {
+                                if (minDist <= closestBranch.radius) {
+                                    isInside = true; currentBranchName = closestBranch.name;
+                                    distText = ` (สาขา: ${closestBranch.name})`;
+                                } else {
+                                    distText = ` (นอกพื้นที่: ห่างสาขา ${closestBranch.name} ${Math.round(minDist)} ม.)`;
+                                }
+                            }
+                        } else {
+                            // ถ้าไม่ได้ตั้งค่าสาขา ให้กดได้ทุกที่
+                            isInside = true; distText = ' (ไม่ได้ตั้งค่าจำกัดพื้นที่)';
                         }
 
                         if (isInside) {
@@ -572,7 +608,7 @@
                             statusEl.innerHTML = `<i class="fa-solid fa-check-circle mr-1"></i>พิกัดถูกต้อง${distText}`;
                         } else {
                             statusEl.className = "text-xs bg-rose-100 text-rose-700 px-2 py-1 rounded-full";
-                            statusEl.innerHTML = `<i class="fa-solid fa-xmark-circle mr-1"></i>อยู่นอกพื้นที่ทำงาน${distText}`;
+                            statusEl.innerHTML = `<i class="fa-solid fa-xmark-circle mr-1"></i>${distText}`;
                             currentLat = null; 
                         }
                         checkReadyState();
@@ -633,6 +669,7 @@
                     type: type,
                     timestamp: serverTimestamp(),
                     lat: currentLat, lng: currentLng,
+                    branchName: currentBranchName, // บันทึกชื่อสาขา
                     photoBase64: capturedPhotoData,
                     remark: remark,
                     isManual: false 
@@ -646,12 +683,22 @@
         document.getElementById('btn-checkout').addEventListener('click', () => saveTimeLog('out'));
 
         function loadEmployeeData() {
+            // โหลดข้อมูลตัวเองแบบ Realtime เพื่ออัปเดตโควตาวันลา
+            listeners.empSelf = onSnapshot(doc(db, "employees", currentEmployee.id), (docSnap) => {
+                if (docSnap.exists()) {
+                    currentEmployee = { id: docSnap.id, ...docSnap.data() };
+                    const qts = currentEmployee.quotas || { 'ลาป่วย': 30, 'ลากิจ': 6, 'ลาพักร้อน': 6 };
+                    document.getElementById('quota-sick').textContent = qts['ลาป่วย'];
+                    document.getElementById('quota-personal').textContent = qts['ลากิจ'];
+                    document.getElementById('quota-vacation').textContent = qts['ลาพักร้อน'];
+                }
+            });
+
             const qLogs = query(collection(db, "timelogs"), where("userId", "==", currentEmployee.id));
             listeners.empTimelogs = onSnapshot(qLogs, (snapshot) => {
                 const logs = []; snapshot.forEach(doc => logs.push({ id: doc.id, ...doc.data() }));
                 logs.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
                 
-                // คำนวณแดชบอร์ดส่วนตัวของเดือนปัจจุบัน
                 const now = new Date();
                 const currYear = now.getFullYear();
                 const currMonth = now.getMonth();
@@ -659,8 +706,7 @@
 
                 const monthlyLogs = logs.filter(l => {
                     if(!l.timestamp) return false;
-                    const d = l.timestamp.toDate();
-                    return d.getFullYear() === currYear && d.getMonth() === currMonth;
+                    const d = l.timestamp.toDate(); return d.getFullYear() === currYear && d.getMonth() === currMonth;
                 });
 
                 const dailyData = {};
@@ -675,17 +721,13 @@
                 let totalDays = 0, lateDays = 0, totalOT = 0;
                 const stdHrs = Number(systemSettings.workHours) || 8;
                 let coreDateCheck = null;
-                if(systemSettings.coreTime) {
-                    const [cH, cM] = systemSettings.coreTime.split(':');
-                    coreDateCheck = { h: cH, m: cM };
-                }
+                if(systemSettings.coreTime) { const [cH, cM] = systemSettings.coreTime.split(':'); coreDateCheck = { h: cH, m: cM }; }
 
                 Object.values(dailyData).forEach(day => {
                     if (day.in) {
                         totalDays++;
                         if (coreDateCheck) {
-                            const coreDate = new Date(day.in);
-                            coreDate.setHours(coreDateCheck.h, coreDateCheck.m, 0, 0);
+                            const coreDate = new Date(day.in); coreDate.setHours(coreDateCheck.h, coreDateCheck.m, 0, 0);
                             if (day.in > coreDate) lateDays++;
                         }
                         if (day.out) {
@@ -699,7 +741,6 @@
                 document.getElementById('emp-stat-late').innerHTML = `${lateDays}<span class="text-xs font-normal text-gray-500"> วัน</span>`;
                 document.getElementById('emp-stat-ot').innerHTML = `${totalOT.toFixed(1)}<span class="text-xs font-normal text-gray-500"> ชม.</span>`;
 
-                // แสดงรายการประวัติล่าสุด
                 const container = document.getElementById('emp-personal-history');
                 if (logs.length === 0) container.innerHTML = '<div class="text-center text-sm text-gray-400 py-4">ยังไม่มีประวัติการบันทึกเวลา</div>';
                 else {
@@ -709,6 +750,7 @@
                         const isCheckIn = log.type === 'in';
                         const remarkStr = log.remark ? `<p class="text-xs text-blue-500 mt-1"><i class="fa-regular fa-comment-dots"></i> ${log.remark}</p>` : '';
                         const manualBadge = log.isManual ? `<span class="text-[10px] bg-gray-200 text-gray-600 px-1 rounded ml-2">แอดมินเพิ่ม</span>` : '';
+                        const branchBadge = log.branchName ? `<span class="text-[10px] bg-indigo-100 text-indigo-600 px-1 rounded ml-1">${log.branchName}</span>` : '';
                         
                         html += `
                             <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
@@ -717,7 +759,7 @@
                                         <i class="fa-solid ${isCheckIn ? 'fa-arrow-right-to-bracket' : 'fa-arrow-right-from-bracket'}"></i>
                                     </div>
                                     <div>
-                                        <p class="font-bold text-sm text-gray-700">${isCheckIn ? 'เข้างาน' : 'ออกงาน'} ${manualBadge}</p>
+                                        <p class="font-bold text-sm text-gray-700">${isCheckIn ? 'เข้างาน' : 'ออกงาน'} ${manualBadge} ${branchBadge}</p>
                                         <p class="text-xs text-gray-500">${timeStr}</p>
                                         ${remarkStr}
                                     </div>
@@ -745,7 +787,7 @@
                         const formatDate = (dateStr) => { if(!dateStr) return ''; const p = dateStr.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; };
                         html += `
                             <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 flex justify-between items-start">
-                                <div><p class="font-bold text-sm text-gray-700">${req.type}</p><p class="text-xs text-gray-500">${formatDate(req.startDate)} - ${formatDate(req.endDate)}</p><p class="text-xs text-gray-400 mt-1">เหตุผล: ${req.reason}</p></div>
+                                <div><p class="font-bold text-sm text-gray-700">${req.type} <span class="text-xs font-normal text-gray-500">(${req.days} วัน)</span></p><p class="text-xs text-gray-500">${formatDate(req.startDate)} - ${formatDate(req.endDate)}</p><p class="text-xs text-gray-400 mt-1">เหตุผล: ${req.reason}</p></div>
                                 <div>${statusHtml}</div>
                             </div>
                         `;
@@ -757,13 +799,20 @@
 
         document.getElementById('btn-submit-leave').addEventListener('click', async () => {
             const type = document.getElementById('leave-type').value, startDate = document.getElementById('leave-start').value, endDate = document.getElementById('leave-end').value, reason = document.getElementById('leave-reason').value.trim();
-            if (!startDate || !endDate || !reason) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณาระบุวันที่และเหตุผลการลา', 'warning');
+            const days = parseFloat(document.getElementById('leave-days').value) || 0;
+            if (!startDate || !endDate || !reason || days <= 0) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณาระบุวันที่ จำนวนวัน และเหตุผล', 'warning');
+
+            // ตรวจสอบโควตาก่อนส่ง
+            const currentQuotas = currentEmployee.quotas || { 'ลาป่วย': 30, 'ลากิจ': 6, 'ลาพักร้อน': 6, 'อื่นๆ': 0 };
+            if (currentQuotas[type] !== undefined && days > currentQuotas[type]) {
+                return Swal.fire('โควตาไม่พอ', `คุณมีสิทธิ์ ${type} เหลือเพียง ${currentQuotas[type]} วัน`, 'error');
+            }
 
             Swal.fire({ title: 'กำลังส่งคำขอ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             try {
-                await addDoc(collection(db, "leave_requests"), { userId: currentEmployee.id, name: currentEmployee.name, type: type, startDate: startDate, endDate: endDate, reason: reason, status: 'pending', timestamp: serverTimestamp() });
+                await addDoc(collection(db, "leave_requests"), { userId: currentEmployee.id, name: currentEmployee.name, type: type, days: days, startDate: startDate, endDate: endDate, reason: reason, status: 'pending', timestamp: serverTimestamp() });
                 Swal.fire('สำเร็จ', 'ส่งคำขอลางานเรียบร้อยแล้ว', 'success');
-                document.getElementById('leave-start').value = ''; document.getElementById('leave-end').value = ''; document.getElementById('leave-reason').value = '';
+                document.getElementById('leave-start').value = ''; document.getElementById('leave-end').value = ''; document.getElementById('leave-reason').value = ''; document.getElementById('leave-days').value = '';
             } catch (error) { Swal.fire('ผิดพลาด', error.message, 'error'); }
         });
 
@@ -784,7 +833,7 @@
                 let empHtml = '';
                 empSnapshot.forEach(doc => {
                     const data = doc.data();
-                    allEmployeesList.push({ id: doc.id, name: data.name }); 
+                    allEmployeesList.push({ id: doc.id, name: data.name, quotas: data.quotas, pin: data.pin }); 
                     empFilterHtml += `<option value="${doc.id}">${data.name}</option>`;
                     
                     empHtml += `
@@ -793,18 +842,17 @@
                             <td class="p-4 text-sm tracking-widest font-mono text-blue-600 font-bold text-center">${data.pin}</td>
                             <td class="p-4 text-center">
                                 <button onclick="window.viewEmployeeReport('${doc.id}', '${data.name}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-lg transition text-xs font-bold mr-1" title="ดูรายงาน"><i class="fa-solid fa-chart-simple"></i></button>
-                                <button onclick="window.editEmployee('${doc.id}', '${data.name}', '${data.pin}')" class="text-amber-500 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 px-3 py-2 rounded-lg transition text-xs font-bold mr-1" title="แก้ไขข้อมูล"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="window.editEmployee('${doc.id}')" class="text-amber-500 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 px-3 py-2 rounded-lg transition text-xs font-bold mr-1" title="แก้ไขข้อมูล"><i class="fa-solid fa-pen"></i></button>
                                 <button onclick="window.deleteEmployee('${doc.id}', '${data.name}')" class="text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-3 py-2 rounded-lg transition text-xs" title="ลบพนักงาน"><i class="fa-solid fa-trash"></i></button>
                             </td>
                         </tr>`;
                 });
                 tbodyEmp.innerHTML = empHtml || '<tr><td colspan="3" class="text-center p-8 text-gray-400">ไม่มีพนักงาน</td></tr>';
                 
-                // อัปเดต Dropdown ในหน้า Timelogs
                 const empSelect = document.getElementById('filter-timelog-emp');
                 const currSelected = empSelect.value;
                 empSelect.innerHTML = empFilterHtml;
-                empSelect.value = currSelected; // รักษาค่าเดิมที่เลือกไว้
+                empSelect.value = currSelected; 
 
                 const qLogs = query(collection(db, "timelogs"));
                 listeners.adminTimelogs = onSnapshot(qLogs, (logSnapshot) => {
@@ -882,7 +930,7 @@
                                 `;
                             }
 
-                            leaveHtml += `<tr class="hover:bg-gray-50 border-b"><td class="p-3 text-sm text-gray-500">${reqDate}</td><td class="p-3 font-medium text-gray-800">${req.name}</td><td class="p-3"><p class="text-sm font-bold text-blue-600">${req.type}</p><p class="text-xs text-gray-500">ช่วงเวลา: ${req.startDate} ถึง ${req.endDate}</p><p class="text-xs text-gray-600 mt-1">เหตุผล: ${req.reason}</p></td><td class="p-3 text-center">${statusBadge}</td><td class="p-3 text-center">${actionBtns}</td></tr>`;
+                            leaveHtml += `<tr class="hover:bg-gray-50 border-b"><td class="p-3 text-sm text-gray-500">${reqDate}</td><td class="p-3 font-medium text-gray-800">${req.name}</td><td class="p-3"><p class="text-sm font-bold text-blue-600">${req.type} <span class="text-xs text-gray-500 font-normal">(${req.days} วัน)</span></p><p class="text-xs text-gray-500">ช่วงเวลา: ${req.startDate} ถึง ${req.endDate}</p><p class="text-xs text-gray-600 mt-1">เหตุผล: ${req.reason}</p></td><td class="p-3 text-center">${statusBadge}</td><td class="p-3 text-center">${actionBtns}</td></tr>`;
                         });
                         
                         document.getElementById('admin-leaves-body').innerHTML = leaveHtml || '<tr><td colspan="5" class="p-8 text-center text-gray-400">ไม่มีคำขอลางาน</td></tr>';
@@ -1020,13 +1068,18 @@
             
             let empOptions = '';
             allEmployeesList.forEach(e => { empOptions += `<option value="${e.id}">${e.name}</option>`; });
+            let branchOptions = '<option value="">(ไม่ระบุสาขา)</option>';
+            if(systemSettings.branches) { systemSettings.branches.forEach(b => { branchOptions += `<option value="${b.name}">${b.name}</option>`; }); }
 
             const { value: formValues } = await Swal.fire({
                 title: 'เพิ่มเวลาย้อนหลัง',
                 html: `
                     <div class="text-left space-y-3 mt-4">
                         <div><label class="text-sm text-gray-600">พนักงาน</label><select id="swal-m-emp" class="w-full p-2 border rounded outline-none">${empOptions}</select></div>
-                        <div><label class="text-sm text-gray-600">ประเภท</label><select id="swal-m-type" class="w-full p-2 border rounded outline-none"><option value="in">เข้างาน</option><option value="out">ออกงาน</option></select></div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div><label class="text-sm text-gray-600">ประเภท</label><select id="swal-m-type" class="w-full p-2 border rounded outline-none"><option value="in">เข้างาน</option><option value="out">ออกงาน</option></select></div>
+                            <div><label class="text-sm text-gray-600">สาขา</label><select id="swal-m-branch" class="w-full p-2 border rounded outline-none">${branchOptions}</select></div>
+                        </div>
                         <div class="flex gap-2">
                             <div class="flex-1"><label class="text-sm text-gray-600">วันที่</label><input type="date" id="swal-m-date" class="w-full p-2 border rounded outline-none"></div>
                             <div class="flex-1"><label class="text-sm text-gray-600">เวลา</label><input type="time" id="swal-m-time" class="w-full p-2 border rounded outline-none"></div>
@@ -1041,8 +1094,9 @@
                     const date = document.getElementById('swal-m-date').value;
                     const time = document.getElementById('swal-m-time').value;
                     const remark = document.getElementById('swal-m-remark').value;
+                    const branchName = document.getElementById('swal-m-branch').value;
                     if (!date || !time) { Swal.showValidationMessage('กรุณาเลือกวันที่และเวลา'); return false; }
-                    return { empId, type, date, time, remark };
+                    return { empId, type, date, time, remark, branchName };
                 }
             });
 
@@ -1054,21 +1108,32 @@
                     
                     await addDoc(collection(db, "timelogs"), {
                         userId: selectedEmp.id, name: selectedEmp.name, type: formValues.type, timestamp: timestamp,
-                        lat: null, lng: null, photoBase64: null, remark: formValues.remark || 'เพิ่มข้อมูลย้อนหลัง', isManual: true
+                        lat: null, lng: null, branchName: formValues.branchName || null, photoBase64: null, remark: formValues.remark || 'เพิ่มข้อมูลย้อนหลัง', isManual: true
                     });
                     Swal.fire({ icon: 'success', title: 'บันทึกเวลาสำเร็จ!', timer: 1500, showConfirmButton: false });
                 } catch (error) { Swal.fire('ผิดพลาด', error.message, 'error'); }
             }
         });
 
-        // แอดมิน: แก้ไขข้อมูลพนักงาน
-        window.editEmployee = async (docId, oldName, oldPin) => {
+        // แอดมิน: แก้ไขข้อมูลพนักงาน (ปรับโควตาได้)
+        window.editEmployee = async (docId) => {
+            const emp = allEmployeesList.find(e => e.id === docId);
+            if(!emp) return;
+            const quotas = emp.quotas || { 'ลาป่วย': 30, 'ลากิจ': 6, 'ลาพักร้อน': 6 };
+
             const { value: formValues } = await Swal.fire({
                 title: 'แก้ไขข้อมูลพนักงาน',
                 html: `
                     <div class="text-left space-y-3 mt-4">
-                        <div><label class="text-sm text-gray-600">ชื่อ-นามสกุล</label><input id="swal-e-name" class="w-full p-2 border rounded outline-none" value="${oldName}"></div>
-                        <div><label class="text-sm text-gray-600">รหัส PIN</label><input id="swal-e-pin" class="w-full p-2 border rounded outline-none tracking-widest text-center" value="${oldPin}" maxlength="6" inputmode="numeric" pattern="[0-9]*"></div>
+                        <div><label class="text-sm text-gray-600">ชื่อ-นามสกุล</label><input id="swal-e-name" class="w-full p-2 border rounded outline-none" value="${emp.name}"></div>
+                        <div><label class="text-sm text-gray-600">รหัส PIN</label><input id="swal-e-pin" class="w-full p-2 border rounded outline-none tracking-widest text-center" value="${emp.pin}" maxlength="6" inputmode="numeric" pattern="[0-9]*"></div>
+                        <hr class="my-2 border-gray-200">
+                        <p class="text-sm font-bold text-gray-700">โควตาวันลา (วัน)</p>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div><label class="text-xs text-gray-500">ลาป่วย</label><input id="swal-q-sick" type="number" step="0.5" class="w-full p-2 border rounded" value="${quotas['ลาป่วย']||0}"></div>
+                            <div><label class="text-xs text-gray-500">ลากิจ</label><input id="swal-q-personal" type="number" step="0.5" class="w-full p-2 border rounded" value="${quotas['ลากิจ']||0}"></div>
+                            <div><label class="text-xs text-gray-500">พักร้อน</label><input id="swal-q-vacation" type="number" step="0.5" class="w-full p-2 border rounded" value="${quotas['ลาพักร้อน']||0}"></div>
+                        </div>
                     </div>
                 `,
                 focusConfirm: false, showCancelButton: true, confirmButtonText: 'บันทึกการเปลี่ยนแปลง', cancelButtonText: 'ยกเลิก',
@@ -1076,37 +1141,69 @@
                     const name = document.getElementById('swal-e-name').value.trim();
                     const pin = document.getElementById('swal-e-pin').value.trim();
                     if (!name || !pin || pin.length !== 6) { Swal.showValidationMessage('กรุณากรอกชื่อและรหัส PIN 6 หลักให้ครบถ้วน'); return false; }
-                    return { name, pin };
+                    return { 
+                        name, pin, 
+                        quotas: {
+                            'ลาป่วย': parseFloat(document.getElementById('swal-q-sick').value) || 0,
+                            'ลากิจ': parseFloat(document.getElementById('swal-q-personal').value) || 0,
+                            'ลาพักร้อน': parseFloat(document.getElementById('swal-q-vacation').value) || 0,
+                            'อื่นๆ': quotas['อื่นๆ'] || 0
+                        }
+                    };
                 }
             });
 
             if (formValues) {
-                if (formValues.pin !== oldPin) {
+                if (formValues.pin !== emp.pin) {
                     const q = query(collection(db, "employees"), where("pin", "==", formValues.pin));
                     if (!(await getDocs(q)).empty) return Swal.fire('รหัส PIN ซ้ำ', 'รหัส PIN นี้มีพนักงานคนอื่นใช้แล้ว', 'error');
                 }
                 Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
                 try {
-                    await updateDoc(doc(db, "employees", docId), { name: formValues.name, pin: formValues.pin });
-                    
-                    // อัปเดตชื่อใน timelogs ด้วยเผื่อมีผลย้อนหลัง (ตัวเลือกเสริม: ปัจจุบันระบบเราเซฟ name ผูกไปกับ doc ตอนสร้าง อาจจะใช้ id เป็นหลักในการโชว์ แต่เพื่อความง่าย เราอัปเดตแค่ employee table พอ)
+                    await updateDoc(doc(db, "employees", docId), { name: formValues.name, pin: formValues.pin, quotas: formValues.quotas });
                     Swal.fire({ icon: 'success', title: 'อัปเดตข้อมูลสำเร็จ', timer: 1500, showConfirmButton: false });
                 } catch (error) { Swal.fire('ผิดพลาด', error.message, 'error'); }
             }
         };
 
-        // แอดมิน: จัดการใบลา
+        // แอดมิน: จัดการใบลา & หักโควตา
         window.updateLeaveStatus = async (docId, newStatus) => {
-            const actionText = newStatus === 'approved' ? 'อนุมัติ' : 'ไม่อนุมัติ';
-            const result = await Swal.fire({ title: `ยืนยันการ${actionText}?`, icon: 'question', showCancelButton: true, confirmButtonColor: newStatus === 'approved' ? '#10b981' : '#e11d48', confirmButtonText: `ใช่, ${actionText}` });
+            const actionText = newStatus === 'approved' ? 'อนุมัติ (หักโควตา)' : 'ไม่อนุมัติ (คืนโควตา)';
+            const result = await Swal.fire({ title: `ยืนยันการ${actionText}?`, icon: 'question', showCancelButton: true, confirmButtonColor: newStatus === 'approved' ? '#10b981' : '#e11d48', confirmButtonText: `ใช่, ดำเนินการ` });
+            
             if (result.isConfirmed) {
-                try { await updateDoc(doc(db, "leave_requests", docId), { status: newStatus }); Swal.fire({ icon: 'success', title: 'อัปเดตสถานะสำเร็จ', timer: 1000, showConfirmButton: false }); } 
+                try { 
+                    Swal.fire({ title: 'กำลังประมวลผล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                    const leaveSnap = await getDoc(doc(db, "leave_requests", docId));
+                    const leaveData = leaveSnap.data();
+
+                    // ระบบคำนวณหัก/คืนโควตา
+                    if (newStatus === 'approved' && leaveData.status !== 'approved') {
+                        const empSnap = await getDoc(doc(db, "employees", leaveData.userId));
+                        if(empSnap.exists()) {
+                            let q = empSnap.data().quotas || { 'ลาป่วย': 30, 'ลากิจ': 6, 'ลาพักร้อน': 6 };
+                            if(q[leaveData.type] !== undefined) q[leaveData.type] -= (leaveData.days || 0);
+                            await updateDoc(doc(db, "employees", leaveData.userId), { quotas: q });
+                        }
+                    } else if (newStatus !== 'approved' && leaveData.status === 'approved') {
+                        // คืนโควตาถ้ายกเลิกอนุมัติ
+                        const empSnap = await getDoc(doc(db, "employees", leaveData.userId));
+                        if(empSnap.exists()) {
+                            let q = empSnap.data().quotas || { 'ลาป่วย': 30, 'ลากิจ': 6, 'ลาพักร้อน': 6 };
+                            if(q[leaveData.type] !== undefined) q[leaveData.type] += (leaveData.days || 0);
+                            await updateDoc(doc(db, "employees", leaveData.userId), { quotas: q });
+                        }
+                    }
+
+                    await updateDoc(doc(db, "leave_requests", docId), { status: newStatus }); 
+                    Swal.fire({ icon: 'success', title: 'อัปเดตสถานะสำเร็จ', timer: 1000, showConfirmButton: false }); 
+                } 
                 catch (error) { Swal.fire('ผิดพลาด', error.message, 'error'); }
             }
         };
         
         window.deleteLeave = (docId) => {
-            Swal.fire({ title: 'ลบคำขอลางาน?', text: "ข้อมูลนี้จะถูกลบถาวร ไม่สามารถกู้คืนได้", icon: 'warning', showCancelButton: true, confirmButtonColor: '#e11d48', confirmButtonText: 'ใช่, ลบทิ้ง' })
+            Swal.fire({ title: 'ลบคำขอลางาน?', text: "ข้อมูลนี้จะถูกลบถาวร หากอนุมัติไปแล้วต้องไปแก้โควตาคืนเอง", icon: 'warning', showCancelButton: true, confirmButtonColor: '#e11d48', confirmButtonText: 'ใช่, ลบทิ้ง' })
             .then(async (result) => { 
                 if (result.isConfirmed) { 
                     try { await deleteDoc(doc(db, "leave_requests", docId)); Swal.fire({ icon: 'success', title: 'ลบสำเร็จ', timer: 1000, showConfirmButton: false }); } 
@@ -1123,12 +1220,14 @@
             try {
                 const q = query(collection(db, "employees"), where("pin", "==", pin));
                 if (!(await getDocs(q)).empty) return Swal.fire('รหัส PIN ซ้ำ', 'รหัส PIN นี้ถูกใช้ไปแล้ว', 'error');
-                await addDoc(collection(db, "employees"), { name: name, pin: pin });
+                
+                // ใส่โควตามาตรฐานให้ตอนสร้างพนักงานใหม่
+                const defaultQuotas = { 'ลาป่วย': 30, 'ลากิจ': 6, 'ลาพักร้อน': 6, 'อื่นๆ': 0 };
+                await addDoc(collection(db, "employees"), { name: name, pin: pin, quotas: defaultQuotas });
                 Swal.fire({ icon: 'success', title: 'เพิ่มพนักงานสำเร็จ', timer: 1500, showConfirmButton: false }); nameInput.value = ''; pinInput.value = '';
             } catch (error) { Swal.fire('ผิดพลาด', error.message, 'error'); }
         });
 
-        // แอดมิน: ลบพนักงาน
         window.deleteEmployee = (docId, name) => {
             Swal.fire({ title: `ลบพนักงาน ${name}?`, text: "ประวัติเข้าออกยังอยู่ แต่จะล็อกอินไม่ได้อีก", icon: 'warning', showCancelButton: true, confirmButtonColor: '#e11d48', confirmButtonText: 'ลบข้อมูล' })
             .then(async (result) => { if (result.isConfirmed) { await deleteDoc(doc(db, "employees", docId)); Swal.fire({ icon: 'success', title: 'ลบสำเร็จ', timer: 1000, showConfirmButton: false }); } });
@@ -1146,12 +1245,11 @@
 
         document.getElementById('btn-export-csv').addEventListener('click', () => {
             if (allLogsForExport.length === 0) return Swal.fire('ไม่มีข้อมูล', 'ไม่มีข้อมูลตามเงื่อนไขที่เลือก', 'info');
-            let csvContent = "data:text/csv;charset=utf-8,\uFEFFDate_Time,Employee,Type,Remark,Latitude,Longitude\n";
-            allLogsForExport.forEach(row => { csvContent += `"${row.Date_Time}","${row.Employee}","${row.Type}","${row.Remark}","${row.Lat}","${row.Lng}"\n`; });
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFFDate_Time,Employee,Type,Remark,Branch,Latitude,Longitude\n";
+            allLogsForExport.forEach(row => { csvContent += `"${row.Date_Time}","${row.Employee}","${row.Type}","${row.Remark}","${row.Branch}","${row.Lat}","${row.Lng}"\n`; });
             const link = document.createElement("a"); link.href = encodeURI(csvContent); link.download = `timelog_export_${new Date().getTime()}.csv`; link.click();
         });
 
-        // อัปเดตตาราง Timelogs โดยรวมฟิลเตอร์ "พนักงาน" เข้าไปด้วย
         function renderTimelogsTable() {
             allLogsForExport = [];
             const tbodyLogs = document.getElementById('admin-table-body');
@@ -1160,7 +1258,6 @@
             
             let filteredLogs = [...allLogsRaw];
             
-            // กรองเดือน
             if (filterMonth) {
                 const [year, month] = filterMonth.split('-');
                 filteredLogs = filteredLogs.filter(log => {
@@ -1168,12 +1265,7 @@
                     const d = log.timestamp.toDate(); return d.getFullYear() == year && (d.getMonth() + 1) == month;
                 });
             }
-            
-            // กรองพนักงาน
-            if (filterEmp) {
-                filteredLogs = filteredLogs.filter(log => log.userId === filterEmp);
-            }
-            
+            if (filterEmp) { filteredLogs = filteredLogs.filter(log => log.userId === filterEmp); }
             filteredLogs.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
             
             let logHtml = '';
@@ -1191,9 +1283,12 @@
                 const remarkExport = data.remark ? data.remark : '-';
                 
                 const photoHtml = data.isManual ? '<span class="text-[10px] text-gray-500 bg-gray-100 px-2 py-1 rounded border">แอดมินเพิ่ม</span>' : `<img src="${data.photoBase64}" class="w-10 h-10 rounded-lg object-cover border cursor-pointer hover:scale-[2] transition-transform origin-left" alt="Selfie">`;
+                
+                const branchBadge = data.branchName ? `<div class="text-xs font-bold text-indigo-600 mb-1">${data.branchName}</div>` : '';
+                const branchExport = data.branchName || '-';
                 const gpsHtml = data.isManual || !data.lat ? '<span class="text-xs text-gray-400">-</span>' : `<a href="https://www.google.com/maps/search/?api=1&query=${data.lat},${data.lng}" target="_blank" class="text-blue-600 hover:underline"><i class="fa-solid fa-map-location-dot"></i> ดูแผนที่</a>`;
 
-                allLogsForExport.push({ Date_Time: exportTimeStr, Employee: empName, Type: isCheckIn?'เข้างาน':'ออกงาน', Remark: remarkExport, Lat: data.lat || '', Lng: data.lng || '' });
+                allLogsForExport.push({ Date_Time: exportTimeStr, Employee: empName, Type: isCheckIn?'เข้างาน':'ออกงาน', Remark: remarkExport, Branch: branchExport, Lat: data.lat || '', Lng: data.lng || '' });
 
                 logHtml += `
                     <tr class="hover:bg-gray-50 border-b">
@@ -1201,47 +1296,85 @@
                         <td class="p-3 text-sm font-medium text-gray-800">${empName}</td>
                         <td class="p-3">${typeBadge}<br>${remarkBadge}</td>
                         <td class="p-3">${photoHtml}</td>
-                        <td class="p-3 text-xs">${gpsHtml}</td>
+                        <td class="p-3 text-xs">${branchBadge}${gpsHtml}</td>
                         <td class="p-3 text-center">
-                            <button onclick="window.deleteTimelog('${data.id}')" class="text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-2 py-1 rounded transition text-xs shadow-sm" title="ลบรายการนี้">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
+                            <button onclick="window.deleteTimelog('${data.id}')" class="text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-2 py-1 rounded transition text-xs shadow-sm" title="ลบรายการนี้"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>`;
             });
             tbodyLogs.innerHTML = logHtml || '<tr><td colspan="6" class="p-8 text-center text-gray-400">ไม่มีข้อมูลตามเงื่อนไข</td></tr>';
         }
 
-        // จับ Event เมื่อมีการเปลี่ยนฟิลเตอร์
         document.getElementById('filter-timelog-month').addEventListener('change', renderTimelogsTable);
         document.getElementById('filter-timelog-emp').addEventListener('change', renderTimelogsTable);
 
-        function populateSettingsForm() {
-            document.getElementById('setting-lat').value = systemSettings.officeLat || '';
-            document.getElementById('setting-lng').value = systemSettings.officeLng || '';
-            document.getElementById('setting-radius').value = systemSettings.radius || 100;
-            document.getElementById('setting-workhours').value = systemSettings.workHours || 8;
-            document.getElementById('setting-coretime').value = systemSettings.coreTime || '09:00';
+        // ระบบเพิ่มสาขา
+        function renderBranchesList() {
+            const container = document.getElementById('branches-list');
+            if (!systemSettings.branches || systemSettings.branches.length === 0) {
+                container.innerHTML = '<div class="text-sm text-gray-400 border border-dashed rounded-lg p-4 text-center">ยังไม่มีการตั้งสาขา (พนักงานจะกดเข้างานได้ทุกที่)</div>';
+                return;
+            }
+            let html = '';
+            systemSettings.branches.forEach((b, idx) => {
+                html += `
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <div class="flex justify-between items-start mb-2">
+                            <input type="text" id="branch-name-${idx}" value="${b.name}" class="font-bold text-gray-700 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none w-1/2" placeholder="ชื่อสาขา">
+                            <button onclick="window.removeBranch(${idx})" class="text-rose-500 hover:text-rose-700 text-xs"><i class="fa-solid fa-trash"></i> ลบ</button>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div><label class="text-[10px] text-gray-500">Latitude</label><input type="number" step="any" id="branch-lat-${idx}" value="${b.lat}" class="w-full p-1.5 text-xs border rounded outline-none"></div>
+                            <div><label class="text-[10px] text-gray-500">Longitude</label><input type="number" step="any" id="branch-lng-${idx}" value="${b.lng}" class="w-full p-1.5 text-xs border rounded outline-none"></div>
+                            <div><label class="text-[10px] text-gray-500">รัศมี (ม.)</label><input type="number" id="branch-rad-${idx}" value="${b.radius}" class="w-full p-1.5 text-xs border rounded outline-none"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
         }
 
-        document.getElementById('btn-get-current-location').addEventListener('click', () => {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    document.getElementById('setting-lat').value = pos.coords.latitude; document.getElementById('setting-lng').value = pos.coords.longitude;
-                    Swal.fire({ icon: 'success', title: 'ดึงพิกัดสำเร็จ', timer: 1000, showConfirmButton: false });
-                }, () => Swal.fire('ผิดพลาด', 'กรุณาอนุญาต Location ในเบราว์เซอร์', 'error'));
-            }
+        window.removeBranch = (idx) => {
+            systemSettings.branches.splice(idx, 1);
+            renderBranchesList();
+        };
+
+        document.getElementById('btn-add-branch').addEventListener('click', () => {
+            if (!systemSettings.branches) systemSettings.branches = [];
+            systemSettings.branches.push({ id: Date.now(), name: 'สาขาใหม่', lat: '', lng: '', radius: 100 });
+            renderBranchesList();
         });
 
+        function populateSettingsForm() {
+            document.getElementById('setting-workhours').value = systemSettings.workHours || 8;
+            document.getElementById('setting-coretime').value = systemSettings.coreTime || '09:00';
+            renderBranchesList();
+        }
+
         document.getElementById('btn-save-settings').addEventListener('click', async () => {
-            const lat = document.getElementById('setting-lat').value, lng = document.getElementById('setting-lng').value, radius = document.getElementById('setting-radius').value;
-            const workHours = document.getElementById('setting-workhours').value, coreTime = document.getElementById('setting-coretime').value;
+            const workHours = document.getElementById('setting-workhours').value;
+            const coreTime = document.getElementById('setting-coretime').value;
+            
+            // ดึงค่าอัปเดตจากฟอร์มสาขา
+            let updatedBranches = [];
+            if (systemSettings.branches) {
+                systemSettings.branches.forEach((b, idx) => {
+                    const name = document.getElementById(`branch-name-${idx}`).value;
+                    const lat = document.getElementById(`branch-lat-${idx}`).value;
+                    const lng = document.getElementById(`branch-lng-${idx}`).value;
+                    const rad = document.getElementById(`branch-rad-${idx}`).value;
+                    if(name && lat && lng) {
+                        updatedBranches.push({ id: b.id, name: name, lat: parseFloat(lat), lng: parseFloat(lng), radius: parseInt(rad) });
+                    }
+                });
+            }
 
             Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             try {
-                const newData = { officeLat: lat ? parseFloat(lat) : null, officeLng: lng ? parseFloat(lng) : null, radius: radius ? parseInt(radius) : 100, workHours: workHours ? parseFloat(workHours) : 8, coreTime: coreTime || "09:00" };
+                const newData = { branches: updatedBranches, workHours: workHours ? parseFloat(workHours) : 8, coreTime: coreTime || "09:00" };
                 await setDoc(doc(db, "settings", "general"), newData);
                 systemSettings = { ...systemSettings, ...newData }; 
+                renderBranchesList(); // อัปเดต UI หน้าตาเผื่อมีการลบสาขาที่ข้อมูลไม่ครบออกไป
                 Swal.fire({ icon: 'success', title: 'บันทึกตั้งค่าสำเร็จ', timer: 1500 });
             } catch (error) { Swal.fire('ผิดพลาด', error.message, 'error'); }
         });
