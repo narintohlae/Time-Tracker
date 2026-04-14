@@ -93,7 +93,6 @@
             <div class="flex max-w-md mx-auto overflow-x-auto whitespace-nowrap px-2">
                 <button id="tab-emp-time" class="py-3 px-4 text-center tab-active focus:outline-none transition"><i class="fa-solid fa-camera mr-2"></i>บันทึกเวลา</button>
                 <button id="tab-emp-leave" class="py-3 px-4 text-center tab-inactive focus:outline-none transition"><i class="fa-solid fa-calendar-minus mr-2"></i>ขอลางาน</button>
-                <!-- แท็บเฉพาะหัวหน้าแผนก -->
                 <button id="tab-emp-approve" class="hide py-3 px-4 text-center tab-inactive focus:outline-none transition"><i class="fa-solid fa-check-double mr-2"></i>อนุมัติใบลา</button>
             </div>
         </div>
@@ -103,7 +102,6 @@
                 <!-- Section: บันทึกเวลา -->
                 <div id="section-emp-time" class="space-y-6">
                     
-                    <!-- กล่องประกาศบริษัท -->
                     <div id="emp-announcement-box" class="hide bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 p-4 rounded-r-2xl shadow-sm mb-2">
                         <div class="flex items-start">
                             <div class="flex-shrink-0"><i class="fa-solid fa-bullhorn text-blue-500 mt-1"></i></div>
@@ -114,7 +112,6 @@
                         </div>
                     </div>
 
-                    <!-- แดชบอร์ดส่วนตัวพนักงาน -->
                     <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
                         <div class="flex justify-between items-end mb-3">
                             <h3 class="font-bold text-gray-700"><i class="fa-solid fa-chart-simple text-blue-500 mr-2"></i>สรุปงานเดือนนี้ (<span id="emp-month-label">...</span>)</h3>
@@ -296,7 +293,6 @@
                     </div>
                     
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <!-- กล่องตัวเลข 4 กล่อง -->
                         <div class="lg:col-span-2 grid grid-cols-2 gap-4">
                             <div class="bg-white p-4 rounded-xl shadow-sm border border-blue-100 flex flex-col justify-between">
                                 <div class="flex justify-between items-start"><p class="text-sm text-gray-500">พนักงานทั้งหมด</p><div class="bg-blue-50 p-2 rounded-lg text-blue-500"><i class="fa-solid fa-users"></i></div></div>
@@ -315,7 +311,6 @@
                                 <p class="text-3xl font-bold text-yellow-600 mt-2" id="stat-leave">0</p>
                             </div>
                         </div>
-                        <!-- กราฟ Chart.js -->
                         <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-center items-center h-48 lg:h-full">
                             <canvas id="dashChart" class="w-full h-full max-w-[200px]"></canvas>
                         </div>
@@ -381,6 +376,14 @@
                                 </tbody>
                             </table>
                         </div>
+                        <!-- UI แบ่งหน้า (Pagination) -->
+                        <div class="p-4 border-t bg-gray-50 flex justify-between items-center">
+                            <span class="text-sm text-gray-500" id="pagination-info">แสดง 0-0 จาก 0 รายการ</span>
+                            <div class="flex gap-2">
+                                <button id="btn-prev-page" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100 text-sm text-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed"><i class="fa-solid fa-chevron-left mr-1"></i> ก่อนหน้า</button>
+                                <button id="btn-next-page" class="px-3 py-1 bg-blue-600 border border-blue-600 rounded hover:bg-blue-700 text-sm text-white transition disabled:opacity-50 disabled:cursor-not-allowed">ถัดไป <i class="fa-solid fa-chevron-right ml-1"></i></button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -413,15 +416,16 @@
                 <div id="section-admin-employees" class="hide space-y-6">
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                         <h3 class="text-lg font-bold text-gray-800 mb-4">เพิ่มพนักงานใหม่</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                             <input type="text" id="new-emp-name" placeholder="ชื่อ-นามสกุล พนักงาน" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                             <input type="text" id="new-emp-pin" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="ตั้งรหัส PIN (6 หลัก)" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            <input type="email" id="new-emp-email" placeholder="Email พนักงาน (สำหรับส่งสลิป)" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                             <select id="new-emp-role" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                                 <option value="staff">สิทธิ์: พนักงานทั่วไป</option>
                                 <option value="supervisor">สิทธิ์: หัวหน้าแผนก</option>
                             </select>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
                             <input type="number" id="new-emp-daily-rate" placeholder="ค่าจ้าง/วัน (฿)" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                             <input type="number" id="new-emp-ot-rate" placeholder="เรท OT/ชม. (฿)" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                             <input type="number" id="new-emp-penalty-rate" placeholder="หักสาย/นาที (฿)" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
@@ -432,10 +436,16 @@
                                 <select id="new-emp-shift" class="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
                                     <option value="">กะเวลามาตรฐาน</option>
                                 </select>
-                                <button id="btn-add-employee" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-bold shadow transition flex items-center justify-center whitespace-nowrap">
-                                    <i class="fa-solid fa-plus mr-1"></i> เพิ่ม
-                                </button>
                             </div>
+                        </div>
+                        <div class="flex justify-between items-center mb-8 border-t pt-4">
+                            <label class="flex items-center text-sm text-gray-700 cursor-pointer">
+                                <input type="checkbox" id="new-emp-deduct-sso" checked class="mr-2 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                คำนวณหักประกันสังคม (SSO)
+                            </label>
+                            <button id="btn-add-employee" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold shadow transition flex items-center justify-center whitespace-nowrap">
+                                <i class="fa-solid fa-plus mr-1"></i> เพิ่มพนักงาน
+                            </button>
                         </div>
 
                         <div class="flex justify-between items-center mb-4 border-t pt-6">
@@ -470,6 +480,20 @@
                         <p class="text-sm text-gray-500 mb-2">ข้อความประกาศจะแสดงในหน้าแรกของแอปพนักงานทุกคน (ปล่อยว่างหากไม่ต้องการแจ้งประกาศ)</p>
                         <div class="mb-6">
                             <textarea id="setting-announcement" rows="3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="พิมพ์ข้อความประกาศที่ต้องการ..."></textarea>
+                        </div>
+
+                        <hr class="my-6 border-gray-100">
+
+                        <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fa-solid fa-money-check-dollar text-blue-500 mr-2"></i>ตั้งค่าเงินเดือน & OT ส่วนกลาง</h3>
+                        <p class="text-sm text-gray-500 mb-4">กำหนดตัวคูณค่าล่วงเวลาและเปอร์เซ็นต์การหักประกันสังคม (SSO)</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div><label class="block text-sm font-medium text-gray-700 mb-1">ตัวคูณ OT วันปกติ (x)</label><input id="setting-ot-normal" type="number" step="0.5" value="1.5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                            <div><label class="block text-sm font-medium text-gray-700 mb-1">ตัวคูณ OT วันหยุดเสาร์-อาทิตย์ (x)</label><input id="setting-ot-weekend" type="number" step="0.5" value="2" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                            <div><label class="block text-sm font-medium text-gray-700 mb-1">ตัวคูณ OT วันหยุดนักขัตฤกษ์ (x)</label><input id="setting-ot-holiday" type="number" step="0.5" value="3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div><label class="block text-sm font-medium text-gray-700 mb-1">หักประกันสังคม (%)</label><input id="setting-sso-percent" type="number" value="5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                            <div><label class="block text-sm font-medium text-gray-700 mb-1">เพดานหักประกันสังคมสูงสุด (บาท)</label><input id="setting-sso-max" type="number" value="750" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></div>
                         </div>
 
                         <hr class="my-6 border-gray-100">
@@ -572,11 +596,15 @@
         let capturedPhotoData = null;
         let stream = null;
         
-        let systemSettings = { branches: [], holidays: [], departments: [], shifts: [], workHours: 8, coreTime: "09:00", announcement: "" };
+        let systemSettings = { branches: [], holidays: [], departments: [], shifts: [], workHours: 8, coreTime: "09:00", announcement: "", otNormal: 1.5, otWeekend: 2, otHoliday: 3, ssoPercent: 5, ssoMax: 750 };
         let allLogsRaw = []; 
         let allLogsForExport = [];
         let allEmployeesList = []; 
-        let allRosters = []; // เก็บตารางกะรายวัน
+        let allRosters = []; 
+        
+        // ตัวแปรสำหรับ Pagination
+        let currentPage = 1;
+        const itemsPerPage = 50;
         
         let listeners = { empSelf: null, empTimelogs: null, empLeaves: null, supLeaves: null, adminTimelogs: null, adminLeaves: null, adminEmployees: null, adminRosters: null, empRosters: null };
 
@@ -635,6 +663,11 @@
                     if (!systemSettings.holidays) systemSettings.holidays = [];
                     if (!systemSettings.departments) systemSettings.departments = [];
                     if (!systemSettings.shifts) systemSettings.shifts = [];
+                    if (!systemSettings.otNormal) systemSettings.otNormal = 1.5;
+                    if (!systemSettings.otWeekend) systemSettings.otWeekend = 2;
+                    if (!systemSettings.otHoliday) systemSettings.otHoliday = 3;
+                    if (!systemSettings.ssoPercent) systemSettings.ssoPercent = 5;
+                    if (!systemSettings.ssoMax) systemSettings.ssoMax = 750;
                 }
             } catch (e) { console.error("Could not load settings", e); }
         }
@@ -648,7 +681,20 @@
             return R * c;
         }
 
-        // ดึงกะการทำงาน (เช็คตารางกะรายวันก่อน ถ้าไม่มีให้ใช้กะประจำตัว)
+        // --- ฟังก์ชันตรวจจับ Fake GPS (Anti-Spoofing Heuristics) ---
+        function detectFakeGPS(pos) {
+            const acc = pos.coords.accuracy;
+            const alt = pos.coords.altitude;
+            if (acc <= 5 && alt === null && !navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+                return true;
+            }
+            if (Math.abs(Date.now() - pos.timestamp) > 60000) {
+                return true;
+            }
+            return false;
+        }
+
+        // ดึงการตั้งค่ากะการทำงานของพนักงานคนนั้นๆ (fallback เป็นค่ามาตรฐาน)
         function getEmployeeShiftDetails(empId, dateStr = null) {
             let coreTime = systemSettings.coreTime || "09:00";
             let workHours = Number(systemSettings.workHours) || 8;
@@ -665,7 +711,6 @@
                 let activeShiftId = emp.shiftId;
                 let isRosterOverride = false;
 
-                // เช็ค Roster Override ถ้ามี dateStr
                 if (dateStr && allRosters.length > 0) {
                     const override = allRosters.find(r => r.userId === empId && r.date === dateStr);
                     if (override) {
@@ -685,6 +730,94 @@
                 }
             }
             return { coreTime, workHours, shiftName, deptName };
+        }
+
+        // --- Core Payroll Calculator Function ---
+        function calculateEmployeePayroll(empId, year, monthStr, logsRaw = allLogsRaw) {
+            const emp = allEmployeesList.find(e => e.id === empId) || currentEmployee;
+            if(!emp) return null;
+
+            const userLogs = logsRaw.filter(l => {
+                if (l.userId !== empId || !l.timestamp) return false;
+                const d = l.timestamp.toDate(); 
+                return d.getFullYear() == year && (d.getMonth() + 1) == monthStr;
+            });
+
+            const dailyData = {};
+            userLogs.forEach(log => {
+                const dateStr = log.timestamp.toDate().toISOString().split('T')[0];
+                if (!dailyData[dateStr]) dailyData[dateStr] = { in: null, out: null };
+                const t = log.timestamp.toDate();
+                if (log.type === 'in') { if (!dailyData[dateStr].in || t < dailyData[dateStr].in) dailyData[dateStr].in = t; } 
+                else { if (!dailyData[dateStr].out || t > dailyData[dateStr].out) dailyData[dateStr].out = t; }
+            });
+
+            let totalDays = 0, lateDays = 0, totalLateMinutes = 0, totalWorkHrs = 0;
+            let otNormalHrs = 0, otWeekendHrs = 0, otHolidayHrs = 0;
+            
+            const dailyRate = emp.dailyRate || 0;
+            const otRate = emp.otRate || 0;
+            const penaltyRate = emp.penaltyRate || 0;
+            const deductSso = emp.deductSso !== false; 
+
+            Object.keys(dailyData).forEach(dateStr => {
+                const day = dailyData[dateStr];
+                if (day.in) {
+                    totalDays++;
+                    const shiftInfo = getEmployeeShiftDetails(empId, dateStr);
+                    const dateObj = new Date(day.in);
+
+                    // Check Late
+                    if (shiftInfo.coreTime) {
+                        const [cH, cM] = shiftInfo.coreTime.split(':');
+                        const coreDate = new Date(day.in); coreDate.setHours(cH, cM, 0, 0);
+                        if (day.in > coreDate) {
+                            lateDays++;
+                            totalLateMinutes += Math.max(0, Math.floor((day.in - coreDate) / 60000));
+                        }
+                    }
+
+                    // Calculate Hours & OT
+                    if (day.out) {
+                        const hrs = (day.out - day.in) / (1000 * 60 * 60);
+                        totalWorkHrs += hrs;
+                        
+                        if (hrs > shiftInfo.workHours) {
+                            const otHrs = hrs - shiftInfo.workHours;
+                            
+                            // Determine OT Multiplier Type
+                            const isHoliday = systemSettings.holidays && systemSettings.holidays.some(h => h.date === dateStr);
+                            const isWeekend = dateObj.getDay() === 0 || dateObj.getDay() === 6;
+
+                            if (isHoliday) otHolidayHrs += otHrs;
+                            else if (isWeekend) otWeekendHrs += otHrs;
+                            else otNormalHrs += otHrs;
+                        }
+                    }
+                }
+            });
+
+            const basePay = totalDays * dailyRate;
+            const otNormalPay = otNormalHrs * otRate * (systemSettings.otNormal || 1.5);
+            const otWeekendPay = otWeekendHrs * otRate * (systemSettings.otWeekend || 2);
+            const otHolidayPay = otHolidayHrs * otRate * (systemSettings.otHoliday || 3);
+            const totalOTPay = otNormalPay + otWeekendPay + otHolidayPay;
+            
+            const penaltyPay = totalLateMinutes * penaltyRate;
+            let ssoDeduction = 0;
+            if (deductSso) {
+                ssoDeduction = Math.min(basePay * ((systemSettings.ssoPercent || 5) / 100), (systemSettings.ssoMax || 750));
+            }
+
+            const totalNet = basePay + totalOTPay - penaltyPay - ssoDeduction;
+
+            return {
+                totalDays, lateDays, totalLateMinutes, totalWorkHrs, 
+                otNormalHrs, otWeekendHrs, otHolidayHrs,
+                basePay, otNormalPay, otWeekendPay, otHolidayPay, totalOTPay,
+                penaltyPay, ssoDeduction, totalNet,
+                dailyRate, otRate, penaltyRate
+            };
         }
 
         function showView(viewName) {
@@ -783,6 +916,16 @@
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
+                        // ตรวจจับ Fake GPS
+                        if (detectFakeGPS(position)) {
+                            statusEl.className = "text-xs bg-rose-100 text-rose-700 px-2 py-1 rounded-full";
+                            statusEl.innerHTML = `<i class="fa-solid fa-ban mr-1"></i>พบการใช้ Fake GPS`;
+                            currentLat = null; currentLng = null;
+                            checkReadyState();
+                            Swal.fire({ icon: 'error', title: 'ตรวจพบความผิดปกติ', text: 'ระบบสงสัยว่ามีการใช้แอปจำลองพิกัด (Fake GPS) กรุณาปิดแอปและตั้งค่า Location ให้ถูกต้อง' });
+                            return;
+                        }
+
                         currentLat = position.coords.latitude; currentLng = position.coords.longitude;
                         let isInside = false; let distText = '';
                         currentBranchName = null;
@@ -823,7 +966,7 @@
                         statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1"></i>ไม่พบ GPS';
                         Swal.fire({ icon: 'warning', title: 'ต้องการ GPS', text: 'กรุณาอนุญาต Location' });
                     },
-                    { enableHighAccuracy: true }
+                    { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
                 );
             }
         }
@@ -901,7 +1044,6 @@
         document.getElementById('btn-checkout').addEventListener('click', () => saveTimeLog('out'));
 
         function loadEmployeeData() {
-            // ระบบแจ้งเตือนพนักงานเรื่องใบลา
             const qNotif = query(collection(db, "leave_requests"), where("userId", "==", currentEmployee.id), where("notified", "==", false));
             getDocs(qNotif).then(snap => {
                 if(!snap.empty) {
@@ -918,7 +1060,6 @@
                 }
             });
 
-            // โหลด Roster ของ Employee คนนี้
             listeners.empRosters = onSnapshot(query(collection(db, "rosters"), where("userId", "==", currentEmployee.id)), (snap) => {
                 allRosters = []; snap.forEach(d => allRosters.push({ id: d.id, ...d.data() }));
                 updateEmployeeDashboard();
@@ -1034,40 +1175,11 @@
                 statusEl.innerHTML = '<span class="text-gray-400">ยังไม่ได้เข้างาน</span>';
             }
 
-            const monthlyLogs = logs.filter(l => l.timestamp && l.timestamp.toDate().getFullYear() === currYear && l.timestamp.toDate().getMonth() === currMonth);
+            const payroll = calculateEmployeePayroll(currentEmployee.id, currYear, currMonth+1, logs);
 
-            const dailyData = {};
-            monthlyLogs.forEach(log => {
-                const dateStr = log.timestamp.toDate().toISOString().split('T')[0];
-                if (!dailyData[dateStr]) dailyData[dateStr] = { in: null, out: null };
-                const t = log.timestamp.toDate();
-                if (log.type === 'in') { if (!dailyData[dateStr].in || t < dailyData[dateStr].in) dailyData[dateStr].in = t; }
-                else { if (!dailyData[dateStr].out || t > dailyData[dateStr].out) dailyData[dateStr].out = t; }
-            });
-
-            let totalDays = 0, lateDays = 0, totalOT = 0;
-            
-            Object.keys(dailyData).forEach(dateStr => {
-                const day = dailyData[dateStr];
-                if (day.in) {
-                    totalDays++;
-                    const sInfo = getEmployeeShiftDetails(currentEmployee.id, dateStr);
-                    
-                    if (sInfo.coreTime) {
-                        const [cH, cM] = sInfo.coreTime.split(':');
-                        const coreDate = new Date(day.in); coreDate.setHours(cH, cM, 0, 0);
-                        if (day.in > coreDate) lateDays++;
-                    }
-                    if (day.out) {
-                        const hrs = (day.out - day.in) / (1000 * 60 * 60);
-                        if (hrs > sInfo.workHours) totalOT += (hrs - sInfo.workHours);
-                    }
-                }
-            });
-
-            document.getElementById('emp-stat-days').innerHTML = `${totalDays}<span class="text-xs font-normal text-gray-500"> วัน</span>`;
-            document.getElementById('emp-stat-late').innerHTML = `${lateDays}<span class="text-xs font-normal text-gray-500"> ครั้ง</span>`;
-            document.getElementById('emp-stat-ot').innerHTML = `${totalOT.toFixed(1)}<span class="text-xs font-normal text-gray-500"> ชม.</span>`;
+            document.getElementById('emp-stat-days').innerHTML = `${payroll ? payroll.totalDays : 0}<span class="text-xs font-normal text-gray-500"> วัน</span>`;
+            document.getElementById('emp-stat-late').innerHTML = `${payroll ? payroll.lateDays : 0}<span class="text-xs font-normal text-gray-500"> ครั้ง</span>`;
+            document.getElementById('emp-stat-ot').innerHTML = `${payroll ? (payroll.otNormalHrs + payroll.otWeekendHrs + payroll.otHolidayHrs).toFixed(1) : 0}<span class="text-xs font-normal text-gray-500"> ชม.</span>`;
 
             const container = document.getElementById('emp-personal-history');
             if (logs.length === 0) container.innerHTML = '<div class="text-center text-sm text-gray-400 py-4">ยังไม่มีประวัติการบันทึกเวลา</div>';
@@ -1159,7 +1271,6 @@
 
             listeners.adminRosters = onSnapshot(collection(db, "rosters"), (snap) => {
                 allRosters = []; snap.forEach(d => allRosters.push({ id: d.id, ...d.data() }));
-                // Force re-render of dash and logs if needed
                 if(allLogsRaw.length > 0) processAdminDashboardData(today, tomorrow, isHolidayToday);
             });
 
@@ -1201,7 +1312,6 @@
                 empSelect.innerHTML = empFilterHtml;
                 empSelect.value = currSelected; 
 
-                // เติม Option ตอนเพิ่มพนักงานใหม่ให้สมบูรณ์
                 let newDeptOpts = '<option value="">ไม่ระบุแผนก</option>';
                 if(systemSettings.departments) systemSettings.departments.forEach(d => newDeptOpts += `<option value="${d.id}">${d.name}</option>`);
                 document.getElementById('new-emp-dept').innerHTML = newDeptOpts;
@@ -1326,7 +1436,6 @@
             document.getElementById('stat-present').textContent = presentCount;
             document.getElementById('dashboard-summary-body').innerHTML = sumHtml || '<tr><td colspan="6" class="p-8 text-center text-gray-400">ยังไม่มีใครเข้างานวันนี้</td></tr>';
 
-            // อัปเดตยอดขาดงาน
             const totalEmp = allEmployeesList.length;
             const leaveCountToday = Number(document.getElementById('stat-leave').textContent) || 0;
             let finalAbsent = totalEmp - presentCount - leaveCountToday;
@@ -1356,7 +1465,6 @@
             });
         }
 
-        // แอดมิน: จัดกะรายวัน
         window.manageRoster = async (empId, empName) => {
             let shiftOptions = '<option value="">(ลบกะพิเศษ / กลับไปใช้กะปกติ)</option>';
             if(systemSettings.shifts) systemSettings.shifts.forEach(s => shiftOptions += `<option value="${s.id}">${s.name} (${s.coreTime}, ${s.workHours}ชม.)</option>`);
@@ -1410,98 +1518,96 @@
 
             if (monthRaw) {
                 const [year, m] = monthRaw.split('-');
-                const userLogs = allLogsRaw.filter(l => {
-                    if (l.userId !== userId || !l.timestamp) return false;
-                    const d = l.timestamp.toDate(); return d.getFullYear() == year && (d.getMonth() + 1) == m;
-                });
+                const pr = calculateEmployeePayroll(userId, year, m);
+                if(!pr) return Swal.fire('ผิดพลาด', 'ไม่พบข้อมูลพนักงาน', 'error');
 
-                const dailyData = {};
-                userLogs.forEach(log => {
-                    const dateStr = log.timestamp.toDate().toISOString().split('T')[0];
-                    if (!dailyData[dateStr]) dailyData[dateStr] = { in: null, out: null };
-                    const t = log.timestamp.toDate();
-                    if (log.type === 'in') { if (!dailyData[dateStr].in || t < dailyData[dateStr].in) dailyData[dateStr].in = t; } 
-                    else { if (!dailyData[dateStr].out || t > dailyData[dateStr].out) dailyData[dateStr].out = t; }
-                });
-
-                let totalDays = 0, lateDays = 0, totalWorkHrs = 0, totalOT = 0;
-                let totalLateMinutes = 0;
-                
                 const empData = allEmployeesList.find(e => e.id === userId) || {};
-                const dailyRate = empData.dailyRate || 0;
-                const otRate = empData.otRate || 0;
-                const penaltyRate = empData.penaltyRate || 0;
-
-                Object.keys(dailyData).forEach(dateStr => {
-                    const day = dailyData[dateStr];
-                    if (day.in) {
-                        totalDays++;
-                        const shiftInfo = getEmployeeShiftDetails(userId, dateStr);
-
-                        if (shiftInfo.coreTime) {
-                            const [cH, cM] = shiftInfo.coreTime.split(':');
-                            const coreDate = new Date(day.in); coreDate.setHours(cH, cM, 0, 0);
-                            if (day.in > coreDate) {
-                                lateDays++;
-                                totalLateMinutes += Math.max(0, Math.floor((day.in - coreDate) / 60000));
-                            }
-                        }
-                        if (day.out) {
-                            const hrs = (day.out - day.in) / (1000 * 60 * 60);
-                            totalWorkHrs += hrs;
-                            if (hrs > shiftInfo.workHours) totalOT += (hrs - shiftInfo.workHours);
-                        }
-                    }
-                });
-
-                const basePay = totalDays * dailyRate;
-                const otPay = totalOT * otRate;
-                const penaltyPay = totalLateMinutes * penaltyRate;
-                const totalNet = basePay + otPay - penaltyPay;
+                const currentShiftInfo = getEmployeeShiftDetails(userId);
 
                 Swal.fire({
-                    title: `รายงานของ ${name}`,
+                    title: `สลิปเงินเดือน: ${name}`,
                     html: `
-                        <div id="print-report-area" class="text-left bg-gray-50 p-5 rounded-xl mt-2 text-gray-800 border">
-                            <p class="mb-3 border-b pb-2"><i class="fa-solid fa-calendar text-blue-500 w-5"></i> <b>ประจำเดือน:</b> ${m}/${year}</p>
-                            <p class="mb-2"><i class="fa-solid fa-briefcase text-blue-500 w-5"></i> <b>มาทำงานรวม:</b> <span class="text-emerald-600 font-bold text-lg">${totalDays}</span> วัน</p>
-                            <p class="mb-2"><i class="fa-solid fa-clock text-blue-500 w-5"></i> <b>ชั่วโมงทำงานรวม:</b> ${totalWorkHrs.toFixed(2)} ชม.</p>
-                            <p class="mb-2"><i class="fa-solid fa-fire text-orange-500 w-5"></i> <b>ล่วงเวลา (OT):</b> <span class="text-orange-600 font-bold">${totalOT.toFixed(2)} ชม.</span></p>
-                            <p class="mb-2"><i class="fa-solid fa-triangle-exclamation text-rose-500 w-5"></i> <b>มาสาย:</b> <span class="${lateDays > 0 ? 'text-rose-600 font-bold' : ''}">${lateDays} วัน (สะสม ${totalLateMinutes} นาที)</span></p>
+                        <div id="print-report-area" class="text-left bg-gray-50 p-5 rounded-xl mt-2 text-gray-800 border text-sm">
+                            <div class="flex justify-between border-b pb-2 mb-3">
+                                <div><i class="fa-solid fa-calendar text-blue-500 w-4"></i> <b>ประจำเดือน:</b> ${m}/${year}</div>
+                                <div><i class="fa-solid fa-building text-blue-500 w-4"></i> <b>แผนก:</b> ${currentShiftInfo.deptName}</div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <p class="text-gray-500 text-xs font-bold mb-1">สถิติการทำงาน</p>
+                                    <p><i class="fa-solid fa-briefcase text-emerald-500 w-4"></i> ทำงาน: <b>${pr.totalDays} วัน</b></p>
+                                    <p><i class="fa-solid fa-clock text-emerald-500 w-4"></i> ชม.รวม: <b>${pr.totalWorkHrs.toFixed(1)} ชม.</b></p>
+                                    <p><i class="fa-solid fa-triangle-exclamation text-rose-500 w-4"></i> มาสาย: <b class="${pr.lateDays > 0 ? 'text-rose-600' : ''}">${pr.lateDays} ครั้ง (${pr.totalLateMinutes} นาที)</b></p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500 text-xs font-bold mb-1">ชั่วโมงล่วงเวลา (OT)</p>
+                                    <p>ปกติ (x${systemSettings.otNormal}): <b>${pr.otNormalHrs.toFixed(1)} ชม.</b></p>
+                                    <p>วันหยุด (x${systemSettings.otWeekend}): <b>${pr.otWeekendHrs.toFixed(1)} ชม.</b></p>
+                                    <p>นักขัตฤกษ์ (x${systemSettings.otHoliday}): <b>${pr.otHolidayHrs.toFixed(1)} ชม.</b></p>
+                                </div>
+                            </div>
+                            
                             <hr class="my-2 border-gray-200">
-                            <p class="mb-2"><i class="fa-solid fa-money-bill text-emerald-500 w-5"></i> <b>ค่าจ้างปกติ:</b> ฿${basePay.toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
-                            <p class="mb-2"><i class="fa-solid fa-money-bill-trend-up text-emerald-500 w-5"></i> <b>ค่าล่วงเวลา (OT):</b> ฿${otPay.toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
-                            <p class="mb-2"><i class="fa-solid fa-money-bill-transfer text-rose-500 w-5"></i> <b>หักมาสาย (นาทีละ ฿${penaltyRate}):</b> <span class="text-rose-600">- ฿${penaltyPay.toLocaleString(undefined, {minimumFractionDigits: 2})}</span></p>
-                            <p class="mb-0 text-lg"><i class="fa-solid fa-sack-dollar text-emerald-500 w-5"></i> <b>รวมรายได้สุทธิ:</b> <span class="text-emerald-600 font-bold">฿${totalNet.toLocaleString(undefined, {minimumFractionDigits: 2})}</span></p>
+                            
+                            <p class="text-gray-500 text-xs font-bold mb-2">รายละเอียดรายได้และรายการหัก</p>
+                            <div class="flex justify-between mb-1"><p><i class="fa-solid fa-money-bill text-emerald-500 w-4"></i> ค่าจ้างปกติ (ฐาน ฿${empData.dailyRate||0}/วัน)</p><p>฿${pr.basePay.toLocaleString(undefined, {minimumFractionDigits: 2})}</p></div>
+                            <div class="flex justify-between mb-1"><p><i class="fa-solid fa-money-bill-trend-up text-emerald-500 w-4"></i> ค่าล่วงเวลารวม (ฐาน ฿${empData.otRate||0}/ชม.)</p><p>฿${pr.totalOTPay.toLocaleString(undefined, {minimumFractionDigits: 2})}</p></div>
+                            <div class="flex justify-between mb-1 text-rose-600"><p><i class="fa-solid fa-money-bill-transfer w-4"></i> หักมาสาย (นาทีละ ฿${empData.penaltyRate||0})</p><p>- ฿${pr.penaltyPay.toLocaleString(undefined, {minimumFractionDigits: 2})}</p></div>
+                            <div class="flex justify-between mb-3 text-rose-600"><p><i class="fa-solid fa-shield-halved w-4"></i> หักประกันสังคม (${empData.deductSso !== false ? systemSettings.ssoPercent+'%' : 'ไม่หัก'})</p><p>- ฿${pr.ssoDeduction.toLocaleString(undefined, {minimumFractionDigits: 2})}</p></div>
+                            
+                            <div class="bg-emerald-100 p-3 rounded-lg flex justify-between items-center text-lg">
+                                <p><i class="fa-solid fa-sack-dollar text-emerald-600 w-5"></i> <b>รวมรับสุทธิ (Net Pay)</b></p>
+                                <span class="text-emerald-700 font-bold">฿${pr.totalNet.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                            </div>
                         </div>
                     `,
-                    showDenyButton: true, confirmButtonText: 'ปิด', denyButtonText: '<i class="fa-solid fa-print"></i> สั่งพิมพ์', denyButtonColor: '#4b5563'
+                    width: '600px',
+                    showDenyButton: true, showCancelButton: true,
+                    confirmButtonText: 'ปิด', 
+                    denyButtonText: '<i class="fa-solid fa-print"></i> พิมพ์', denyButtonColor: '#4b5563',
+                    cancelButtonText: '<i class="fa-solid fa-envelope"></i> ส่ง Email', cancelButtonColor: '#3b82f6'
                 }).then((result) => {
                     if (result.isDenied) {
-                        const printWindow = window.open('', '', 'height=600,width=800');
-                        printWindow.document.write('<html><head><title>พิมพ์รายงาน: '+name+'</title>');
-                        printWindow.document.write('<style>body{font-family:sans-serif; padding:20px;} .box{border:1px solid #ddd; padding:20px; border-radius:8px;} h2{color:#2563eb;} p{margin-bottom:10px; font-size:16px;} hr{margin:20px 0;}</style>');
+                        const printWindow = window.open('', '', 'height=800,width=800');
+                        printWindow.document.write('<html><head><title>Payslip: '+name+'</title>');
+                        printWindow.document.write('<style>body{font-family:sans-serif; padding:40px;} .box{border:1px solid #000; padding:30px;} h2{text-align:center;} .flex{display:flex; justify-content:space-between;} hr{margin:15px 0;} table{width:100%; border-collapse:collapse; margin-bottom:20px;} th,td{border:1px solid #ddd; padding:8px; text-align:left;} th{background-color:#f4f4f4;}</style>');
                         printWindow.document.write('</head><body><div class="box">');
-                        printWindow.document.write(`<h2>สรุปรายงานการทำงาน - ${name}</h2><hr>`);
-                        printWindow.document.write(`<p><b>ประจำเดือน:</b> ${m}/${year}</p>`);
-                        printWindow.document.write(`<p><b>มาทำงานรวม:</b> ${totalDays} วัน</p>`);
-                        printWindow.document.write(`<p><b>ชั่วโมงทำงานรวม:</b> ${totalWorkHrs.toFixed(2)} ชั่วโมง</p>`);
-                        printWindow.document.write(`<p><b>ล่วงเวลา (OT):</b> ${totalOT.toFixed(2)} ชั่วโมง</p>`);
-                        printWindow.document.write(`<p><b>มาสายสะสม:</b> ${lateDays} วัน (${totalLateMinutes} นาที)</p>`);
-                        printWindow.document.write(`<hr>`);
-                        printWindow.document.write(`<p><b>ค่าจ้างปกติ (ฐาน ${dailyRate} บาท/วัน):</b> ฿${basePay.toLocaleString(undefined, {minimumFractionDigits: 2})}</p>`);
-                        printWindow.document.write(`<p><b>ค่าล่วงเวลา (ฐาน ${otRate} บาท/ชม.):</b> ฿${otPay.toLocaleString(undefined, {minimumFractionDigits: 2})}</p>`);
-                        printWindow.document.write(`<p><b>หักมาสาย (ฐาน ${penaltyRate} บาท/นาที):</b> - ฿${penaltyPay.toLocaleString(undefined, {minimumFractionDigits: 2})}</p>`);
-                        printWindow.document.write(`<h3><b>รวมรายได้สุทธิ: ฿${totalNet.toLocaleString(undefined, {minimumFractionDigits: 2})}</b></h3>`);
-                        printWindow.document.write('<hr><p style="text-align:right; font-size:12px; color:#888;">เอกสารออกโดยระบบ Time Tracker</p>');
+                        printWindow.document.write(`<h2>สลิปเงินเดือน (Payslip)</h2>`);
+                        printWindow.document.write(`<div class="flex"><p><b>ชื่อพนักงาน:</b> ${name}</p><p><b>ประจำเดือน:</b> ${m}/${year}</p></div>`);
+                        printWindow.document.write(`<div class="flex"><p><b>แผนก:</b> ${currentShiftInfo.deptName}</p><p><b>วันที่ออกเอกสาร:</b> ${new Date().toLocaleDateString('th-TH')}</p></div>`);
+                        
+                        printWindow.document.write(`<table><tr><th>รายการรายได้ (Earnings)</th><th style="text-align:right">จำนวนเงิน (บาท)</th></tr>`);
+                        printWindow.document.write(`<tr><td>ค่าจ้างปกติ (${pr.totalDays} วัน)</td><td style="text-align:right">${pr.basePay.toLocaleString(undefined, {minimumFractionDigits: 2})}</td></tr>`);
+                        if(pr.otNormalHrs>0) printWindow.document.write(`<tr><td>OT ปกติ x${systemSettings.otNormal} (${pr.otNormalHrs.toFixed(1)} ชม.)</td><td style="text-align:right">${pr.otNormalPay.toLocaleString(undefined, {minimumFractionDigits: 2})}</td></tr>`);
+                        if(pr.otWeekendHrs>0) printWindow.document.write(`<tr><td>OT วันหยุด x${systemSettings.otWeekend} (${pr.otWeekendHrs.toFixed(1)} ชม.)</td><td style="text-align:right">${pr.otWeekendPay.toLocaleString(undefined, {minimumFractionDigits: 2})}</td></tr>`);
+                        if(pr.otHolidayHrs>0) printWindow.document.write(`<tr><td>OT นักขัตฤกษ์ x${systemSettings.otHoliday} (${pr.otHolidayHrs.toFixed(1)} ชม.)</td><td style="text-align:right">${pr.otHolidayPay.toLocaleString(undefined, {minimumFractionDigits: 2})}</td></tr>`);
+                        
+                        printWindow.document.write(`<tr><th>รายการหัก (Deductions)</th><th style="text-align:right"></th></tr>`);
+                        if(pr.penaltyPay>0) printWindow.document.write(`<tr><td>หักมาสาย (${pr.totalLateMinutes} นาที)</td><td style="text-align:right">- ${pr.penaltyPay.toLocaleString(undefined, {minimumFractionDigits: 2})}</td></tr>`);
+                        if(pr.ssoDeduction>0) printWindow.document.write(`<tr><td>หักประกันสังคม</td><td style="text-align:right">- ${pr.ssoDeduction.toLocaleString(undefined, {minimumFractionDigits: 2})}</td></tr>`);
+                        
+                        printWindow.document.write(`<tr><th><h3>รวมรับสุทธิ (Net Pay)</h3></th><th style="text-align:right"><h3>${pr.totalNet.toLocaleString(undefined, {minimumFractionDigits: 2})}</h3></th></tr></table>`);
+                        printWindow.document.write('<p style="text-align:center; font-size:12px; margin-top:40px;">เอกสารนี้สร้างโดยระบบอัตโนมัติ</p>');
                         printWindow.document.write('</div></body></html>');
                         printWindow.document.close(); printWindow.print();
+                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                        if (!empData.email) return Swal.fire('ไม่พบ Email', 'พนักงานคนนี้ยังไม่ได้ระบุที่อยู่อีเมลในระบบ', 'warning');
+                        
+                        Swal.fire({ title: 'กำลังเตรียมส่ง Email...', didOpen: () => Swal.showLoading(), timer: 1500 }).then(() => {
+                            const subject = encodeURIComponent(`สลิปเงินเดือน ประจำเดือน ${m}/${year} - ${name}`);
+                            const body = encodeURIComponent(`สวัสดี ${name},\n\nนี่คือรายละเอียดสลิปเงินเดือนของคุณประจำเดือน ${m}/${year}\n\nค่าจ้างปกติ: ฿${pr.basePay.toLocaleString()}\nค่าล่วงเวลารวม (OT): ฿${pr.totalOTPay.toLocaleString()}\nหักมาสาย: -฿${pr.penaltyPay.toLocaleString()}\nหักประกันสังคม: -฿${pr.ssoDeduction.toLocaleString()}\n\nยอดเงินรับสุทธิ (Net Pay): ฿${pr.totalNet.toLocaleString()}\n\nขอบคุณที่ทำงานอย่างหนัก\nจาก ฝ่ายบุคคล`);
+                            window.location.href = `mailto:${empData.email}?subject=${subject}&body=${body}`;
+                            
+                            setTimeout(() => {
+                                Swal.fire({ icon: 'success', title: 'สร้างแบบร่าง Email สำเร็จ', text: 'ระบบได้ส่งข้อมูลไปยังแอป Email ของคุณแล้ว กรุณากดส่งจากแอปของคุณอีกครั้ง' });
+                            }, 500);
+                        });
                     }
                 });
             }
         };
 
-        // แอดมิน: โหลดสรุปเงินเดือน
         document.getElementById('btn-export-monthly-summary').addEventListener('click', async () => {
             const currentMonthStr = new Date().toISOString().slice(0, 7); 
             const { value: monthRaw } = await Swal.fire({
@@ -1513,65 +1619,20 @@
 
             if (monthRaw) {
                 const [year, m] = monthRaw.split('-');
-                let csvContent = "data:text/csv;charset=utf-8,\uFEFFชื่อพนักงาน,แผนก,กะทำงานเริ่มต้น,ค่าจ้าง/วัน,เรท OT/ชม.,หักสาย/นาที,วันทำงานทั้งหมด,วันมาสาย,สายสะสม(นาที),ชั่วโมงทำงานรวม,ชั่วโมง OT รวม,รวมค่าจ้างปกติ,รวมค่า OT,หักสายรวม,รวมเงินได้สุทธิ\n";
+                let csvContent = "data:text/csv;charset=utf-8,\uFEFFชื่อพนักงาน,แผนก,กะทำงานเริ่มต้น,ค่าจ้าง/วัน,เรท OT/ชม.,วันทำงานทั้งหมด,ชั่วโมงทำงานรวม,OTปกติ(ชม),OTวันหยุด(ชม),OTนักขัตฤกษ์(ชม),รวมค่าจ้างปกติ,รวมค่า OT,สายสะสม(นาที),หักสายรวม,หักประกันสังคม,รวมเงินได้สุทธิ\n";
 
                 allEmployeesList.forEach(emp => {
-                    const defaultShiftInfo = getEmployeeShiftDetails(emp.id); // ดึงกะเริ่มต้นมาโชว์ใน csv
-                    const dailyRate = emp.dailyRate || 0;
-                    const otRate = emp.otRate || 0;
-                    const penaltyRate = emp.penaltyRate || 0;
-
-                    const userLogs = allLogsRaw.filter(l => {
-                        if (l.userId !== emp.id || !l.timestamp) return false;
-                        const d = l.timestamp.toDate(); return d.getFullYear() == year && (d.getMonth() + 1) == m;
-                    });
-
-                    const dailyData = {};
-                    userLogs.forEach(log => {
-                        const dateStr = log.timestamp.toDate().toISOString().split('T')[0];
-                        if (!dailyData[dateStr]) dailyData[dateStr] = { in: null, out: null };
-                        const t = log.timestamp.toDate();
-                        if (log.type === 'in') { if (!dailyData[dateStr].in || t < dailyData[dateStr].in) dailyData[dateStr].in = t; } 
-                        else { if (!dailyData[dateStr].out || t > dailyData[dateStr].out) dailyData[dateStr].out = t; }
-                    });
-
-                    let totalDays = 0, lateDays = 0, totalWorkHrs = 0, totalOT = 0, totalLateMinutes = 0;
-                    
-                    Object.keys(dailyData).forEach(dateStr => {
-                        const day = dailyData[dateStr];
-                        if (day.in) {
-                            totalDays++;
-                            const shiftInfo = getEmployeeShiftDetails(emp.id, dateStr);
-
-                            if (shiftInfo.coreTime) {
-                                const [cH, cM] = shiftInfo.coreTime.split(':');
-                                const coreDate = new Date(day.in); coreDate.setHours(cH, cM, 0, 0);
-                                if (day.in > coreDate) {
-                                    lateDays++;
-                                    totalLateMinutes += Math.max(0, Math.floor((day.in - coreDate) / 60000));
-                                }
-                            }
-                            if (day.out) {
-                                const hrs = (day.out - day.in) / (1000 * 60 * 60);
-                                totalWorkHrs += hrs;
-                                if (hrs > shiftInfo.workHours) totalOT += (hrs - shiftInfo.workHours);
-                            }
-                        }
-                    });
-
-                    const basePay = totalDays * dailyRate;
-                    const otPay = totalOT * otRate;
-                    const penaltyPay = totalLateMinutes * penaltyRate;
-                    const totalNet = basePay + otPay - penaltyPay;
-
-                    csvContent += `"${emp.name}","${defaultShiftInfo.deptName}","${defaultShiftInfo.shiftName}","${dailyRate}","${otRate}","${penaltyRate}","${totalDays}","${lateDays}","${totalLateMinutes}","${totalWorkHrs.toFixed(2)}","${totalOT.toFixed(2)}","${basePay.toFixed(2)}","${otPay.toFixed(2)}","${penaltyPay.toFixed(2)}","${totalNet.toFixed(2)}"\n`;
+                    const pr = calculateEmployeePayroll(emp.id, year, m, allLogsRaw);
+                    if (pr) {
+                        const defaultShiftInfo = getEmployeeShiftDetails(emp.id); 
+                        csvContent += `"${emp.name}","${defaultShiftInfo.deptName}","${defaultShiftInfo.shiftName}","${pr.dailyRate}","${pr.otRate}","${pr.totalDays}","${pr.totalWorkHrs.toFixed(2)}","${pr.otNormalHrs.toFixed(2)}","${pr.otWeekendHrs.toFixed(2)}","${pr.otHolidayHrs.toFixed(2)}","${pr.basePay.toFixed(2)}","${pr.totalOTPay.toFixed(2)}","${pr.totalLateMinutes}","${pr.penaltyPay.toFixed(2)}","${pr.ssoDeduction.toFixed(2)}","${pr.totalNet.toFixed(2)}"\n`;
+                    }
                 });
 
                 const link = document.createElement("a"); link.href = encodeURI(csvContent); link.download = `Payroll_Summary_${m}_${year}.csv`; link.click();
             }
         });
 
-        // แอดมิน: เพิ่มเวลาย้อนหลัง
         document.getElementById('btn-add-manual-log').addEventListener('click', async () => {
             if(allEmployeesList.length === 0) return Swal.fire('ไม่พบพนักงาน', 'กรุณาเพิ่มรายชื่อพนักงานเข้าระบบก่อน', 'warning');
             
@@ -1619,7 +1680,6 @@
             }
         });
 
-        // แอดมิน: แก้ไขข้อมูลพนักงาน (ปรับโควตาและเรทเงินได้)
         window.editEmployee = async (docId) => {
             const emp = allEmployeesList.find(e => e.id === docId);
             if(!emp) return;
@@ -1627,6 +1687,8 @@
             const dailyRate = emp.dailyRate || 0;
             const otRate = emp.otRate || 0;
             const penaltyRate = emp.penaltyRate || 0;
+            const email = emp.email || '';
+            const deductSso = emp.deductSso !== false;
             
             let deptOptions = '<option value="">ไม่ระบุแผนก</option>';
             if(systemSettings.departments) systemSettings.departments.forEach(d => deptOptions += `<option value="${d.id}" ${emp.departmentId == d.id ? 'selected' : ''}>${d.name}</option>`);
@@ -1637,9 +1699,12 @@
             const { value: formValues } = await Swal.fire({
                 title: 'แก้ไขข้อมูลพนักงาน',
                 html: `
-                    <div class="text-left space-y-3 mt-4">
+                    <div class="text-left space-y-3 mt-4 h-96 overflow-y-auto pr-2">
                         <div><label class="text-sm text-gray-600">ชื่อ-นามสกุล</label><input id="swal-e-name" class="w-full p-2 border rounded outline-none" value="${emp.name}"></div>
-                        <div><label class="text-sm text-gray-600">รหัส PIN</label><input id="swal-e-pin" class="w-full p-2 border rounded outline-none tracking-widest text-center" value="${emp.pin}" maxlength="6" inputmode="numeric" pattern="[0-9]*"></div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div><label class="text-sm text-gray-600">รหัส PIN</label><input id="swal-e-pin" class="w-full p-2 border rounded outline-none tracking-widest text-center" value="${emp.pin}" maxlength="6" inputmode="numeric" pattern="[0-9]*"></div>
+                            <div><label class="text-sm text-gray-600">Email (ส่งสลิป)</label><input id="swal-e-email" type="email" class="w-full p-2 border rounded outline-none text-sm" value="${email}"></div>
+                        </div>
                         
                         <hr class="my-2 border-gray-200">
                         <p class="text-sm font-bold text-gray-700">ตำแหน่ง / แผนก / ค่าจ้าง</p>
@@ -1660,6 +1725,12 @@
                             <div><label class="text-xs text-gray-600">เรท OT/ชม.(฿)</label><input id="swal-e-ot" type="number" class="w-full p-2 border rounded outline-none" value="${otRate}"></div>
                             <div><label class="text-xs text-gray-600">หักสาย/นาที(฿)</label><input id="swal-e-penalty" type="number" class="w-full p-2 border rounded outline-none" value="${penaltyRate}"></div>
                         </div>
+                        <div class="mt-2">
+                            <label class="flex items-center text-sm text-gray-700 cursor-pointer">
+                                <input type="checkbox" id="swal-e-sso" ${deductSso ? 'checked' : ''} class="mr-2 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                คำนวณหักประกันสังคม (SSO)
+                            </label>
+                        </div>
 
                         <hr class="my-2 border-gray-200">
                         <p class="text-sm font-bold text-gray-700">โควตาวันลา (วัน)</p>
@@ -1673,15 +1744,17 @@
                 focusConfirm: false, showCancelButton: true, confirmButtonText: 'บันทึกการเปลี่ยนแปลง', cancelButtonText: 'ยกเลิก',
                 preConfirm: () => {
                     const name = document.getElementById('swal-e-name').value.trim(), pin = document.getElementById('swal-e-pin').value.trim();
+                    const email = document.getElementById('swal-e-email').value.trim();
                     const role = document.getElementById('swal-e-role').value;
                     const deptId = document.getElementById('swal-e-dept').value, shiftId = document.getElementById('swal-e-shift').value;
                     const dRate = parseFloat(document.getElementById('swal-e-daily').value) || 0;
                     const oRate = parseFloat(document.getElementById('swal-e-ot').value) || 0;
                     const pRate = parseFloat(document.getElementById('swal-e-penalty').value) || 0;
+                    const sso = document.getElementById('swal-e-sso').checked;
                     if (!name || !pin || pin.length !== 6) { Swal.showValidationMessage('กรุณากรอกชื่อและรหัส PIN 6 หลักให้ครบถ้วน'); return false; }
                     return { 
-                        name, pin, role, departmentId: deptId, shiftId: shiftId,
-                        dailyRate: dRate, otRate: oRate, penaltyRate: pRate,
+                        name, pin, email, role, departmentId: deptId, shiftId: shiftId,
+                        dailyRate: dRate, otRate: oRate, penaltyRate: pRate, deductSso: sso,
                         quotas: { 'ลาป่วย': parseFloat(document.getElementById('swal-q-sick').value) || 0, 'ลากิจ': parseFloat(document.getElementById('swal-q-personal').value) || 0, 'ลาพักร้อน': parseFloat(document.getElementById('swal-q-vacation').value) || 0, 'อื่นๆ': quotas['อื่นๆ'] || 0 }
                     };
                 }
@@ -1695,16 +1768,105 @@
                 Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
                 try {
                     await updateDoc(doc(db, "employees", docId), { 
-                        name: formValues.name, pin: formValues.pin, role: formValues.role,
+                        name: formValues.name, pin: formValues.pin, email: formValues.email, role: formValues.role,
                         departmentId: formValues.departmentId, shiftId: formValues.shiftId, 
-                        dailyRate: formValues.dailyRate, otRate: formValues.otRate, penaltyRate: formValues.penaltyRate, quotas: formValues.quotas 
+                        dailyRate: formValues.dailyRate, otRate: formValues.otRate, penaltyRate: formValues.penaltyRate, deductSso: formValues.deductSso, quotas: formValues.quotas 
                     });
                     Swal.fire({ icon: 'success', title: 'อัปเดตข้อมูลสำเร็จ', timer: 1500, showConfirmButton: false });
                 } catch (error) { Swal.fire('ผิดพลาด', error.message, 'error'); }
             }
         };
 
-        // แอดมิน: จัดการใบลา & หักโควตา
+        // --- ระบบ Pagination (แบ่งหน้าแสดงผล) ---
+        function renderTimelogsTable() {
+            const tbodyLogs = document.getElementById('admin-table-body');
+            const filterMonth = document.getElementById('filter-timelog-month').value; 
+            const filterEmp = document.getElementById('filter-timelog-emp').value; 
+            
+            let filteredLogs = [...allLogsRaw];
+            
+            if (filterMonth) {
+                const [year, month] = filterMonth.split('-');
+                filteredLogs = filteredLogs.filter(log => {
+                    if (!log.timestamp) return false;
+                    const d = log.timestamp.toDate(); return d.getFullYear() == year && (d.getMonth() + 1) == month;
+                });
+            }
+            if (filterEmp) { filteredLogs = filteredLogs.filter(log => log.userId === filterEmp); }
+            
+            filteredLogs.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+            
+            // ส่งออก CSV จะได้ข้อมูลทั้งหมดตามฟิลเตอร์
+            allLogsForExport = [];
+            filteredLogs.forEach(data => {
+                let exportTimeStr = '';
+                if (data.timestamp) exportTimeStr = data.timestamp.toDate().toLocaleString('en-GB'); 
+                const isCheckIn = data.type === 'in', empName = data.name || 'ไม่ทราบชื่อ';
+                const remarkExport = data.remark ? data.remark : '-';
+                const branchExport = data.branchName || '-';
+                allLogsForExport.push({ Date_Time: exportTimeStr, Employee: empName, Type: isCheckIn?'เข้างาน':'ออกงาน', Remark: remarkExport, Branch: branchExport, Lat: data.lat || '', Lng: data.lng || '' });
+            });
+
+            // การแบ่งหน้า (Pagination) สำหรับแสดงผลบน UI เท่านั้น
+            const totalItems = filteredLogs.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedLogs = filteredLogs.slice(startIndex, endIndex);
+
+            let logHtml = '';
+            paginatedLogs.forEach(data => {
+                let timeStr = '...';
+                if (data.timestamp) {
+                    const d = data.timestamp.toDate();
+                    timeStr = d.toLocaleString('th-TH', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+                }
+                const isCheckIn = data.type === 'in', empName = data.name || 'ไม่ทราบชื่อ';
+                const typeBadge = isCheckIn ? '<span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-bold">เข้างาน</span>' : '<span class="bg-rose-100 text-rose-700 px-2 py-1 rounded text-xs font-bold">ออกงาน</span>';
+                
+                const remarkBadge = data.remark ? `<div class="mt-1 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded inline-block"><i class="fa-regular fa-comment-dots"></i> ${data.remark}</div>` : '';
+                const photoHtml = data.isManual ? '<span class="text-[10px] text-gray-500 bg-gray-100 px-2 py-1 rounded border">แอดมินเพิ่ม</span>' : `<img src="${data.photoBase64}" class="w-10 h-10 rounded-lg object-cover border cursor-pointer hover:scale-[2] transition-transform origin-left" alt="Selfie">`;
+                const branchBadge = data.branchName ? `<div class="text-xs font-bold text-indigo-600 mb-1">${data.branchName}</div>` : '';
+                const gpsHtml = data.isManual || !data.lat ? '<span class="text-xs text-gray-400">-</span>' : `<a href="https://www.google.com/maps/search/?api=1&query=${data.lat},${data.lng}" target="_blank" class="text-blue-600 hover:underline"><i class="fa-solid fa-map-location-dot"></i> ดูแผนที่</a>`;
+
+                logHtml += `
+                    <tr class="hover:bg-gray-50 border-b">
+                        <td class="p-3 text-sm whitespace-nowrap">${timeStr}</td>
+                        <td class="p-3 text-sm font-medium text-gray-800">${empName}</td>
+                        <td class="p-3">${typeBadge}<br>${remarkBadge}</td>
+                        <td class="p-3">${photoHtml}</td>
+                        <td class="p-3 text-xs">${branchBadge}${gpsHtml}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="window.deleteTimelog('${data.id}')" class="text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-2 py-1 rounded transition text-xs shadow-sm" title="ลบรายการนี้"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+            });
+            tbodyLogs.innerHTML = logHtml || '<tr><td colspan="6" class="p-8 text-center text-gray-400">ไม่มีข้อมูลตามเงื่อนไข</td></tr>';
+
+            document.getElementById('pagination-info').innerText = `แสดง ${totalItems > 0 ? startIndex + 1 : 0}-${Math.min(endIndex, totalItems)} จาก ${totalItems} รายการ (หน้า ${currentPage}/${totalPages})`;
+            document.getElementById('btn-prev-page').disabled = currentPage === 1;
+            document.getElementById('btn-next-page').disabled = currentPage === totalPages || totalPages === 0;
+        }
+
+        document.getElementById('filter-timelog-month').addEventListener('change', () => { currentPage = 1; renderTimelogsTable(); });
+        document.getElementById('filter-timelog-emp').addEventListener('change', () => { currentPage = 1; renderTimelogsTable(); });
+        
+        document.getElementById('btn-prev-page').addEventListener('click', () => {
+            if (currentPage > 1) { currentPage--; renderTimelogsTable(); }
+        });
+        document.getElementById('btn-next-page').addEventListener('click', () => {
+            currentPage++; renderTimelogsTable(); 
+        });
+
+        document.getElementById('btn-export-csv').addEventListener('click', () => {
+            if (allLogsForExport.length === 0) return Swal.fire('ไม่มีข้อมูล', 'ไม่มีข้อมูลตามเงื่อนไขที่เลือก', 'info');
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFFDate_Time,Employee,Type,Remark,Branch,Latitude,Longitude\n";
+            allLogsForExport.forEach(row => { csvContent += `"${row.Date_Time}","${row.Employee}","${row.Type}","${row.Remark}","${row.Branch}","${row.Lat}","${row.Lng}"\n`; });
+            const link = document.createElement("a"); link.href = encodeURI(csvContent); link.download = `timelog_export_${new Date().getTime()}.csv`; link.click();
+        });
+
         window.updateLeaveStatus = async (docId, newStatus) => {
             const actionText = newStatus === 'approved' ? 'อนุมัติ (หักโควตา)' : 'ไม่อนุมัติ (คืนโควตา)';
             const result = await Swal.fire({ title: `ยืนยันการ${actionText}?`, icon: 'question', showCancelButton: true, confirmButtonColor: newStatus === 'approved' ? '#10b981' : '#e11d48', confirmButtonText: `ใช่, ดำเนินการ` });
@@ -1748,13 +1910,13 @@
             });
         };
 
-        // แอดมิน: เพิ่มพนักงาน
         document.getElementById('btn-add-employee').addEventListener('click', async () => {
             const nameInput = document.getElementById('new-emp-name'), pinInput = document.getElementById('new-emp-pin');
-            const roleInput = document.getElementById('new-emp-role');
+            const emailInput = document.getElementById('new-emp-email'), roleInput = document.getElementById('new-emp-role');
             const dailyRateInput = document.getElementById('new-emp-daily-rate'), otRateInput = document.getElementById('new-emp-ot-rate');
             const penaltyRateInput = document.getElementById('new-emp-penalty-rate');
             const deptInput = document.getElementById('new-emp-dept'), shiftInput = document.getElementById('new-emp-shift');
+            const ssoCheck = document.getElementById('new-emp-deduct-sso').checked;
             
             const name = nameInput.value.trim(), pin = pinInput.value.trim();
             const dailyRate = parseFloat(dailyRateInput?.value) || 0, otRate = parseFloat(otRateInput?.value) || 0, penaltyRate = parseFloat(penaltyRateInput?.value) || 0;
@@ -1766,15 +1928,14 @@
                 
                 const defaultQuotas = { 'ลาป่วย': 30, 'ลากิจ': 6, 'ลาพักร้อน': 6, 'อื่นๆ': 0 };
                 await addDoc(collection(db, "employees"), { 
-                    name: name, pin: pin, role: roleInput.value,
-                    departmentId: deptInput.value, shiftId: shiftInput.value, 
+                    name: name, pin: pin, email: emailInput?.value.trim() || '', role: roleInput.value,
+                    departmentId: deptInput.value, shiftId: shiftInput.value, deductSso: ssoCheck,
                     dailyRate: dailyRate, otRate: otRate, penaltyRate: penaltyRate, quotas: defaultQuotas 
                 });
                 Swal.fire({ icon: 'success', title: 'เพิ่มพนักงานสำเร็จ', timer: 1500, showConfirmButton: false }); 
                 nameInput.value = ''; pinInput.value = ''; deptInput.value = ''; shiftInput.value = ''; roleInput.value = 'staff';
-                if(dailyRateInput) dailyRateInput.value = '';
-                if(otRateInput) otRateInput.value = '';
-                if(penaltyRateInput) penaltyRateInput.value = '';
+                if(emailInput) emailInput.value = ''; if(dailyRateInput) dailyRateInput.value = '';
+                if(otRateInput) otRateInput.value = ''; if(penaltyRateInput) penaltyRateInput.value = '';
             } catch (error) { Swal.fire('ผิดพลาด', error.message, 'error'); }
         });
 
@@ -1793,72 +1954,6 @@
             });
         };
 
-        document.getElementById('btn-export-csv').addEventListener('click', () => {
-            if (allLogsForExport.length === 0) return Swal.fire('ไม่มีข้อมูล', 'ไม่มีข้อมูลตามเงื่อนไขที่เลือก', 'info');
-            let csvContent = "data:text/csv;charset=utf-8,\uFEFFDate_Time,Employee,Type,Remark,Branch,Latitude,Longitude\n";
-            allLogsForExport.forEach(row => { csvContent += `"${row.Date_Time}","${row.Employee}","${row.Type}","${row.Remark}","${row.Branch}","${row.Lat}","${row.Lng}"\n`; });
-            const link = document.createElement("a"); link.href = encodeURI(csvContent); link.download = `timelog_export_${new Date().getTime()}.csv`; link.click();
-        });
-
-        function renderTimelogsTable() {
-            allLogsForExport = [];
-            const tbodyLogs = document.getElementById('admin-table-body');
-            const filterMonth = document.getElementById('filter-timelog-month').value; 
-            const filterEmp = document.getElementById('filter-timelog-emp').value; 
-            
-            let filteredLogs = [...allLogsRaw];
-            
-            if (filterMonth) {
-                const [year, month] = filterMonth.split('-');
-                filteredLogs = filteredLogs.filter(log => {
-                    if (!log.timestamp) return false;
-                    const d = log.timestamp.toDate(); return d.getFullYear() == year && (d.getMonth() + 1) == month;
-                });
-            }
-            if (filterEmp) { filteredLogs = filteredLogs.filter(log => log.userId === filterEmp); }
-            filteredLogs.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
-            
-            let logHtml = '';
-            filteredLogs.forEach(data => {
-                let exportTimeStr = '', timeStr = '...';
-                if (data.timestamp) {
-                    const d = data.timestamp.toDate();
-                    timeStr = d.toLocaleString('th-TH', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
-                    exportTimeStr = d.toLocaleString('en-GB'); 
-                }
-                const isCheckIn = data.type === 'in', empName = data.name || 'ไม่ทราบชื่อ';
-                const typeBadge = isCheckIn ? '<span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-bold">เข้างาน</span>' : '<span class="bg-rose-100 text-rose-700 px-2 py-1 rounded text-xs font-bold">ออกงาน</span>';
-                
-                const remarkBadge = data.remark ? `<div class="mt-1 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded inline-block"><i class="fa-regular fa-comment-dots"></i> ${data.remark}</div>` : '';
-                const remarkExport = data.remark ? data.remark : '-';
-                
-                const photoHtml = data.isManual ? '<span class="text-[10px] text-gray-500 bg-gray-100 px-2 py-1 rounded border">แอดมินเพิ่ม</span>' : `<img src="${data.photoBase64}" class="w-10 h-10 rounded-lg object-cover border cursor-pointer hover:scale-[2] transition-transform origin-left" alt="Selfie">`;
-                
-                const branchBadge = data.branchName ? `<div class="text-xs font-bold text-indigo-600 mb-1">${data.branchName}</div>` : '';
-                const branchExport = data.branchName || '-';
-                const gpsHtml = data.isManual || !data.lat ? '<span class="text-xs text-gray-400">-</span>' : `<a href="https://www.google.com/maps/search/?api=1&query=${data.lat},${data.lng}" target="_blank" class="text-blue-600 hover:underline"><i class="fa-solid fa-map-location-dot"></i> ดูแผนที่</a>`;
-
-                allLogsForExport.push({ Date_Time: exportTimeStr, Employee: empName, Type: isCheckIn?'เข้างาน':'ออกงาน', Remark: remarkExport, Branch: branchExport, Lat: data.lat || '', Lng: data.lng || '' });
-
-                logHtml += `
-                    <tr class="hover:bg-gray-50 border-b">
-                        <td class="p-3 text-sm whitespace-nowrap">${timeStr}</td>
-                        <td class="p-3 text-sm font-medium text-gray-800">${empName}</td>
-                        <td class="p-3">${typeBadge}<br>${remarkBadge}</td>
-                        <td class="p-3">${photoHtml}</td>
-                        <td class="p-3 text-xs">${branchBadge}${gpsHtml}</td>
-                        <td class="p-3 text-center">
-                            <button onclick="window.deleteTimelog('${data.id}')" class="text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-2 py-1 rounded transition text-xs shadow-sm" title="ลบรายการนี้"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>`;
-            });
-            tbodyLogs.innerHTML = logHtml || '<tr><td colspan="6" class="p-8 text-center text-gray-400">ไม่มีข้อมูลตามเงื่อนไข</td></tr>';
-        }
-
-        document.getElementById('filter-timelog-month').addEventListener('change', renderTimelogsTable);
-        document.getElementById('filter-timelog-emp').addEventListener('change', renderTimelogsTable);
-
-        // ระบบแผนก
         function renderDepartmentsList() {
             const container = document.getElementById('depts-list');
             if (!systemSettings.departments || systemSettings.departments.length === 0) {
@@ -1870,14 +1965,12 @@
             });
             container.innerHTML = html;
         }
-
         window.removeDept = (idx) => { systemSettings.departments.splice(idx, 1); renderDepartmentsList(); };
         document.getElementById('btn-add-dept').addEventListener('click', () => {
             if (!systemSettings.departments) systemSettings.departments = [];
             systemSettings.departments.push({ id: Date.now(), name: 'แผนกใหม่' }); renderDepartmentsList();
         });
 
-        // ระบบกะการทำงาน
         function renderShiftsList() {
             const container = document.getElementById('shifts-list');
             if (!systemSettings.shifts || systemSettings.shifts.length === 0) {
@@ -1885,107 +1978,63 @@
             }
             let html = '';
             systemSettings.shifts.forEach((s, idx) => {
-                html += `
-                    <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                        <div class="flex justify-between items-start mb-2">
-                            <input type="text" id="shift-name-${idx}" value="${s.name}" class="font-bold text-gray-700 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none w-1/2 text-sm" placeholder="ชื่อกะ (เช่น กะดึก)">
-                            <button onclick="window.removeShift(${idx})" class="text-rose-500 hover:text-rose-700 text-xs"><i class="fa-solid fa-trash"></i> ลบ</button>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div><label class="text-[10px] text-gray-500">เวลาเข้าปกติ</label><input type="time" id="shift-coretime-${idx}" value="${s.coreTime}" class="w-full p-1.5 text-xs border rounded outline-none"></div>
-                            <div><label class="text-[10px] text-gray-500">ชม. ต่อวัน (คิด OT)</label><input type="number" step="0.5" id="shift-workhours-${idx}" value="${s.workHours}" class="w-full p-1.5 text-xs border rounded outline-none"></div>
-                        </div>
-                    </div>`;
+                html += `<div class="bg-gray-50 p-3 rounded-lg border border-gray-200"><div class="flex justify-between items-start mb-2"><input type="text" id="shift-name-${idx}" value="${s.name}" class="font-bold text-gray-700 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none w-1/2 text-sm" placeholder="ชื่อกะ (เช่น กะดึก)"><button onclick="window.removeShift(${idx})" class="text-rose-500 hover:text-rose-700 text-xs"><i class="fa-solid fa-trash"></i> ลบ</button></div><div class="grid grid-cols-2 gap-2"><div><label class="text-[10px] text-gray-500">เวลาเข้าปกติ</label><input type="time" id="shift-coretime-${idx}" value="${s.coreTime}" class="w-full p-1.5 text-xs border rounded outline-none"></div><div><label class="text-[10px] text-gray-500">ชม. ต่อวัน (คิด OT)</label><input type="number" step="0.5" id="shift-workhours-${idx}" value="${s.workHours}" class="w-full p-1.5 text-xs border rounded outline-none"></div></div></div>`;
             });
             container.innerHTML = html;
         }
-
         window.removeShift = (idx) => { systemSettings.shifts.splice(idx, 1); renderShiftsList(); };
         document.getElementById('btn-add-shift').addEventListener('click', () => {
             if (!systemSettings.shifts) systemSettings.shifts = [];
             systemSettings.shifts.push({ id: Date.now(), name: 'กะใหม่', coreTime: '08:00', workHours: 8 }); renderShiftsList();
         });
 
-        // ระบบเพิ่มสาขา
         function renderBranchesList() {
             const container = document.getElementById('branches-list');
             if (!systemSettings.branches || systemSettings.branches.length === 0) {
-                container.innerHTML = '<div class="text-sm text-gray-400 border border-dashed rounded-lg p-4 text-center">ยังไม่มีการตั้งสาขา (พนักงานจะกดเข้างานได้ทุกที่)</div>';
-                return;
+                container.innerHTML = '<div class="text-sm text-gray-400 border border-dashed rounded-lg p-4 text-center">ยังไม่มีการตั้งสาขา (พนักงานจะกดเข้างานได้ทุกที่)</div>'; return;
             }
             let html = '';
             systemSettings.branches.forEach((b, idx) => {
-                html += `
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <div class="flex justify-between items-start mb-2">
-                            <input type="text" id="branch-name-${idx}" value="${b.name}" class="font-bold text-gray-700 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none w-1/2" placeholder="ชื่อสาขา">
-                            <button onclick="window.removeBranch(${idx})" class="text-rose-500 hover:text-rose-700 text-xs"><i class="fa-solid fa-trash"></i> ลบ</button>
-                        </div>
-                        <div class="grid grid-cols-3 gap-2">
-                            <div><label class="text-[10px] text-gray-500">Latitude</label><input type="number" step="any" id="branch-lat-${idx}" value="${b.lat}" class="w-full p-1.5 text-xs border rounded outline-none"></div>
-                            <div><label class="text-[10px] text-gray-500">Longitude</label><input type="number" step="any" id="branch-lng-${idx}" value="${b.lng}" class="w-full p-1.5 text-xs border rounded outline-none"></div>
-                            <div><label class="text-[10px] text-gray-500">รัศมี (ม.)</label><input type="number" id="branch-rad-${idx}" value="${b.radius}" class="w-full p-1.5 text-xs border rounded outline-none"></div>
-                        </div>
-                    </div>
-                `;
+                html += `<div class="bg-gray-50 p-4 rounded-lg border border-gray-200"><div class="flex justify-between items-start mb-2"><input type="text" id="branch-name-${idx}" value="${b.name}" class="font-bold text-gray-700 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none w-1/2" placeholder="ชื่อสาขา"><button onclick="window.removeBranch(${idx})" class="text-rose-500 hover:text-rose-700 text-xs"><i class="fa-solid fa-trash"></i> ลบ</button></div><div class="grid grid-cols-3 gap-2"><div><label class="text-[10px] text-gray-500">Latitude</label><input type="number" step="any" id="branch-lat-${idx}" value="${b.lat}" class="w-full p-1.5 text-xs border rounded outline-none"></div><div><label class="text-[10px] text-gray-500">Longitude</label><input type="number" step="any" id="branch-lng-${idx}" value="${b.lng}" class="w-full p-1.5 text-xs border rounded outline-none"></div><div><label class="text-[10px] text-gray-500">รัศมี (ม.)</label><input type="number" id="branch-rad-${idx}" value="${b.radius}" class="w-full p-1.5 text-xs border rounded outline-none"></div></div></div>`;
             });
             container.innerHTML = html;
         }
-
-        window.removeBranch = (idx) => {
-            systemSettings.branches.splice(idx, 1);
-            renderBranchesList();
-        };
-
+        window.removeBranch = (idx) => { systemSettings.branches.splice(idx, 1); renderBranchesList(); };
         document.getElementById('btn-add-branch').addEventListener('click', () => {
             if (!systemSettings.branches) systemSettings.branches = [];
-            systemSettings.branches.push({ id: Date.now(), name: 'สาขาใหม่', lat: '', lng: '', radius: 100 });
-            renderBranchesList();
+            systemSettings.branches.push({ id: Date.now(), name: 'สาขาใหม่', lat: '', lng: '', radius: 100 }); renderBranchesList();
         });
 
-        // ระบบเพิ่มวันหยุดบริษัท
         function renderHolidaysList() {
             const container = document.getElementById('holidays-list');
             if (!systemSettings.holidays || systemSettings.holidays.length === 0) {
-                container.innerHTML = '<div class="text-sm text-gray-400 border border-dashed rounded-lg p-4 text-center">ยังไม่มีการตั้งวันหยุดบริษัท</div>';
-                return;
+                container.innerHTML = '<div class="text-sm text-gray-400 border border-dashed rounded-lg p-4 text-center">ยังไม่มีการตั้งวันหยุดบริษัท</div>'; return;
             }
             let html = '';
-            // เรียงวันที่จากเก่าไปใหม่
             systemSettings.holidays.sort((a,b) => new Date(a.date) - new Date(b.date));
             systemSettings.holidays.forEach((h, idx) => {
-                html += `
-                    <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 flex justify-between items-center">
-                        <div class="flex gap-4 w-full mr-4">
-                            <input type="date" id="hol-date-${idx}" value="${h.date}" class="p-2 border border-gray-300 rounded text-sm w-1/3 focus:ring-2 focus:ring-blue-500 outline-none">
-                            <input type="text" id="hol-name-${idx}" value="${h.name}" placeholder="ชื่อวันหยุด (เช่น วันสงกรานต์)" class="p-2 border border-gray-300 rounded text-sm w-2/3 focus:ring-2 focus:ring-blue-500 outline-none">
-                        </div>
-                        <button onclick="window.removeHoliday(${idx})" class="text-rose-500 hover:text-rose-700 bg-rose-50 p-2 rounded-lg"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                `;
+                html += `<div class="bg-gray-50 p-3 rounded-lg border border-gray-200 flex justify-between items-center"><div class="flex gap-4 w-full mr-4"><input type="date" id="hol-date-${idx}" value="${h.date}" class="p-2 border border-gray-300 rounded text-sm w-1/3 focus:ring-2 focus:ring-blue-500 outline-none"><input type="text" id="hol-name-${idx}" value="${h.name}" placeholder="ชื่อวันหยุด (เช่น วันสงกรานต์)" class="p-2 border border-gray-300 rounded text-sm w-2/3 focus:ring-2 focus:ring-blue-500 outline-none"></div><button onclick="window.removeHoliday(${idx})" class="text-rose-500 hover:text-rose-700 bg-rose-50 p-2 rounded-lg"><i class="fa-solid fa-trash"></i></button></div>`;
             });
             container.innerHTML = html;
         }
-
-        window.removeHoliday = (idx) => {
-            systemSettings.holidays.splice(idx, 1);
-            renderHolidaysList();
-        };
-
+        window.removeHoliday = (idx) => { systemSettings.holidays.splice(idx, 1); renderHolidaysList(); };
         document.getElementById('btn-add-holiday').addEventListener('click', () => {
             if (!systemSettings.holidays) systemSettings.holidays = [];
-            systemSettings.holidays.push({ date: '', name: '' });
-            renderHolidaysList();
+            systemSettings.holidays.push({ date: '', name: '' }); renderHolidaysList();
         });
 
         function populateSettingsForm() {
             document.getElementById('setting-announcement').value = systemSettings.announcement || '';
             document.getElementById('setting-workhours').value = systemSettings.workHours || 8;
             document.getElementById('setting-coretime').value = systemSettings.coreTime || '09:00';
-            renderDepartmentsList();
-            renderShiftsList();
-            renderBranchesList();
-            renderHolidaysList();
+            
+            document.getElementById('setting-ot-normal').value = systemSettings.otNormal || 1.5;
+            document.getElementById('setting-ot-weekend').value = systemSettings.otWeekend || 2;
+            document.getElementById('setting-ot-holiday').value = systemSettings.otHoliday || 3;
+            document.getElementById('setting-sso-percent').value = systemSettings.ssoPercent || 5;
+            document.getElementById('setting-sso-max').value = systemSettings.ssoMax || 750;
+            
+            renderDepartmentsList(); renderShiftsList(); renderBranchesList(); renderHolidaysList();
         }
 
         document.getElementById('btn-save-settings').addEventListener('click', async () => {
@@ -1993,54 +2042,23 @@
             const workHours = document.getElementById('setting-workhours').value;
             const coreTime = document.getElementById('setting-coretime').value;
             
-            let updatedDepts = [];
-            if (systemSettings.departments) {
-                systemSettings.departments.forEach((d, idx) => {
-                    const name = document.getElementById(`dept-name-${idx}`).value;
-                    if(name) updatedDepts.push({ id: d.id, name: name });
-                });
-            }
-
-            let updatedShifts = [];
-            if (systemSettings.shifts) {
-                systemSettings.shifts.forEach((s, idx) => {
-                    const name = document.getElementById(`shift-name-${idx}`).value;
-                    const ctime = document.getElementById(`shift-coretime-${idx}`).value;
-                    const whours = document.getElementById(`shift-workhours-${idx}`).value;
-                    if(name && ctime && whours) updatedShifts.push({ id: s.id, name: name, coreTime: ctime, workHours: parseFloat(whours) });
-                });
-            }
-
-            let updatedBranches = [];
-            if (systemSettings.branches) {
-                systemSettings.branches.forEach((b, idx) => {
-                    const name = document.getElementById(`branch-name-${idx}`).value;
-                    const lat = document.getElementById(`branch-lat-${idx}`).value;
-                    const lng = document.getElementById(`branch-lng-${idx}`).value;
-                    const rad = document.getElementById(`branch-rad-${idx}`).value;
-                    if(name && lat && lng) updatedBranches.push({ id: b.id, name: name, lat: parseFloat(lat), lng: parseFloat(lng), radius: parseInt(rad) });
-                });
-            }
-
-            let updatedHolidays = [];
-            if (systemSettings.holidays) {
-                systemSettings.holidays.forEach((h, idx) => {
-                    const hdate = document.getElementById(`hol-date-${idx}`).value;
-                    const hname = document.getElementById(`hol-name-${idx}`).value;
-                    if(hdate && hname) updatedHolidays.push({ date: hdate, name: hname });
-                });
-            }
+            const otNormal = parseFloat(document.getElementById('setting-ot-normal').value) || 1.5;
+            const otWeekend = parseFloat(document.getElementById('setting-ot-weekend').value) || 2;
+            const otHoliday = parseFloat(document.getElementById('setting-ot-holiday').value) || 3;
+            const ssoPercent = parseFloat(document.getElementById('setting-sso-percent').value) || 5;
+            const ssoMax = parseFloat(document.getElementById('setting-sso-max').value) || 750;
+            
+            let updatedDepts = []; if (systemSettings.departments) { systemSettings.departments.forEach((d, idx) => { const name = document.getElementById(`dept-name-${idx}`).value; if(name) updatedDepts.push({ id: d.id, name: name }); }); }
+            let updatedShifts = []; if (systemSettings.shifts) { systemSettings.shifts.forEach((s, idx) => { const name = document.getElementById(`shift-name-${idx}`).value; const ctime = document.getElementById(`shift-coretime-${idx}`).value; const whours = document.getElementById(`shift-workhours-${idx}`).value; if(name && ctime && whours) updatedShifts.push({ id: s.id, name: name, coreTime: ctime, workHours: parseFloat(whours) }); }); }
+            let updatedBranches = []; if (systemSettings.branches) { systemSettings.branches.forEach((b, idx) => { const name = document.getElementById(`branch-name-${idx}`).value; const lat = document.getElementById(`branch-lat-${idx}`).value; const lng = document.getElementById(`branch-lng-${idx}`).value; const rad = document.getElementById(`branch-rad-${idx}`).value; if(name && lat && lng) updatedBranches.push({ id: b.id, name: name, lat: parseFloat(lat), lng: parseFloat(lng), radius: parseInt(rad) }); }); }
+            let updatedHolidays = []; if (systemSettings.holidays) { systemSettings.holidays.forEach((h, idx) => { const hdate = document.getElementById(`hol-date-${idx}`).value; const hname = document.getElementById(`hol-name-${idx}`).value; if(hdate && hname) updatedHolidays.push({ date: hdate, name: hname }); }); }
 
             Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             try {
                 const newData = { 
-                    announcement: announcement,
-                    departments: updatedDepts,
-                    shifts: updatedShifts,
-                    branches: updatedBranches, 
-                    holidays: updatedHolidays,
-                    workHours: workHours ? parseFloat(workHours) : 8, 
-                    coreTime: coreTime || "09:00" 
+                    announcement: announcement, departments: updatedDepts, shifts: updatedShifts, branches: updatedBranches, holidays: updatedHolidays, 
+                    workHours: workHours ? parseFloat(workHours) : 8, coreTime: coreTime || "09:00",
+                    otNormal: otNormal, otWeekend: otWeekend, otHoliday: otHoliday, ssoPercent: ssoPercent, ssoMax: ssoMax
                 };
                 await setDoc(doc(db, "settings", "general"), newData);
                 systemSettings = { ...systemSettings, ...newData }; 
