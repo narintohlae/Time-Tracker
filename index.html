@@ -14,7 +14,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; }
+        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;700&display=swap');
+        body { font-family: 'Prompt', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; }
         .hide { display: none !important; }
         .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
         #camera-feed { object-fit: cover; border-radius: 0.5rem; transform: scaleX(-1); }
@@ -24,6 +25,12 @@
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* สไตล์สำหรับ Modal แสดง PDF/ภาพ */
+        .swal2-html-container { margin: 1em 0 0 0 !important; overflow: hidden; }
+        
+        /* ฟอนต์นาฬิกาดิจิทัล */
+        .digital-clock { font-variant-numeric: tabular-nums; letter-spacing: -0.05em; }
     </style>
 </head>
 <body class="text-gray-800 h-screen flex flex-col">
@@ -40,16 +47,16 @@
     </nav>
     
     <!-- แถบแจ้งเตือน Offline -->
-    <div id="offline-banner" class="hide bg-rose-500 text-white text-center py-1.5 text-xs font-bold w-full z-10">
+    <div id="offline-banner" class="hide bg-rose-500 text-white text-center py-1.5 text-xs font-bold w-full z-10 shadow-sm">
         <i class="fa-solid fa-wifi-slash mr-1"></i> โหมดออฟไลน์: ข้อมูลจะถูกบันทึกลงเครื่องชั่วคราวและซิงค์เมื่อมีอินเทอร์เน็ต
     </div>
 
     <!-- ==================== หน้าจอ Login ==================== -->
     <div id="view-login" class="flex-1 flex justify-center items-center p-4">
-        <div class="glass-panel p-8 rounded-2xl shadow-xl w-full max-w-md">
+        <div class="glass-panel p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-100">
             <div class="text-center mb-8">
-                <div class="bg-blue-100 text-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
-                    <i class="fa-solid fa-keyboard"></i>
+                <div class="bg-gradient-to-br from-blue-500 to-indigo-600 text-white w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4 text-4xl shadow-lg transform rotate-3 hover:rotate-0 transition-transform duration-300">
+                    <i class="fa-solid fa-fingerprint"></i>
                 </div>
                 <h2 class="text-2xl font-bold text-gray-800">เข้าสู่ระบบ</h2>
                 <p class="text-gray-500 text-sm mt-1">กรุณากรอกรหัส PIN หรือล็อกอินผู้ดูแลระบบ</p>
@@ -58,13 +65,13 @@
             <div id="form-pin" class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1 text-center">รหัส PIN 6 หลัก</label>
-                    <input type="password" id="login-pin" maxlength="6" inputmode="numeric" pattern="[0-9]*" class="w-full p-4 text-center text-3xl tracking-[0.5em] border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:tracking-normal" placeholder="••••••">
+                    <input type="password" id="login-pin" maxlength="6" inputmode="numeric" pattern="[0-9]*" class="w-full p-4 text-center text-3xl tracking-[0.5em] border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 focus:outline-none transition-all placeholder:tracking-normal" placeholder="••••••">
                 </div>
-                <button id="btn-login-pin" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition shadow-lg mt-4 flex justify-center items-center">
+                <button id="btn-login-pin" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition shadow-lg mt-4 flex justify-center items-center">
                     <span>เข้าสู่ระบบด้วย PIN</span>
                 </button>
                 <div class="text-center mt-4">
-                    <button id="toggle-to-admin" class="text-sm text-gray-500 hover:text-blue-600 underline">สำหรับผู้ดูแลระบบ</button>
+                    <button id="toggle-to-admin" class="text-sm text-gray-500 hover:text-blue-600 font-medium underline">สำหรับผู้ดูแลระบบ</button>
                 </div>
             </div>
 
@@ -77,11 +84,11 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">รหัสผ่าน</label>
                     <input type="password" id="login-password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="••••••••">
                 </div>
-                <button id="btn-login" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 rounded-lg transition shadow-lg mt-4 flex justify-center items-center">
+                <button id="btn-login" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3.5 rounded-xl transition shadow-lg mt-4 flex justify-center items-center">
                     <span>เข้าสู่ระบบแอดมิน</span>
                 </button>
                 <div class="text-center mt-4">
-                    <button id="toggle-to-pin" class="text-sm text-gray-500 hover:text-blue-600 underline">กลับไปใช้รหัส PIN</button>
+                    <button id="toggle-to-pin" class="text-sm text-gray-500 hover:text-blue-600 font-medium underline">กลับไปใช้รหัส PIN</button>
                 </div>
             </div>
         </div>
@@ -102,6 +109,23 @@
                 <!-- Section: บันทึกเวลา -->
                 <div id="section-emp-time" class="space-y-6">
                     
+                    <!-- คำทักทายและนาฬิกา (อัปเกรดใหม่) -->
+                    <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 text-white/10 text-8xl"><i class="fa-regular fa-clock"></i></div>
+                        <p class="text-blue-100 text-sm font-medium mb-1" id="emp-greeting">สวัสดี,</p>
+                        <h2 class="text-2xl font-bold mb-4 truncate" id="emp-welcome-name">พนักงาน</h2>
+                        
+                        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center border border-white/20">
+                            <p class="text-blue-100 text-xs mb-1" id="realtime-date">วันจันทร์ที่ 1 มกราคม 2024</p>
+                            <div class="text-5xl font-black tracking-tight digital-clock drop-shadow-md" id="realtime-clock">00:00<span class="text-2xl text-blue-200"> 00</span></div>
+                        </div>
+                        
+                        <div class="mt-4 flex justify-between items-center text-xs bg-black/20 rounded-lg p-2 px-3">
+                            <span class="flex items-center"><i class="fa-solid fa-briefcase mr-2 text-blue-300"></i><span id="emp-dept-badge">แผนกทั่วไป</span></span>
+                            <span class="flex items-center text-amber-200"><i class="fa-solid fa-bullseye mr-1"></i> เข้าก่อน <span id="emp-target-time" class="font-bold ml-1">09:00</span></span>
+                        </div>
+                    </div>
+
                     <div id="emp-announcement-box" class="hide bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 p-4 rounded-r-2xl shadow-sm mb-2">
                         <div class="flex items-start">
                             <div class="flex-shrink-0"><i class="fa-solid fa-bullhorn text-blue-500 mt-1"></i></div>
@@ -112,82 +136,92 @@
                         </div>
                     </div>
 
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                        <div class="flex justify-between items-end mb-3">
-                            <h3 class="font-bold text-gray-700"><i class="fa-solid fa-chart-simple text-blue-500 mr-2"></i>สรุปงานเดือนนี้ (<span id="emp-month-label">...</span>)</h3>
-                            <div class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-bold" id="emp-dept-shift-badge">กะมาตรฐาน</div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-2 text-center">
-                            <div class="bg-blue-50 p-2 rounded-lg">
-                                <p class="text-xs text-gray-500">มาทำงาน</p>
-                                <p class="text-lg font-bold text-blue-600" id="emp-stat-days">0<span class="text-xs font-normal text-gray-500"> วัน</span></p>
+                    <!-- แดชบอร์ดส่วนตัวพนักงาน -->
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-gray-700 mb-4"><i class="fa-solid fa-chart-simple text-blue-500 mr-2"></i>สรุปผลงานเดือน <span id="emp-month-label" class="text-blue-600">...</span></h3>
+                        <div class="grid grid-cols-3 gap-3 text-center">
+                            <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-100">
+                                <p class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider mb-1">มาทำงาน</p>
+                                <p class="text-2xl font-bold text-emerald-700" id="emp-stat-days">0<span class="text-xs font-normal text-emerald-600 ml-1">วัน</span></p>
                             </div>
-                            <div class="bg-rose-50 p-2 rounded-lg">
-                                <p class="text-xs text-gray-500">มาสาย</p>
-                                <p class="text-lg font-bold text-rose-600" id="emp-stat-late">0<span class="text-xs font-normal text-gray-500"> ครั้ง</span></p>
+                            <div class="bg-rose-50 p-3 rounded-xl border border-rose-100">
+                                <p class="text-[10px] text-rose-600 font-bold uppercase tracking-wider mb-1">มาสาย</p>
+                                <p class="text-2xl font-bold text-rose-700" id="emp-stat-late">0<span class="text-xs font-normal text-rose-600 ml-1">ครั้ง</span></p>
                             </div>
-                            <div class="bg-orange-50 p-2 rounded-lg">
-                                <p class="text-xs text-gray-500">OT รวม</p>
-                                <p class="text-lg font-bold text-orange-600" id="emp-stat-ot">0<span class="text-xs font-normal text-gray-500"> ชม.</span></p>
+                            <div class="bg-orange-50 p-3 rounded-xl border border-orange-100">
+                                <p class="text-[10px] text-orange-600 font-bold uppercase tracking-wider mb-1">OT รวม</p>
+                                <p class="text-2xl font-bold text-orange-700" id="emp-stat-ot">0<span class="text-xs font-normal text-orange-600 ml-1">ชม.</span></p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                        <div class="flex justify-between items-center mb-3">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                        <div class="flex justify-between items-center mb-4">
                             <h3 class="font-bold text-gray-700"><i class="fa-solid fa-camera text-blue-500 mr-2"></i>ถ่ายรูปยืนยันตัวตน</h3>
-                            <span id="gps-status" class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full"><i class="fa-solid fa-location-crosshairs fa-spin mr-1"></i>หาพิกัด...</span>
+                            <span id="gps-status" class="text-xs bg-yellow-100 text-yellow-700 px-2.5 py-1 rounded-full font-medium"><i class="fa-solid fa-location-crosshairs fa-spin mr-1"></i>หาพิกัด...</span>
                         </div>
-                        <div class="relative w-full aspect-[3/4] bg-gray-200 rounded-lg overflow-hidden mb-3 border-2 border-dashed border-gray-300 flex justify-center items-center">
+                        <div class="relative w-full aspect-[3/4] bg-gray-100 rounded-xl overflow-hidden mb-4 border-2 border-dashed border-gray-300 flex justify-center items-center shadow-inner">
                             <video id="camera-feed" class="w-full h-full object-cover absolute top-0 left-0" autoplay playsinline></video>
                             <img id="captured-photo" class="w-full h-full object-cover absolute top-0 left-0 hide" />
                             <div id="camera-placeholder" class="text-gray-400 flex flex-col items-center">
-                                <i class="fa-solid fa-video-slash text-4xl mb-2"></i>
-                                <span>ยังไม่ได้เปิดกล้อง</span>
+                                <div class="bg-gray-200 w-16 h-16 rounded-full flex items-center justify-center mb-3 shadow-sm">
+                                    <i class="fa-solid fa-video-slash text-2xl"></i>
+                                </div>
+                                <span class="font-medium text-sm">ยังไม่ได้เปิดกล้อง</span>
                             </div>
                         </div>
-                        <div class="flex gap-2 mb-3">
-                            <button id="btn-start-camera" class="flex-1 bg-gray-800 text-white py-2 rounded-lg text-sm hover:bg-gray-900 transition">
-                                <i class="fa-solid fa-camera"></i> เปิดกล้อง
+                        <div class="flex gap-2 mb-4">
+                            <button id="btn-start-camera" class="flex-1 bg-gray-800 text-white py-3 rounded-xl text-sm font-bold hover:bg-gray-900 transition shadow-sm">
+                                <i class="fa-solid fa-camera mr-1"></i> เปิดกล้อง
                             </button>
-                            <button id="btn-snap" class="hide flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm hover:bg-blue-700 transition">
-                                <i class="fa-solid fa-bolt"></i> ถ่ายรูป
+                            <button id="btn-snap" class="hide flex-1 bg-blue-600 text-white py-3 rounded-xl text-sm font-bold hover:bg-blue-700 transition shadow-md">
+                                <i class="fa-solid fa-bolt mr-1"></i> ถ่ายรูป
                             </button>
-                            <button id="btn-retake" class="hide flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg text-sm hover:bg-gray-300 transition">
-                                <i class="fa-solid fa-rotate-right"></i> ถ่ายใหม่
+                            <button id="btn-retake" class="hide flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl text-sm font-bold hover:bg-gray-300 transition">
+                                <i class="fa-solid fa-rotate-right mr-1"></i> ถ่ายใหม่
                             </button>
                         </div>
                         <canvas id="photo-canvas" class="hide"></canvas>
 
                         <!-- ช่องพิมพ์หมายเหตุ -->
-                        <div class="mt-4 mb-2">
-                            <input type="text" id="log-remark" placeholder="หมายเหตุเพิ่มเติม (ถ้ามี) เช่น ไปพบลูกค้า..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                        <div class="mt-2">
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fa-regular fa-comment-dots text-gray-400"></i>
+                                </div>
+                                <input type="text" id="log-remark" placeholder="ระบุหมายเหตุ (ถ้ามี) เช่น รถติด, ลืมกด..." class="w-full pl-10 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm transition-all bg-gray-50 focus:bg-white">
+                            </div>
                         </div>
                     </div>
 
                     <div>
                         <!-- แสดงสถานะของวันนี้ -->
-                        <div class="text-center mb-3">
-                            <span class="text-sm font-medium text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full border border-gray-200 shadow-sm">
-                                สถานะวันนี้: <span id="emp-current-status" class="font-bold text-gray-400">กำลังโหลด...</span>
-                            </span>
+                        <div class="text-center mb-4">
+                            <div class="inline-block bg-white px-4 py-2 rounded-full border border-gray-200 shadow-sm">
+                                <span class="text-sm font-bold text-gray-600">
+                                    สถานะวันนี้: <span id="emp-current-status" class="text-gray-400">กำลังโหลด...</span>
+                                </span>
+                            </div>
                         </div>
                         
                         <div class="grid grid-cols-2 gap-4">
-                            <button id="btn-checkin" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-2xl shadow-lg transition flex flex-col items-center disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                                <i class="fa-solid fa-sign-in-alt text-2xl mb-1"></i>
-                                <span>เข้างาน</span>
+                            <button id="btn-checkin" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-5 rounded-2xl shadow-[0_8px_0_0_#059669] hover:shadow-[0_4px_0_0_#059669] hover:translate-y-1 transition-all flex flex-col items-center disabled:opacity-50 disabled:shadow-none disabled:translate-y-0 disabled:cursor-not-allowed" disabled>
+                                <i class="fa-solid fa-sign-in-alt text-3xl mb-2"></i>
+                                <span class="text-lg">เข้างาน</span>
                             </button>
-                            <button id="btn-checkout" class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-4 rounded-2xl shadow-lg transition flex flex-col items-center disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                                <i class="fa-solid fa-sign-out-alt text-2xl mb-1"></i>
-                                <span>ออกงาน</span>
+                            <button id="btn-checkout" class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-5 rounded-2xl shadow-[0_8px_0_0_#e11d48] hover:shadow-[0_4px_0_0_#e11d48] hover:translate-y-1 transition-all flex flex-col items-center disabled:opacity-50 disabled:shadow-none disabled:translate-y-0 disabled:cursor-not-allowed" disabled>
+                                <i class="fa-solid fa-sign-out-alt text-3xl mb-2"></i>
+                                <span class="text-lg">ออกงาน</span>
                             </button>
                         </div>
                     </div>
 
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                        <h3 class="font-bold text-gray-700 mb-3"><i class="fa-solid fa-clock-rotate-left text-blue-500 mr-2"></i>ประวัติส่วนตัวของฉัน (ล่าสุด)</h3>
-                        <div id="emp-personal-history" class="space-y-3 max-h-48 overflow-y-auto pr-2">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-gray-700"><i class="fa-solid fa-clock-rotate-left text-blue-500 mr-2"></i>ประวัติล่าสุด</h3>
+                            <span class="text-xs text-gray-400">10 รายการล่าสุด</span>
+                        </div>
+                        <div id="emp-personal-history" class="space-y-3 max-h-60 overflow-y-auto pr-2">
                             <div class="text-center text-sm text-gray-400 py-4">กำลังโหลด...</div>
                         </div>
                     </div>
@@ -196,59 +230,60 @@
                 <!-- Section: ขอลางาน -->
                 <div id="section-emp-leave" class="hide space-y-6">
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-                        <h3 class="font-bold text-gray-800 mb-2 text-lg">แบบฟอร์มขอลางาน</h3>
+                        <h3 class="font-bold text-gray-800 mb-4 text-lg"><i class="fa-solid fa-file-contract text-blue-500 mr-2"></i>แบบฟอร์มขอลางาน</h3>
                         
                         <!-- โควตาคงเหลือ -->
-                        <div class="grid grid-cols-3 gap-2 mb-4 text-center">
-                            <div class="bg-indigo-50 p-2 rounded-lg border border-indigo-100"><p class="text-[10px] text-gray-500 font-bold">ลาป่วยเหลือ</p><p class="font-bold text-indigo-600 text-sm" id="quota-sick">-</p></div>
-                            <div class="bg-indigo-50 p-2 rounded-lg border border-indigo-100"><p class="text-[10px] text-gray-500 font-bold">ลากิจเหลือ</p><p class="font-bold text-indigo-600 text-sm" id="quota-personal">-</p></div>
-                            <div class="bg-indigo-50 p-2 rounded-lg border border-indigo-100"><p class="text-[10px] text-gray-500 font-bold">พักร้อนเหลือ</p><p class="font-bold text-indigo-600 text-sm" id="quota-vacation">-</p></div>
+                        <div class="grid grid-cols-3 gap-2 mb-6 text-center">
+                            <div class="bg-indigo-50 p-2 rounded-xl border border-indigo-100 shadow-sm"><p class="text-[10px] text-gray-500 font-bold mb-1">ลาป่วยเหลือ</p><p class="font-black text-indigo-700 text-lg" id="quota-sick">-</p></div>
+                            <div class="bg-emerald-50 p-2 rounded-xl border border-emerald-100 shadow-sm"><p class="text-[10px] text-gray-500 font-bold mb-1">ลากิจเหลือ</p><p class="font-black text-emerald-700 text-lg" id="quota-personal">-</p></div>
+                            <div class="bg-amber-50 p-2 rounded-xl border border-amber-100 shadow-sm"><p class="text-[10px] text-gray-500 font-bold mb-1">พักร้อนเหลือ</p><p class="font-black text-amber-700 text-lg" id="quota-vacation">-</p></div>
                         </div>
 
                         <div class="space-y-4">
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทการลา</label>
-                                    <select id="leave-type" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                                        <option value="ลาป่วย">ลาป่วย</option>
-                                        <option value="ลากิจ">ลากิจ</option>
-                                        <option value="ลาพักร้อน">ลาพักร้อน</option>
-                                        <option value="อื่นๆ">อื่นๆ</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">จำนวนวัน (ใส่ 0.5 ได้)</label>
-                                    <input type="number" id="leave-days" step="0.5" min="0.5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="เช่น 1 หรือ 1.5">
-                                </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">ประเภทการลา</label>
+                                <select id="leave-type" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 focus:bg-white transition-colors">
+                                    <option value="ลาป่วย">ลาป่วย</option>
+                                    <option value="ลากิจ">ลากิจ</option>
+                                    <option value="ลาพักร้อน">ลาพักร้อน</option>
+                                    <option value="อื่นๆ">อื่นๆ</option>
+                                </select>
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">ตั้งแต่วันที่</label>
-                                    <input type="date" id="leave-start" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">ตั้งแต่วันที่</label>
+                                    <input type="date" id="leave-start" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 focus:bg-white transition-colors">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">ถึงวันที่</label>
-                                    <input type="date" id="leave-end" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">ถึงวันที่</label>
+                                    <input type="date" id="leave-end" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 focus:bg-white transition-colors">
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">เหตุผลการลา</label>
-                                <textarea id="leave-reason" rows="3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="ระบุเหตุผล..."></textarea>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="block text-sm font-bold text-gray-700">จำนวนวัน</label>
+                                    <span class="text-[10px] text-blue-500 bg-blue-50 px-2 py-0.5 rounded-md">* คำนวณให้อัตโนมัติ (แก้ไขได้)</span>
+                                </div>
+                                <input type="number" id="leave-days" step="0.5" min="0.5" class="w-full p-3 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-bold text-blue-700 bg-blue-50 transition-colors" placeholder="เช่น 1 หรือ 1.5">
                             </div>
-                            <div class="col-span-2 border-t pt-3">
-                                <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa-solid fa-paperclip text-blue-500 mr-1"></i> แนบเอกสาร (ถ้ามี, สูงสุด 800KB)</label>
-                                <input type="file" id="leave-attachment" accept="image/*,.pdf" class="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                                <p class="text-[10px] text-gray-500 mt-1">* รองรับไฟล์รูปภาพและ PDF (แนะนำใบรับรองแพทย์)</p>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">เหตุผลการลา</label>
+                                <textarea id="leave-reason" rows="2" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 focus:bg-white transition-colors" placeholder="ระบุเหตุผล..."></textarea>
                             </div>
-                            <button id="btn-submit-leave" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow transition">
-                                <i class="fa-solid fa-paper-plane mr-2"></i>ส่งคำขอ
+                            <div class="p-4 bg-gray-50 border border-gray-200 rounded-xl border-dashed">
+                                <label class="block text-sm font-bold text-gray-700 mb-2"><i class="fa-solid fa-paperclip text-gray-500 mr-1"></i> แนบเอกสาร (ใบรับรองแพทย์)</label>
+                                <input type="file" id="leave-attachment" accept="image/*,.pdf" class="w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 transition-all cursor-pointer">
+                                <p class="text-[10px] text-gray-400 mt-2">* รองรับไฟล์ .jpg, .png, .pdf (ขนาดไม่เกิน 800KB)</p>
+                            </div>
+                            <button id="btn-submit-leave" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all flex justify-center items-center mt-2">
+                                <i class="fa-solid fa-paper-plane mr-2"></i> ยืนยันการส่งคำขอ
                             </button>
                         </div>
                     </div>
 
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                        <h3 class="font-bold text-gray-700 mb-3"><i class="fa-solid fa-list-check text-blue-500 mr-2"></i>ประวัติการลาของฉัน</h3>
-                        <div id="emp-leave-history" class="space-y-3 max-h-48 overflow-y-auto pr-2">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-gray-700 mb-3"><i class="fa-solid fa-clock-rotate-left text-blue-500 mr-2"></i>ประวัติการลาของฉัน</h3>
+                        <div id="emp-leave-history" class="space-y-3 max-h-60 overflow-y-auto pr-2">
                             <div class="text-center text-sm text-gray-400 py-4">กำลังโหลด...</div>
                         </div>
                     </div>
@@ -595,12 +630,14 @@
         let currentBranchName = null; 
         let capturedPhotoData = null;
         let stream = null;
+        let clockInterval = null; // สำหรับอัปเดตนาฬิกาเรียลไทม์
         
         let systemSettings = { branches: [], holidays: [], departments: [], shifts: [], workHours: 8, coreTime: "09:00", announcement: "", otNormal: 1.5, otWeekend: 2, otHoliday: 3, ssoPercent: 5, ssoMax: 750 };
         let allLogsRaw = []; 
         let allLogsForExport = [];
         let allEmployeesList = []; 
         let allRosters = []; 
+        let allLeavesRaw = []; 
         
         // ตัวแปรสำหรับ Pagination
         let currentPage = 1;
@@ -632,6 +669,48 @@
         document.getElementById('tab-admin-leaves').addEventListener('click', () => switchTabs('tab-admin-leaves', 'section-admin-leaves', 'tab-admin-', 'section-admin-'));
         document.getElementById('tab-admin-employees').addEventListener('click', () => switchTabs('tab-admin-employees', 'section-admin-employees', 'tab-admin-', 'section-admin-'));
         document.getElementById('tab-admin-settings').addEventListener('click', () => switchTabs('tab-admin-settings', 'section-admin-settings', 'tab-admin-', 'section-admin-'));
+
+        // --- ระบบนาฬิกา Real-time สำหรับพนักงาน ---
+        function startRealtimeClock() {
+            if (clockInterval) clearInterval(clockInterval);
+            
+            const clockEl = document.getElementById('realtime-clock');
+            const dateEl = document.getElementById('realtime-date');
+            
+            const updateClock = () => {
+                const now = new Date();
+                const h = String(now.getHours()).padStart(2, '0');
+                const m = String(now.getMinutes()).padStart(2, '0');
+                const s = String(now.getSeconds()).padStart(2, '0');
+                
+                clockEl.innerHTML = `${h}:${m}<span class="text-2xl text-blue-200 ml-1 opacity-80">${s}</span>`;
+                
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                dateEl.innerText = now.toLocaleDateString('th-TH', options);
+            };
+            
+            updateClock(); // เรียกทันที
+            clockInterval = setInterval(updateClock, 1000);
+        }
+
+        // --- คำนวณวันลาอัตโนมัติ (Auto-Calc Leave Days) ---
+        function calculateLeaveDays() {
+            const start = document.getElementById('leave-start').value;
+            const end = document.getElementById('leave-end').value;
+            if (start && end) {
+                const sDate = new Date(start);
+                const eDate = new Date(end);
+                if (eDate >= sDate) {
+                    const diffTime = Math.abs(eDate - sDate);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                    document.getElementById('leave-days').value = diffDays;
+                } else {
+                    document.getElementById('leave-days').value = '';
+                }
+            }
+        }
+        document.getElementById('leave-start').addEventListener('change', calculateLeaveDays);
+        document.getElementById('leave-end').addEventListener('change', calculateLeaveDays);
 
         // --- Offline Sync Logic ---
         window.addEventListener('online', async () => {
@@ -681,20 +760,40 @@
             return R * c;
         }
 
-        // --- ฟังก์ชันตรวจจับ Fake GPS (Anti-Spoofing Heuristics) ---
+        window.viewAttachment = (leaveId) => {
+            const req = allLeavesRaw.find(l => l.id === leaveId);
+            if(!req || !req.attachmentBase64) return;
+            
+            const data = req.attachmentBase64;
+            if (data.startsWith('data:application/pdf')) {
+                Swal.fire({
+                    title: 'เอกสารแนบ (PDF)',
+                    html: `<iframe src="${data}" class="w-full h-[60vh] rounded border" frameborder="0"></iframe>`,
+                    width: '80%',
+                    showCloseButton: true,
+                    showConfirmButton: false
+                });
+            } else {
+                Swal.fire({
+                    title: 'เอกสารแนบ (รูปภาพ)',
+                    imageUrl: data,
+                    imageAlt: 'Attachment',
+                    width: 'auto',
+                    imageWidth: '100%',
+                    showCloseButton: true,
+                    showConfirmButton: false
+                });
+            }
+        };
+
         function detectFakeGPS(pos) {
             const acc = pos.coords.accuracy;
             const alt = pos.coords.altitude;
-            if (acc <= 5 && alt === null && !navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
-                return true;
-            }
-            if (Math.abs(Date.now() - pos.timestamp) > 60000) {
-                return true;
-            }
+            if (acc <= 5 && alt === null && !navigator.userAgent.match(/iPhone|iPad|iPod/i)) return true;
+            if (Math.abs(Date.now() - pos.timestamp) > 60000) return true;
             return false;
         }
 
-        // ดึงการตั้งค่ากะการทำงานของพนักงานคนนั้นๆ (fallback เป็นค่ามาตรฐาน)
         function getEmployeeShiftDetails(empId, dateStr = null) {
             let coreTime = systemSettings.coreTime || "09:00";
             let workHours = Number(systemSettings.workHours) || 8;
@@ -732,10 +831,25 @@
             return { coreTime, workHours, shiftName, deptName };
         }
 
-        // --- Core Payroll Calculator Function ---
         function calculateEmployeePayroll(empId, year, monthStr, logsRaw = allLogsRaw) {
             const emp = allEmployeesList.find(e => e.id === empId) || currentEmployee;
             if(!emp) return null;
+
+            const userLeaves = allLeavesRaw.filter(l => l.userId === empId && l.status === 'approved');
+            const leaveMap = {}; 
+            
+            userLeaves.forEach(lv => {
+                let currDate = new Date(lv.startDate);
+                let endDate = new Date(lv.endDate);
+                let safety = 0;
+                while (currDate <= endDate && safety < 30) {
+                    const dStr = currDate.toISOString().split('T')[0];
+                    let lDays = (lv.startDate === lv.endDate) ? (lv.days || 1) : 1; 
+                    leaveMap[dStr] = (leaveMap[dStr] || 0) + lDays;
+                    currDate.setDate(currDate.getDate() + 1);
+                    safety++;
+                }
+            });
 
             const userLogs = logsRaw.filter(l => {
                 if (l.userId !== empId || !l.timestamp) return false;
@@ -752,7 +866,8 @@
                 else { if (!dailyData[dateStr].out || t > dailyData[dateStr].out) dailyData[dateStr].out = t; }
             });
 
-            let totalDays = 0, lateDays = 0, totalLateMinutes = 0, totalWorkHrs = 0;
+            let totalWorkedDays = 0, totalPaidLeaveDays = 0;
+            let lateDays = 0, totalLateMinutes = 0, totalWorkHrs = 0;
             let otNormalHrs = 0, otWeekendHrs = 0, otHolidayHrs = 0;
             
             const dailyRate = emp.dailyRate || 0;
@@ -760,32 +875,38 @@
             const penaltyRate = emp.penaltyRate || 0;
             const deductSso = emp.deductSso !== false; 
 
-            Object.keys(dailyData).forEach(dateStr => {
-                const day = dailyData[dateStr];
-                if (day.in) {
-                    totalDays++;
-                    const shiftInfo = getEmployeeShiftDetails(empId, dateStr);
-                    const dateObj = new Date(day.in);
+            const daysInMonth = new Date(year, monthStr, 0).getDate();
+            
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dateStr = `${year}-${String(monthStr).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                const dayLog = dailyData[dateStr];
+                const leaveDays = Math.min(1, leaveMap[dateStr] || 0); 
+                
+                totalPaidLeaveDays += leaveDays;
 
-                    // Check Late
-                    if (shiftInfo.coreTime) {
+                if (dayLog && dayLog.in) {
+                    const shiftInfo = getEmployeeShiftDetails(empId, dateStr);
+                    const dateObj = new Date(dayLog.in);
+                    
+                    const workedFraction = 1 - leaveDays;
+                    totalWorkedDays += workedFraction;
+
+                    if (shiftInfo.coreTime && leaveDays === 0) {
                         const [cH, cM] = shiftInfo.coreTime.split(':');
-                        const coreDate = new Date(day.in); coreDate.setHours(cH, cM, 0, 0);
-                        if (day.in > coreDate) {
+                        const coreDate = new Date(dayLog.in); coreDate.setHours(cH, cM, 0, 0);
+                        if (dayLog.in > coreDate) {
                             lateDays++;
-                            totalLateMinutes += Math.max(0, Math.floor((day.in - coreDate) / 60000));
+                            totalLateMinutes += Math.max(0, Math.floor((dayLog.in - coreDate) / 60000));
                         }
                     }
 
-                    // Calculate Hours & OT
-                    if (day.out) {
-                        const hrs = (day.out - day.in) / (1000 * 60 * 60);
+                    if (dayLog.out) {
+                        const hrs = (dayLog.out - dayLog.in) / (1000 * 60 * 60);
                         totalWorkHrs += hrs;
                         
                         if (hrs > shiftInfo.workHours) {
                             const otHrs = hrs - shiftInfo.workHours;
                             
-                            // Determine OT Multiplier Type
                             const isHoliday = systemSettings.holidays && systemSettings.holidays.some(h => h.date === dateStr);
                             const isWeekend = dateObj.getDay() === 0 || dateObj.getDay() === 6;
 
@@ -795,9 +916,9 @@
                         }
                     }
                 }
-            });
+            }
 
-            const basePay = totalDays * dailyRate;
+            const basePay = (totalWorkedDays + totalPaidLeaveDays) * dailyRate;
             const otNormalPay = otNormalHrs * otRate * (systemSettings.otNormal || 1.5);
             const otWeekendPay = otWeekendHrs * otRate * (systemSettings.otWeekend || 2);
             const otHolidayPay = otHolidayHrs * otRate * (systemSettings.otHoliday || 3);
@@ -812,7 +933,7 @@
             const totalNet = basePay + totalOTPay - penaltyPay - ssoDeduction;
 
             return {
-                totalDays, lateDays, totalLateMinutes, totalWorkHrs, 
+                totalWorkedDays, totalPaidLeaveDays, lateDays, totalLateMinutes, totalWorkHrs, 
                 otNormalHrs, otWeekendHrs, otHolidayHrs,
                 basePay, otNormalPay, otWeekendPay, otHolidayPay, totalOTPay,
                 penaltyPay, ssoDeduction, totalNet,
@@ -827,15 +948,30 @@
             
             if (viewName === 'login') {
                 navUserInfo.classList.add('hide');
+                if (clockInterval) clearInterval(clockInterval);
                 stopCamera();
             } else {
                 navUserInfo.classList.remove('hide');
                 if (viewName === 'admin') {
                     userNameSpan.innerHTML = '<i class="fa-solid fa-crown text-yellow-300 mr-1"></i> ผู้ดูแลระบบ';
+                    if (clockInterval) clearInterval(clockInterval);
                     loadSystemSettings().then(() => { loadAdminData(); populateSettingsForm(); });
                 } else if (viewName === 'employee') {
                     const roleTxt = currentEmployee.role === 'supervisor' ? '<i class="fa-solid fa-user-tie mr-1 text-amber-300"></i> หัวหน้า' : '<i class="fa-solid fa-user mr-1"></i>';
                     userNameSpan.innerHTML = roleTxt + ' ' + currentEmployee.name;
+                    
+                    // ตั้งค่าคำทักทาย (Greeting)
+                    const hr = new Date().getHours();
+                    let greet = 'สวัสดี,';
+                    if(hr < 12) greet = '☀️ อรุณสวัสดิ์,';
+                    else if(hr < 17) greet = '🌤️ สวัสดีตอนบ่าย,';
+                    else greet = '🌙 สวัสดีตอนเย็น,';
+                    
+                    document.getElementById('emp-greeting').innerText = greet;
+                    document.getElementById('emp-welcome-name').innerText = currentEmployee.name;
+                    
+                    // เริ่มนาฬิกา
+                    startRealtimeClock();
                     
                     if (currentEmployee.role === 'supervisor') {
                         document.getElementById('tab-emp-approve').classList.remove('hide');
@@ -910,13 +1046,11 @@
             .then((result) => { if (result.isConfirmed) { sessionStorage.removeItem('currentEmployeeData'); currentEmployee = null; signOut(auth); showView('login'); } });
         });
 
-        // Employee Multi-Branch Location
         function initLocation() {
             const statusEl = document.getElementById('gps-status');
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
-                        // ตรวจจับ Fake GPS
                         if (detectFakeGPS(position)) {
                             statusEl.className = "text-xs bg-rose-100 text-rose-700 px-2 py-1 rounded-full";
                             statusEl.innerHTML = `<i class="fa-solid fa-ban mr-1"></i>พบการใช้ Fake GPS`;
@@ -952,17 +1086,17 @@
                         }
 
                         if (isInside) {
-                            statusEl.className = "text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full";
+                            statusEl.className = "text-xs bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full font-medium";
                             statusEl.innerHTML = `<i class="fa-solid fa-check-circle mr-1"></i>พิกัดถูกต้อง${distText}`;
                         } else {
-                            statusEl.className = "text-xs bg-rose-100 text-rose-700 px-2 py-1 rounded-full";
+                            statusEl.className = "text-xs bg-rose-100 text-rose-700 px-2.5 py-1 rounded-full font-medium";
                             statusEl.innerHTML = `<i class="fa-solid fa-xmark-circle mr-1"></i>${distText}`;
                             currentLat = null; 
                         }
                         checkReadyState();
                     },
                     (error) => {
-                        statusEl.className = "text-xs bg-rose-100 text-rose-700 px-2 py-1 rounded-full";
+                        statusEl.className = "text-xs bg-rose-100 text-rose-700 px-2.5 py-1 rounded-full font-medium";
                         statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1"></i>ไม่พบ GPS';
                         Swal.fire({ icon: 'warning', title: 'ต้องการ GPS', text: 'กรุณาอนุญาต Location' });
                     },
@@ -1020,7 +1154,6 @@
                 isManual: false 
             };
 
-            // ออฟไลน์ซิงค์: เก็บลงเครื่องถ้ายกเลิกเน็ต
             if (!navigator.onLine) {
                 logData.timestampStr = new Date().toISOString(); 
                 const offlineLogs = JSON.parse(localStorage.getItem('offlineTimeLogs') || '[]');
@@ -1044,17 +1177,50 @@
         document.getElementById('btn-checkout').addEventListener('click', () => saveTimeLog('out'));
 
         function loadEmployeeData() {
-            const qNotif = query(collection(db, "leave_requests"), where("userId", "==", currentEmployee.id), where("notified", "==", false));
-            getDocs(qNotif).then(snap => {
-                if(!snap.empty) {
+            const qLeavesAll = query(collection(db, "leave_requests"));
+            listeners.empLeaves = onSnapshot(qLeavesAll, (snapshot) => {
+                allLeavesRaw = []; snapshot.forEach(doc => allLeavesRaw.push({ id: doc.id, ...doc.data() }));
+                
+                const leaves = allLeavesRaw.filter(l => l.userId === currentEmployee.id);
+                leaves.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+                
+                const container = document.getElementById('emp-leave-history');
+                if (leaves.length === 0) container.innerHTML = '<div class="text-center text-sm text-gray-400 py-4">ยังไม่มีประวัติการขอลางาน</div>';
+                else {
+                    let html = '';
+                    leaves.forEach(req => {
+                        let statusHtml = '';
+                        if (req.status === 'pending') statusHtml = '<span class="text-xs font-bold text-yellow-600 bg-yellow-100 px-2 py-1 rounded">รอหัวหน้าพิจารณา</span>';
+                        else if (req.status === 'supervisor_approved') statusHtml = '<span class="text-xs font-bold text-blue-600 bg-blue-100 px-2 py-1 rounded">รอ HR อนุมัติ</span>';
+                        else if (req.status === 'approved') statusHtml = '<span class="text-xs font-bold text-emerald-600 bg-emerald-100 px-2 py-1 rounded">อนุมัติแล้ว</span>';
+                        else statusHtml = '<span class="text-xs font-bold text-rose-600 bg-rose-100 px-2 py-1 rounded">ไม่อนุมัติ</span>';
+                        
+                        const formatDate = (dateStr) => { if(!dateStr) return ''; const p = dateStr.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; };
+                        const attachmentStr = req.attachmentBase64 ? `<p class="text-xs text-blue-500 mt-1 cursor-pointer hover:underline" onclick="window.viewAttachment('${req.id}')"><i class="fa-solid fa-paperclip"></i> ดูเอกสารแนบ</p>` : '';
+                        
+                        html += `
+                            <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 flex justify-between items-start">
+                                <div>
+                                    <p class="font-bold text-sm text-gray-700">${req.type} <span class="text-xs font-normal text-gray-500">(${req.days} วัน)</span></p>
+                                    <p class="text-xs text-gray-500">${formatDate(req.startDate)} - ${formatDate(req.endDate)}</p>
+                                    <p class="text-xs text-gray-400 mt-1">เหตุผล: ${req.reason}</p>
+                                    ${attachmentStr}
+                                </div>
+                                <div class="text-right">${statusHtml}</div>
+                            </div>
+                        `;
+                    });
+                    container.innerHTML = html;
+                }
+                updateEmployeeDashboard();
+                
+                const unnotified = leaves.filter(l => l.notified === false && (l.status === 'approved' || l.status === 'rejected'));
+                if(unnotified.length > 0) {
                     let msg = '';
-                    snap.forEach(d => {
-                        const data = d.data();
-                        if(data.status === 'approved') msg += `✅ ${data.type} ได้รับการอนุมัติแล้ว<br>`;
-                        if(data.status === 'rejected') msg += `❌ ${data.type} ไม่ได้รับการอนุมัติ<br>`;
-                        if(data.status === 'approved' || data.status === 'rejected') {
-                            updateDoc(doc(db, "leave_requests", d.id), { notified: true });
-                        }
+                    unnotified.forEach(d => {
+                        if(d.status === 'approved') msg += `✅ ${d.type} ได้รับการอนุมัติแล้ว<br>`;
+                        if(d.status === 'rejected') msg += `❌ ${d.type} ไม่ได้รับการอนุมัติ<br>`;
+                        updateDoc(doc(db, "leave_requests", d.id), { notified: true });
                     });
                     if(msg) Swal.fire({ title: 'อัปเดตสถานะการลา', html: msg, icon: 'info' });
                 }
@@ -1082,42 +1248,6 @@
                 updateEmployeeDashboard();
             });
 
-            const qLeaves = query(collection(db, "leave_requests"), where("userId", "==", currentEmployee.id));
-            listeners.empLeaves = onSnapshot(qLeaves, (snapshot) => {
-                const leaves = []; snapshot.forEach(doc => leaves.push({ id: doc.id, ...doc.data() }));
-                leaves.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
-                
-                const container = document.getElementById('emp-leave-history');
-                if (leaves.length === 0) container.innerHTML = '<div class="text-center text-sm text-gray-400 py-4">ยังไม่มีประวัติการขอลางาน</div>';
-                else {
-                    let html = '';
-                    leaves.forEach(req => {
-                        let statusHtml = '';
-                        if (req.status === 'pending') statusHtml = '<span class="text-xs font-bold text-yellow-600 bg-yellow-100 px-2 py-1 rounded">รอหัวหน้าพิจารณา</span>';
-                        else if (req.status === 'supervisor_approved') statusHtml = '<span class="text-xs font-bold text-blue-600 bg-blue-100 px-2 py-1 rounded">รอ HR อนุมัติ</span>';
-                        else if (req.status === 'approved') statusHtml = '<span class="text-xs font-bold text-emerald-600 bg-emerald-100 px-2 py-1 rounded">อนุมัติแล้ว</span>';
-                        else statusHtml = '<span class="text-xs font-bold text-rose-600 bg-rose-100 px-2 py-1 rounded">ไม่อนุมัติ</span>';
-                        
-                        const formatDate = (dateStr) => { if(!dateStr) return ''; const p = dateStr.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; };
-                        const attachmentStr = req.attachmentBase64 ? `<p class="text-xs text-blue-500 mt-1 cursor-pointer hover:underline" onclick="window.open('${req.attachmentBase64}')"><i class="fa-solid fa-paperclip"></i> ดูเอกสารแนบ</p>` : '';
-                        
-                        html += `
-                            <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 flex justify-between items-start">
-                                <div>
-                                    <p class="font-bold text-sm text-gray-700">${req.type} <span class="text-xs font-normal text-gray-500">(${req.days} วัน)</span></p>
-                                    <p class="text-xs text-gray-500">${formatDate(req.startDate)} - ${formatDate(req.endDate)}</p>
-                                    <p class="text-xs text-gray-400 mt-1">เหตุผล: ${req.reason}</p>
-                                    ${attachmentStr}
-                                </div>
-                                <div class="text-right">${statusHtml}</div>
-                            </div>
-                        `;
-                    });
-                    container.innerHTML = html;
-                }
-            });
-
-            // Supervisor: Load leaves for their department
             if (currentEmployee.role === 'supervisor') {
                 const qSup = query(collection(db, "leave_requests"), where("departmentId", "==", currentEmployee.departmentId), where("status", "==", "pending"));
                 listeners.supLeaves = onSnapshot(qSup, (snapshot) => {
@@ -1162,24 +1292,25 @@
             document.getElementById('emp-month-label').textContent = now.toLocaleDateString('th-TH', { month: 'short', year: 'numeric' });
 
             const todayShift = getEmployeeShiftDetails(currentEmployee.id, todayIso);
-            document.getElementById('emp-dept-shift-badge').innerHTML = `${todayShift.deptName} | ${todayShift.shiftName}`;
+            document.getElementById('emp-dept-badge').innerHTML = `${todayShift.deptName} | ${todayShift.shiftName}`;
+            document.getElementById('emp-target-time').innerHTML = todayShift.coreTime;
 
             const todayLogs = logs.filter(l => l.timestamp && l.timestamp.toDate().toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' }) === todayStrTh);
 
             const statusEl = document.getElementById('emp-current-status');
             if(todayLogs.length > 0) {
                 const lastLog = todayLogs[0]; 
-                if(lastLog.type === 'in') statusEl.innerHTML = '<span class="text-emerald-600">เข้างานแล้ว (กำลังทำงาน)</span>';
-                else statusEl.innerHTML = '<span class="text-rose-600">ออกงานแล้ว</span>';
+                if(lastLog.type === 'in') statusEl.innerHTML = '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-circle-check mr-1"></i> เข้างานแล้ว</span>';
+                else statusEl.innerHTML = '<span class="text-rose-600 font-bold"><i class="fa-solid fa-door-open mr-1"></i> ออกงานแล้ว</span>';
             } else {
-                statusEl.innerHTML = '<span class="text-gray-400">ยังไม่ได้เข้างาน</span>';
+                statusEl.innerHTML = '<span class="text-gray-400">ยังไม่ได้บันทึกเวลา</span>';
             }
 
             const payroll = calculateEmployeePayroll(currentEmployee.id, currYear, currMonth+1, logs);
 
-            document.getElementById('emp-stat-days').innerHTML = `${payroll ? payroll.totalDays : 0}<span class="text-xs font-normal text-gray-500"> วัน</span>`;
-            document.getElementById('emp-stat-late').innerHTML = `${payroll ? payroll.lateDays : 0}<span class="text-xs font-normal text-gray-500"> ครั้ง</span>`;
-            document.getElementById('emp-stat-ot').innerHTML = `${payroll ? (payroll.otNormalHrs + payroll.otWeekendHrs + payroll.otHolidayHrs).toFixed(1) : 0}<span class="text-xs font-normal text-gray-500"> ชม.</span>`;
+            document.getElementById('emp-stat-days').innerHTML = `${payroll ? (payroll.totalWorkedDays + payroll.totalPaidLeaveDays) : 0}<span class="text-xs font-normal text-emerald-600 ml-1">วัน</span>`;
+            document.getElementById('emp-stat-late').innerHTML = `${payroll ? payroll.lateDays : 0}<span class="text-xs font-normal text-rose-600 ml-1">ครั้ง</span>`;
+            document.getElementById('emp-stat-ot').innerHTML = `${payroll ? (payroll.otNormalHrs + payroll.otWeekendHrs + payroll.otHolidayHrs).toFixed(1) : 0}<span class="text-xs font-normal text-orange-600 ml-1">ชม.</span>`;
 
             const container = document.getElementById('emp-personal-history');
             if (logs.length === 0) container.innerHTML = '<div class="text-center text-sm text-gray-400 py-4">ยังไม่มีประวัติการบันทึกเวลา</div>';
@@ -1326,61 +1457,6 @@
                     allLogsRaw = logs; 
                     if (typeof renderTimelogsTable === 'function') renderTimelogsTable(); 
                     processAdminDashboardData(today, tomorrow, isHolidayToday);
-                });
-
-                const qLeaves = query(collection(db, "leave_requests"));
-                listeners.adminLeaves = onSnapshot(qLeaves, (leaveSnapshot) => {
-                    const leaves = []; leaveSnapshot.forEach(doc => leaves.push({ id: doc.id, ...doc.data() }));
-                    leaves.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
-
-                    let leaveCountToday = 0, pendingCount = 0, leaveHtml = '';
-
-                    leaves.forEach(req => {
-                        if (req.status === 'pending' || req.status === 'supervisor_approved') pendingCount++;
-                        if (req.status === 'approved' && todayIso >= req.startDate && todayIso <= req.endDate) leaveCountToday++;
-
-                        const reqDate = req.timestamp ? req.timestamp.toDate().toLocaleDateString('th-TH') : '';
-                        
-                        let statusBadge = '';
-                        if (req.status === 'pending') statusBadge = '<span class="text-xs font-bold text-yellow-600 bg-yellow-100 px-3 py-1 rounded-full">รอหัวหน้าตรวจสอบ</span>';
-                        else if (req.status === 'supervisor_approved') statusBadge = '<span class="text-xs font-bold text-blue-600 bg-blue-100 px-3 py-1 rounded-full">รอ HR อนุมัติ</span>';
-                        else if (req.status === 'approved') statusBadge = '<span class="text-xs font-bold text-emerald-600 bg-emerald-100 px-3 py-1 rounded-full">อนุมัติแล้ว</span>';
-                        else statusBadge = '<span class="text-xs font-bold text-rose-600 bg-rose-100 px-3 py-1 rounded-full">ไม่อนุมัติ</span>';
-                        
-                        const attachmentStr = req.attachmentBase64 ? `<p class="text-xs text-blue-500 mt-1 cursor-pointer hover:underline" onclick="window.open('${req.attachmentBase64}')"><i class="fa-solid fa-paperclip"></i> ดูเอกสารแนบ</p>` : '';
-
-                        let actionBtns = '';
-                        if (req.status === 'pending' || req.status === 'supervisor_approved') {
-                            actionBtns = `
-                                <div class="flex gap-1 justify-center items-center">
-                                    <button onclick="window.updateLeaveStatus('${req.id}', 'approved')" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-2 py-1 rounded shadow" title="อนุมัติ"><i class="fa-solid fa-check"></i></button>
-                                    <button onclick="window.updateLeaveStatus('${req.id}', 'rejected')" class="bg-rose-500 hover:bg-rose-600 text-white text-xs px-2 py-1 rounded shadow" title="ไม่อนุมัติ"><i class="fa-solid fa-xmark"></i></button>
-                                    <button onclick="window.deleteLeave('${req.id}')" class="bg-gray-200 hover:bg-gray-300 text-gray-600 text-xs px-2 py-1 rounded shadow ml-1" title="ลบรายการ"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            `;
-                        } else {
-                            actionBtns = `
-                                <div class="flex gap-1 justify-center items-center">
-                                    <span class="text-xs text-gray-400 mr-2">-</span>
-                                    <button onclick="window.deleteLeave('${req.id}')" class="bg-gray-100 hover:bg-gray-200 text-gray-500 text-xs px-2 py-1 rounded shadow" title="ลบรายการ"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            `;
-                        }
-
-                        leaveHtml += `<tr class="hover:bg-gray-50 border-b"><td class="p-3 text-sm text-gray-500">${reqDate}</td><td class="p-3 font-medium text-gray-800">${req.name}</td><td class="p-3"><p class="text-sm font-bold text-blue-600">${req.type} <span class="text-xs text-gray-500 font-normal">(${req.days} วัน)</span></p><p class="text-xs text-gray-500">ช่วงเวลา: ${req.startDate} ถึง ${req.endDate}</p><p class="text-xs text-gray-600 mt-1">เหตุผล: ${req.reason}</p>${attachmentStr}</td><td class="p-3 text-center">${statusBadge}</td><td class="p-3 text-center">${actionBtns}</td></tr>`;
-                    });
-                    
-                    document.getElementById('admin-leaves-body').innerHTML = leaveHtml || '<tr><td colspan="5" class="p-8 text-center text-gray-400">ไม่มีคำขอลางาน</td></tr>';
-                    document.getElementById('stat-leave').textContent = leaveCountToday;
-                    
-                    let finalAbsent = empSnapshot.size - Number(document.getElementById('stat-present').textContent) - leaveCountToday;
-                    if (isHolidayToday) finalAbsent = 0; 
-                    
-                    document.getElementById('stat-absent').textContent = finalAbsent < 0 ? 0 : finalAbsent;
-                    document.getElementById('leave-badge').textContent = pendingCount;
-                    document.getElementById('leave-badge').className = pendingCount > 0 ? 'bg-rose-500 text-white text-xs rounded-full px-2 py-0.5 ml-1' : 'hide';
-
-                    drawDashboardChart();
                 });
             });
         }
@@ -1536,7 +1612,7 @@
                             <div class="grid grid-cols-2 gap-4 mb-4">
                                 <div>
                                     <p class="text-gray-500 text-xs font-bold mb-1">สถิติการทำงาน</p>
-                                    <p><i class="fa-solid fa-briefcase text-emerald-500 w-4"></i> ทำงาน: <b>${pr.totalDays} วัน</b></p>
+                                    <p><i class="fa-solid fa-briefcase text-emerald-500 w-4"></i> ทำงาน (รวมลา): <b>${pr.totalWorkedDays + pr.totalPaidLeaveDays} วัน</b></p>
                                     <p><i class="fa-solid fa-clock text-emerald-500 w-4"></i> ชม.รวม: <b>${pr.totalWorkHrs.toFixed(1)} ชม.</b></p>
                                     <p><i class="fa-solid fa-triangle-exclamation text-rose-500 w-4"></i> มาสาย: <b class="${pr.lateDays > 0 ? 'text-rose-600' : ''}">${pr.lateDays} ครั้ง (${pr.totalLateMinutes} นาที)</b></p>
                                 </div>
@@ -1578,7 +1654,7 @@
                         printWindow.document.write(`<div class="flex"><p><b>แผนก:</b> ${currentShiftInfo.deptName}</p><p><b>วันที่ออกเอกสาร:</b> ${new Date().toLocaleDateString('th-TH')}</p></div>`);
                         
                         printWindow.document.write(`<table><tr><th>รายการรายได้ (Earnings)</th><th style="text-align:right">จำนวนเงิน (บาท)</th></tr>`);
-                        printWindow.document.write(`<tr><td>ค่าจ้างปกติ (${pr.totalDays} วัน)</td><td style="text-align:right">${pr.basePay.toLocaleString(undefined, {minimumFractionDigits: 2})}</td></tr>`);
+                        printWindow.document.write(`<tr><td>ค่าจ้างปกติ (${pr.totalWorkedDays} ทำงานจริง + ${pr.totalPaidLeaveDays} วันลาได้เงิน)</td><td style="text-align:right">${pr.basePay.toLocaleString(undefined, {minimumFractionDigits: 2})}</td></tr>`);
                         if(pr.otNormalHrs>0) printWindow.document.write(`<tr><td>OT ปกติ x${systemSettings.otNormal} (${pr.otNormalHrs.toFixed(1)} ชม.)</td><td style="text-align:right">${pr.otNormalPay.toLocaleString(undefined, {minimumFractionDigits: 2})}</td></tr>`);
                         if(pr.otWeekendHrs>0) printWindow.document.write(`<tr><td>OT วันหยุด x${systemSettings.otWeekend} (${pr.otWeekendHrs.toFixed(1)} ชม.)</td><td style="text-align:right">${pr.otWeekendPay.toLocaleString(undefined, {minimumFractionDigits: 2})}</td></tr>`);
                         if(pr.otHolidayHrs>0) printWindow.document.write(`<tr><td>OT นักขัตฤกษ์ x${systemSettings.otHoliday} (${pr.otHolidayHrs.toFixed(1)} ชม.)</td><td style="text-align:right">${pr.otHolidayPay.toLocaleString(undefined, {minimumFractionDigits: 2})}</td></tr>`);
@@ -1619,13 +1695,13 @@
 
             if (monthRaw) {
                 const [year, m] = monthRaw.split('-');
-                let csvContent = "data:text/csv;charset=utf-8,\uFEFFชื่อพนักงาน,แผนก,กะทำงานเริ่มต้น,ค่าจ้าง/วัน,เรท OT/ชม.,วันทำงานทั้งหมด,ชั่วโมงทำงานรวม,OTปกติ(ชม),OTวันหยุด(ชม),OTนักขัตฤกษ์(ชม),รวมค่าจ้างปกติ,รวมค่า OT,สายสะสม(นาที),หักสายรวม,หักประกันสังคม,รวมเงินได้สุทธิ\n";
+                let csvContent = "data:text/csv;charset=utf-8,\uFEFFชื่อพนักงาน,แผนก,กะทำงานเริ่มต้น,ค่าจ้าง/วัน,เรท OT/ชม.,วันทำงานจริง,วันลาที่ได้เงิน,วันมาสาย,สายสะสม(นาที),ชั่วโมงทำงานรวม,OTปกติ(ชม),OTวันหยุด(ชม),OTนักขัตฤกษ์(ชม),รวมค่าจ้างปกติ,รวมค่า OT,หักสายรวม,หักประกันสังคม,รวมเงินได้สุทธิ\n";
 
                 allEmployeesList.forEach(emp => {
                     const pr = calculateEmployeePayroll(emp.id, year, m, allLogsRaw);
                     if (pr) {
                         const defaultShiftInfo = getEmployeeShiftDetails(emp.id); 
-                        csvContent += `"${emp.name}","${defaultShiftInfo.deptName}","${defaultShiftInfo.shiftName}","${pr.dailyRate}","${pr.otRate}","${pr.totalDays}","${pr.totalWorkHrs.toFixed(2)}","${pr.otNormalHrs.toFixed(2)}","${pr.otWeekendHrs.toFixed(2)}","${pr.otHolidayHrs.toFixed(2)}","${pr.basePay.toFixed(2)}","${pr.totalOTPay.toFixed(2)}","${pr.totalLateMinutes}","${pr.penaltyPay.toFixed(2)}","${pr.ssoDeduction.toFixed(2)}","${pr.totalNet.toFixed(2)}"\n`;
+                        csvContent += `"${emp.name}","${defaultShiftInfo.deptName}","${defaultShiftInfo.shiftName}","${pr.dailyRate}","${pr.otRate}","${pr.totalWorkedDays}","${pr.totalPaidLeaveDays}","${pr.lateDays}","${pr.totalLateMinutes}","${pr.totalWorkHrs.toFixed(2)}","${pr.otNormalHrs.toFixed(2)}","${pr.otWeekendHrs.toFixed(2)}","${pr.otHolidayHrs.toFixed(2)}","${pr.basePay.toFixed(2)}","${pr.totalOTPay.toFixed(2)}","${pr.penaltyPay.toFixed(2)}","${pr.ssoDeduction.toFixed(2)}","${pr.totalNet.toFixed(2)}"\n`;
                     }
                 });
 
@@ -1796,7 +1872,6 @@
             
             filteredLogs.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
             
-            // ส่งออก CSV จะได้ข้อมูลทั้งหมดตามฟิลเตอร์
             allLogsForExport = [];
             filteredLogs.forEach(data => {
                 let exportTimeStr = '';
@@ -1807,7 +1882,6 @@
                 allLogsForExport.push({ Date_Time: exportTimeStr, Employee: empName, Type: isCheckIn?'เข้างาน':'ออกงาน', Remark: remarkExport, Branch: branchExport, Lat: data.lat || '', Lng: data.lng || '' });
             });
 
-            // การแบ่งหน้า (Pagination) สำหรับแสดงผลบน UI เท่านั้น
             const totalItems = filteredLogs.length;
             const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
             if (currentPage > totalPages) currentPage = totalPages;
@@ -1866,93 +1940,6 @@
             allLogsForExport.forEach(row => { csvContent += `"${row.Date_Time}","${row.Employee}","${row.Type}","${row.Remark}","${row.Branch}","${row.Lat}","${row.Lng}"\n`; });
             const link = document.createElement("a"); link.href = encodeURI(csvContent); link.download = `timelog_export_${new Date().getTime()}.csv`; link.click();
         });
-
-        window.updateLeaveStatus = async (docId, newStatus) => {
-            const actionText = newStatus === 'approved' ? 'อนุมัติ (หักโควตา)' : 'ไม่อนุมัติ (คืนโควตา)';
-            const result = await Swal.fire({ title: `ยืนยันการ${actionText}?`, icon: 'question', showCancelButton: true, confirmButtonColor: newStatus === 'approved' ? '#10b981' : '#e11d48', confirmButtonText: `ใช่, ดำเนินการ` });
-            
-            if (result.isConfirmed) {
-                try { 
-                    Swal.fire({ title: 'กำลังประมวลผล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-                    const leaveSnap = await getDoc(doc(db, "leave_requests", docId));
-                    const leaveData = leaveSnap.data();
-
-                    if (newStatus === 'approved' && leaveData.status !== 'approved') {
-                        const empSnap = await getDoc(doc(db, "employees", leaveData.userId));
-                        if(empSnap.exists()) {
-                            let q = empSnap.data().quotas || { 'ลาป่วย': 30, 'ลากิจ': 6, 'ลาพักร้อน': 6 };
-                            if(q[leaveData.type] !== undefined) q[leaveData.type] -= (leaveData.days || 0);
-                            await updateDoc(doc(db, "employees", leaveData.userId), { quotas: q });
-                        }
-                    } else if (newStatus !== 'approved' && leaveData.status === 'approved') {
-                        const empSnap = await getDoc(doc(db, "employees", leaveData.userId));
-                        if(empSnap.exists()) {
-                            let q = empSnap.data().quotas || { 'ลาป่วย': 30, 'ลากิจ': 6, 'ลาพักร้อน': 6 };
-                            if(q[leaveData.type] !== undefined) q[leaveData.type] += (leaveData.days || 0);
-                            await updateDoc(doc(db, "employees", leaveData.userId), { quotas: q });
-                        }
-                    }
-
-                    await updateDoc(doc(db, "leave_requests", docId), { status: newStatus, notified: false }); 
-                    Swal.fire({ icon: 'success', title: 'อัปเดตสถานะสำเร็จ', timer: 1000, showConfirmButton: false }); 
-                } 
-                catch (error) { Swal.fire('ผิดพลาด', error.message, 'error'); }
-            }
-        };
-        
-        window.deleteLeave = (docId) => {
-            Swal.fire({ title: 'ลบคำขอลางาน?', text: "ข้อมูลนี้จะถูกลบถาวร หากอนุมัติไปแล้วต้องไปแก้โควตาคืนเอง", icon: 'warning', showCancelButton: true, confirmButtonColor: '#e11d48', confirmButtonText: 'ใช่, ลบทิ้ง' })
-            .then(async (result) => { 
-                if (result.isConfirmed) { 
-                    try { await deleteDoc(doc(db, "leave_requests", docId)); Swal.fire({ icon: 'success', title: 'ลบสำเร็จ', timer: 1000, showConfirmButton: false }); } 
-                    catch (error) { Swal.fire('ผิดพลาด', error.message, 'error'); }
-                } 
-            });
-        };
-
-        document.getElementById('btn-add-employee').addEventListener('click', async () => {
-            const nameInput = document.getElementById('new-emp-name'), pinInput = document.getElementById('new-emp-pin');
-            const emailInput = document.getElementById('new-emp-email'), roleInput = document.getElementById('new-emp-role');
-            const dailyRateInput = document.getElementById('new-emp-daily-rate'), otRateInput = document.getElementById('new-emp-ot-rate');
-            const penaltyRateInput = document.getElementById('new-emp-penalty-rate');
-            const deptInput = document.getElementById('new-emp-dept'), shiftInput = document.getElementById('new-emp-shift');
-            const ssoCheck = document.getElementById('new-emp-deduct-sso').checked;
-            
-            const name = nameInput.value.trim(), pin = pinInput.value.trim();
-            const dailyRate = parseFloat(dailyRateInput?.value) || 0, otRate = parseFloat(otRateInput?.value) || 0, penaltyRate = parseFloat(penaltyRateInput?.value) || 0;
-            
-            if (!name || !pin || pin.length !== 6) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอกชื่อ และตั้ง PIN 6 หลัก', 'warning');
-            try {
-                const q = query(collection(db, "employees"), where("pin", "==", pin));
-                if (!(await getDocs(q)).empty) return Swal.fire('รหัส PIN ซ้ำ', 'รหัส PIN นี้ถูกใช้ไปแล้ว', 'error');
-                
-                const defaultQuotas = { 'ลาป่วย': 30, 'ลากิจ': 6, 'ลาพักร้อน': 6, 'อื่นๆ': 0 };
-                await addDoc(collection(db, "employees"), { 
-                    name: name, pin: pin, email: emailInput?.value.trim() || '', role: roleInput.value,
-                    departmentId: deptInput.value, shiftId: shiftInput.value, deductSso: ssoCheck,
-                    dailyRate: dailyRate, otRate: otRate, penaltyRate: penaltyRate, quotas: defaultQuotas 
-                });
-                Swal.fire({ icon: 'success', title: 'เพิ่มพนักงานสำเร็จ', timer: 1500, showConfirmButton: false }); 
-                nameInput.value = ''; pinInput.value = ''; deptInput.value = ''; shiftInput.value = ''; roleInput.value = 'staff';
-                if(emailInput) emailInput.value = ''; if(dailyRateInput) dailyRateInput.value = '';
-                if(otRateInput) otRateInput.value = ''; if(penaltyRateInput) penaltyRateInput.value = '';
-            } catch (error) { Swal.fire('ผิดพลาด', error.message, 'error'); }
-        });
-
-        window.deleteEmployee = (docId, name) => {
-            Swal.fire({ title: `ลบพนักงาน ${name}?`, text: "ประวัติเข้าออกยังอยู่ แต่จะล็อกอินไม่ได้อีก", icon: 'warning', showCancelButton: true, confirmButtonColor: '#e11d48', confirmButtonText: 'ลบข้อมูล' })
-            .then(async (result) => { if (result.isConfirmed) { await deleteDoc(doc(db, "employees", docId)); Swal.fire({ icon: 'success', title: 'ลบสำเร็จ', timer: 1000, showConfirmButton: false }); } });
-        };
-
-        window.deleteTimelog = (docId) => {
-            Swal.fire({ title: 'ลบรายการนี้?', text: "เมื่อลบแล้วจะไม่สามารถกู้คืนได้", icon: 'warning', showCancelButton: true, confirmButtonColor: '#e11d48', confirmButtonText: 'ใช่, ลบทิ้ง' })
-            .then(async (result) => { 
-                if (result.isConfirmed) { 
-                    try { await deleteDoc(doc(db, "timelogs", docId)); Swal.fire({ icon: 'success', title: 'ลบสำเร็จ', timer: 1000, showConfirmButton: false }); } 
-                    catch (error) { Swal.fire('ผิดพลาด', error.message, 'error'); }
-                } 
-            });
-        };
 
         function renderDepartmentsList() {
             const container = document.getElementById('depts-list');
@@ -2067,7 +2054,6 @@
             } catch (error) { Swal.fire('ผิดพลาด', error.message, 'error'); }
         });
 
-        // Initialize App Offline Logic on boot
         if (!navigator.onLine) document.getElementById('offline-banner').classList.remove('hide');
 
     </script>
