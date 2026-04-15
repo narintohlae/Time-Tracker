@@ -1,33 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
-    <title>PWA Notification</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA Firebase Push</title>
     <link rel="manifest" href="manifest.json">
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; background-color: #f0f0f0; }
+        button { padding: 15px 30px; font-size: 18px; margin: 10px; border-radius: 8px; border: none; cursor: pointer; background-color: #007aff; color: white; }
+        #token-display { margin-top: 20px; padding: 15px; background: #fff; border-radius: 8px; word-break: break-all; font-size: 14px; color: #333; display: none; border: 1px solid #ccc;}
+    </style>
 </head>
 <body>
-    <h1>ระบบแจ้งเตือน PWA</h1>
-    <button onclick="requestAndShow()">ส่งแจ้งเตือน</button>
+    <h1>ทดสอบ Firebase FCM 🚀</h1>
+    <p id="status">สถานะ: รอการอนุญาต</p>
+    <button id="btn-permission">ขออนุญาตแจ้งเตือน</button>
 
-    <script>
-        // 1. ลงทะเบียน Service Worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
-        }
+    <div id="token-display"></div>
 
-        async function requestAndShow() {
-            // 2. ขอสิทธิ์แจ้งเตือน
-            const permission = await Notification.requestPermission();
-            
-            if (permission === 'granted') {
-                const reg = await navigator.serviceWorker.ready;
-                // 3. ส่งข้อมูล url ไปกับแจ้งเตือน
-                reg.showNotification('สวัสดีจาก PWA', {
-                    body: 'คลิกที่นี่เพื่อไปหน้า page2.html',
-                    icon: 'https://via.placeholder.com/128',
-                    data: { url: './page2.html' }
-                });
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js";
+
+        // Config ของคุณ
+        const firebaseConfig = {
+            apiKey: "AIzaSyAgTWrI1G1t3GYVz4-SPM7btrsixSe0el8",
+            authDomain: "time-tracker-46283.firebaseapp.com",
+            projectId: "time-tracker-46283",
+            storageBucket: "time-tracker-46283.firebasestorage.app",
+            messagingSenderId: "882533547295",
+            appId: "1:882533547295:web:4b78bfc84322c58a50042a",
+            measurementId: "G-5DPBNCSWFW"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const messaging = getMessaging(app);
+
+        // VAPID Key ของคุณ
+        const vapidKey = "BDNGswO_-C1zLdkCtXs7GEqf4mzS6oDVVT4MVwEmgK1M4acf-0fk-FzSa-wYaTUa-wg_3eLK2_TFFytdqz1WBYo";
+
+        document.getElementById('btn-permission').addEventListener('click', async () => {
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    document.getElementById('status').innerText = "กำลังดึงข้อมูลจาก Firebase...";
+                    
+                    const currentToken = await getToken(messaging, { vapidKey: vapidKey });
+                    
+                    if (currentToken) {
+                        document.getElementById('status').innerText = "เชื่อมต่อสำเร็จ! ✅ คัดลอก Token ด้านล่างไปใช้ได้เลย";
+                        const tokenBox = document.getElementById('token-display');
+                        tokenBox.style.display = 'block';
+                        tokenBox.innerText = currentToken;
+                        console.log("Token: ", currentToken);
+                    } else {
+                        document.getElementById('status').innerText = "ไม่สามารถสร้าง Token ได้";
+                    }
+                } else {
+                    document.getElementById('status').innerText = "สถานะ: ปฏิเสธการแจ้งเตือน ❌";
+                }
+            } catch (err) {
+                console.error("เกิดข้อผิดพลาด: ", err);
+                document.getElementById('status').innerText = "เกิดข้อผิดพลาด (ดูรายละเอียดใน Console)";
             }
-        }
+        });
     </script>
 </body>
 </html>
