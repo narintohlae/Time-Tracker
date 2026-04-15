@@ -1,58 +1,33 @@
 <!DOCTYPE html>
-<html lang="th">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PWA แจ้งเตือน</title>
+    <title>PWA Notification</title>
     <link rel="manifest" href="manifest.json">
-    <style>
-        body { font-family: sans-serif; text-align: center; padding: 50px; background-color: #f0f0f0; }
-        button { padding: 15px 30px; font-size: 18px; margin: 10px; border-radius: 8px; border: none; cursor: pointer; }
-        #btn-permission { background-color: #007aff; color: white; }
-        #btn-notify { background-color: #34c759; color: white; display: none; }
-    </style>
 </head>
 <body>
-
-    <h1>ทดสอบการแจ้งเตือน 🔔</h1>
-    <p id="status">สถานะ: รอการอนุญาต</p>
-
-    <button id="btn-permission">1. ขออนุญาตส่งแจ้งเตือน</button>
-    <button id="btn-notify">2. ทดสอบส่งแจ้งเตือนเลย!</button>
+    <h1>ระบบแจ้งเตือน PWA</h1>
+    <button onclick="requestAndShow()">ส่งแจ้งเตือน</button>
 
     <script>
-        // ติดตั้ง Service Worker
+        // 1. ลงทะเบียน Service Worker
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-            .then(() => console.log('Service Worker ติดตั้งสำเร็จ!'))
-            .catch(err => console.error('ติดตั้ง Service Worker พลาด:', err));
+            navigator.serviceWorker.register('sw.js');
         }
 
-        const btnPermission = document.getElementById('btn-permission');
-        const btnNotify = document.getElementById('btn-notify');
-        const statusText = document.getElementById('status');
-
-        // ฟังก์ชันขออนุญาตเมื่อกดปุ่ม
-        btnPermission.addEventListener('click', async () => {
+        async function requestAndShow() {
+            // 2. ขอสิทธิ์แจ้งเตือน
             const permission = await Notification.requestPermission();
+            
             if (permission === 'granted') {
-                statusText.innerText = "สถานะ: อนุญาตแล้ว ✅";
-                btnPermission.style.display = 'none';
-                btnNotify.style.display = 'inline-block';
-            } else {
-                statusText.innerText = "สถานะ: ปฏิเสธ ❌";
-            }
-        });
-
-        // ฟังก์ชันสั่งให้ Service Worker ส่งแจ้งเตือน
-        btnNotify.addEventListener('click', () => {
-            navigator.serviceWorker.ready.then(registration => {
-                registration.showNotification('สวัสดีจาก PWA! 🚀', {
-                    body: 'ระบบแจ้งเตือนของคุณทำงานได้อย่างสมบูรณ์แบบ',
-                    vibrate: [200, 100, 200]
+                const reg = await navigator.serviceWorker.ready;
+                // 3. ส่งข้อมูล url ไปกับแจ้งเตือน
+                reg.showNotification('สวัสดีจาก PWA', {
+                    body: 'คลิกที่นี่เพื่อไปหน้า page2.html',
+                    icon: 'https://via.placeholder.com/128',
+                    data: { url: './page2.html' }
                 });
-            });
-        });
+            }
+        }
     </script>
 </body>
 </html>

@@ -1,10 +1,10 @@
 {
-  "name": "PWA Notify Test",
-  "short_name": "NotifyTest",
-  "start_url": "./index.html",
+  "name": "PWA Notification Demo",
+  "short_name": "PWA Alert",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#007aff",
+  "theme_color": "#2196f3",
   "icons": [
     {
       "src": "https://via.placeholder.com/192",
