@@ -44,8 +44,8 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .toast-enter { animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes slideUp { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .toast-enter { animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
         .shake { animation: shake 0.4s ease-in-out; }
         
@@ -66,6 +66,14 @@
         .pt-header { padding-top: max(1.5rem, var(--sat)); }
         .pb-nav { padding-bottom: max(0.5rem, var(--sab)); }
         .pt-modal { padding-top: max(1rem, var(--sat)); }
+
+        @media print {
+            body * { visibility: hidden; }
+            #modal-payslip, #modal-payslip * { visibility: visible; }
+            #modal-payslip { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: none; }
+            #modal-payslip-content { box-shadow: none; border: none; transform: none; width: 100%; max-width: 100%; }
+            .no-print { display: none !important; }
+        }
     </style>
 </head>
 <body class="h-screen w-screen overflow-hidden flex justify-center bg-gray-300">
@@ -149,7 +157,13 @@
                     </div>
                     <div class="flex flex-col items-center justify-center p-6 mt-8 shrink-0">
                         <div class="relative"><button id="btn-punch" onclick="attemptPunch()" class="w-52 h-52 rounded-full bg-[#4ade80] text-[#111827] font-bold text-3xl neo-border neo-shadow flex flex-col items-center justify-center gap-3 active:scale-95 transition-all"><i id="punch-icon" class="fa-solid fa-sign-in-alt text-6xl"></i><span id="punch-text">เข้างาน</span></button></div>
-                        <div class="mt-8 bg-gray-200 px-4 py-2 rounded-full neo-border"><p id="punch-status-text" class="text-[#111827] font-bold text-sm">กดปุ่มเพื่อบันทึกเวลา</p></div>
+                        <div class="mt-8 bg-gray-200 px-4 py-2 rounded-full neo-border text-center">
+                            <p id="punch-status-text" class="text-[#111827] font-bold text-sm">กดปุ่มเพื่อบันทึกเวลา</p>
+                        </div>
+                        <div class="mt-4 bg-white px-4 py-2 rounded-xl neo-border shadow-[2px_2px_0px_#111827] text-center border-dashed">
+                            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide">เวลาทำงานวันนี้</p>
+                            <p id="emp-today-hours" class="text-lg font-extrabold text-[#111827] mt-0.5">0 ชม. 0 นาที</p>
+                        </div>
                     </div>
                     <div class="px-6 pb-6 shrink-0"><h3 class="font-bold text-lg mb-4 text-[#111827] flex items-center gap-2"><div class="w-8 h-8 bg-white rounded-lg neo-border flex justify-center items-center"><i class="fa-solid fa-clock-rotate-left"></i></div> ประวัติวันนี้</h3><div id="emp-history-list" class="space-y-4"></div></div>
                 </div>
@@ -176,7 +190,7 @@
                 <button onclick="switchEmpTab('time')" id="nav-emp-time" class="flex-1 flex flex-col items-center justify-center text-[#38bdf8] border-r-3 border-[#111827] py-2"><i class="fa-solid fa-fingerprint text-xl mb-1"></i><span class="text-[10px] font-bold">ลงเวลา</span></button>
                 <button onclick="switchEmpTab('leave')" id="nav-emp-leave" class="flex-1 flex flex-col items-center justify-center text-gray-400 border-r-3 border-[#111827] py-2"><i class="fa-solid fa-file-signature text-xl mb-1"></i><span class="text-[10px] font-bold">คำขอ</span></button>
                 <button onclick="switchEmpTab('payroll')" id="nav-emp-payroll" class="flex-1 flex flex-col items-center justify-center text-gray-400 border-r-3 border-[#111827] py-2"><i class="fa-solid fa-file-invoice-dollar text-xl mb-1"></i><span class="text-[10px] font-bold">เงินเดือน</span></button>
-                <button onclick="logout()" class="flex-[0.5] flex flex-col items-center justify-center text-red-500 bg-red-50 py-2"><i class="fa-solid fa-power-off text-xl mb-1"></i></button>
+                <button onclick="logout()" class="flex-[0.5] flex flex-col items-center justify-center text-red-500 bg-red-50 py-2 active:bg-red-200 transition-colors"><i class="fa-solid fa-power-off text-xl mb-1"></i></button>
             </div>
         </div>
 
@@ -186,57 +200,65 @@
                 
                 <!-- Tab: แดชบอร์ด -->
                 <div id="owner-tab-dashboard" class="flex flex-col min-h-full">
-    <div class="bg-[#fb923c] px-6 pt-header pb-8 rounded-b-[2.5rem] neo-border border-t-0 neo-shadow-sm shrink-0">
-        <div class="flex justify-between items-center mb-6">
-            <div>
-                <h2 class="text-3xl font-extrabold text-[#111827]">แดชบอร์ด</h2>
-                <p class="text-[#111827] font-bold mt-1 bg-white/80 backdrop-blur-sm inline-block px-3 py-1 rounded-lg neo-border text-xs" id="owner-date">18 เม.ย.</p>
-            </div>
-            <div class="w-12 h-12 bg-white rounded-xl neo-border flex items-center justify-center shadow-[4px_4px_0px_#111827]">
-                <i class="fa-solid fa-store text-2xl text-[#111827]"></i>
-            </div>
-        </div>
-        
-        <div class="grid grid-cols-2 gap-3">
-            <div class="bg-white rounded-2xl p-4 neo-border shadow-[4px_4px_0px_#111827] flex flex-col justify-center">
-                <p class="text-[10px] font-extrabold text-gray-500 uppercase tracking-wide">พนักงานทั้งหมด</p>
-                <div class="flex items-end gap-2 mt-1"><p class="text-4xl font-extrabold text-[#111827] leading-none" id="stat-total">0</p><span class="text-xs font-bold text-gray-500 mb-1">คน</span></div>
-            </div>
-            <div class="bg-[#4ade80] rounded-2xl p-4 neo-border shadow-[4px_4px_0px_#111827] flex flex-col justify-center">
-                <p class="text-[10px] font-extrabold text-[#111827] uppercase tracking-wide">เข้างานวันนี้</p>
-                <div class="flex items-end gap-2 mt-1"><p class="text-4xl font-extrabold text-[#111827] leading-none" id="stat-working">0</p><span class="text-xs font-bold text-[#111827] mb-1">คน</span></div>
-            </div>
-            <div class="bg-[#c084fc] rounded-2xl p-4 neo-border shadow-[4px_4px_0px_#111827] flex flex-col justify-center">
-                <p class="text-[10px] font-extrabold text-[#111827] uppercase tracking-wide">ลาหยุดพัก</p>
-                <div class="flex items-end gap-2 mt-1"><p class="text-4xl font-extrabold text-white leading-none" id="stat-leave">0</p><span class="text-xs font-bold text-white mb-1">คน</span></div>
-            </div>
-            <div class="bg-[#f87171] rounded-2xl p-4 neo-border shadow-[4px_4px_0px_#111827] flex flex-col justify-center">
-                <p class="text-[10px] font-extrabold text-[#111827] uppercase tracking-wide">ยังไม่เข้า / ขาด</p>
-                <div class="flex items-end gap-2 mt-1"><p class="text-4xl font-extrabold text-white leading-none" id="stat-absent">0</p><span class="text-xs font-bold text-white mb-1">คน</span></div>
-            </div>
-        </div>
-    </div>
+                    <div class="bg-[#fb923c] px-6 pt-header pb-8 rounded-b-[2.5rem] neo-border border-t-0 neo-shadow-sm shrink-0">
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h2 class="text-3xl font-extrabold text-[#111827]">แดชบอร์ด</h2>
+                                <p class="text-[#111827] font-bold mt-1 bg-white/80 backdrop-blur-sm inline-block px-3 py-1 rounded-lg neo-border text-xs" id="owner-date">18 เม.ย.</p>
+                            </div>
+                            <div class="w-12 h-12 bg-white rounded-xl neo-border flex items-center justify-center shadow-[4px_4px_0px_#111827]">
+                                <i class="fa-solid fa-store text-2xl text-[#111827]"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-white rounded-2xl p-4 neo-border shadow-[4px_4px_0px_#111827] flex flex-col justify-center">
+                                <p class="text-[10px] font-extrabold text-gray-500 uppercase tracking-wide">พนักงานทั้งหมด</p>
+                                <div class="flex items-end gap-2 mt-1"><p class="text-4xl font-extrabold text-[#111827] leading-none" id="stat-total">0</p><span class="text-xs font-bold text-gray-500 mb-1">คน</span></div>
+                            </div>
+                            <div class="bg-[#4ade80] rounded-2xl p-4 neo-border shadow-[4px_4px_0px_#111827] flex flex-col justify-center">
+                                <p class="text-[10px] font-extrabold text-[#111827] uppercase tracking-wide">เข้างานวันนี้</p>
+                                <div class="flex items-end gap-2 mt-1"><p class="text-4xl font-extrabold text-[#111827] leading-none" id="stat-working">0</p><span class="text-xs font-bold text-[#111827] mb-1">คน</span></div>
+                            </div>
+                            <div class="bg-[#c084fc] rounded-2xl p-4 neo-border shadow-[4px_4px_0px_#111827] flex flex-col justify-center">
+                                <p class="text-[10px] font-extrabold text-[#111827] uppercase tracking-wide">ลาหยุดพัก</p>
+                                <div class="flex items-end gap-2 mt-1"><p class="text-4xl font-extrabold text-white leading-none" id="stat-leave">0</p><span class="text-xs font-bold text-white mb-1">คน</span></div>
+                            </div>
+                            <div class="bg-[#f87171] rounded-2xl p-4 neo-border shadow-[4px_4px_0px_#111827] flex flex-col justify-center">
+                                <p class="text-[10px] font-extrabold text-[#111827] uppercase tracking-wide">ยังไม่เข้า / ขาด</p>
+                                <div class="flex items-end gap-2 mt-1"><p class="text-4xl font-extrabold text-white leading-none" id="stat-absent">0</p><span class="text-xs font-bold text-white mb-1">คน</span></div>
+                            </div>
+                        </div>
+                    </div>
 
-    <div class="p-6 pb-6 space-y-6">
-        <div id="dashboard-alerts"></div>
+                    <div class="p-6 pb-6 space-y-6">
+                        <div id="dashboard-alerts"></div>
 
-        <div>
-            <h3 class="font-bold text-lg mb-3 text-[#111827] flex items-center gap-2"><div class="w-8 h-8 bg-white rounded-lg neo-border flex justify-center items-center"><i class="fa-solid fa-bolt text-yellow-500"></i></div> ความเคลื่อนไหวล่าสุด</h3>
-            <div id="owner-recent-activity" class="space-y-3"></div>
-        </div>
+                        <div>
+                            <h3 class="font-bold text-lg mb-3 text-[#111827] flex items-center gap-2"><div class="w-8 h-8 bg-white rounded-lg neo-border flex justify-center items-center"><i class="fa-solid fa-bolt text-yellow-500"></i></div> ความเคลื่อนไหวล่าสุด</h3>
+                            <div id="owner-recent-activity" class="space-y-3"></div>
+                        </div>
 
-        <div>
-            <h3 class="font-bold text-lg mb-3 text-[#111827] flex items-center gap-2"><div class="w-8 h-8 bg-white rounded-lg neo-border flex justify-center items-center"><i class="fa-solid fa-users-viewfinder"></i></div> สถานะพนักงานวันนี้</h3>
-            <div id="owner-employee-status-list" class="space-y-3"></div>
-        </div>
-    </div>
-</div>
-
+                        <div>
+                            <h3 class="font-bold text-lg mb-3 text-[#111827] flex items-center gap-2"><div class="w-8 h-8 bg-white rounded-lg neo-border flex justify-center items-center"><i class="fa-solid fa-users-viewfinder"></i></div> สถานะพนักงานวันนี้</h3>
+                            <div id="owner-employee-status-list" class="space-y-3"></div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Tab: พนักงาน -->
                 <div id="owner-tab-employees" class="flex flex-col min-h-full hidden">
                     <div class="px-6 pt-header pb-4 flex justify-between items-center shrink-0"><h2 class="text-3xl font-extrabold text-[#111827]">พนักงาน</h2><button onclick="openEmployeeModal()" class="bg-[#4ade80] text-[#111827] px-4 py-2 rounded-xl font-bold neo-border neo-shadow-sm flex items-center gap-2 active:translate-y-1"><i class="fa-solid fa-user-plus"></i> เพิ่ม</button></div>
-                    <div class="px-6 pb-6"><div id="owner-employee-management-list" class="space-y-4"></div></div>
+                    
+                    <!-- Search Bar -->
+                    <div class="px-6 pb-2 shrink-0">
+                        <div class="relative">
+                            <i class="fa-solid fa-search absolute left-3 top-3.5 text-gray-400"></i>
+                            <input type="text" id="search-emp" placeholder="ค้นหาชื่อ หรือ ตำแหน่ง..." class="neo-input pl-10 py-2.5 text-sm bg-white w-full border-2" onkeyup="renderOwnerEmployeeList()">
+                        </div>
+                    </div>
+
+                    <div class="px-6 pb-6"><div id="owner-employee-management-list" class="space-y-4 mt-2"></div></div>
                 </div>
 
                 <!-- Tab: คำขอ -->
@@ -258,7 +280,7 @@
                 <button onclick="switchOwnerTab('employees')" id="nav-owner-employees" class="flex-[1.2] flex flex-col items-center justify-center text-gray-400 border-r-3 border-[#111827] py-2"><i class="fa-solid fa-users text-xl mb-1"></i><span class="text-[9px] font-bold">พนักงาน</span></button>
                 <button onclick="switchOwnerTab('leave')" id="nav-owner-leave" class="flex-[1.2] flex flex-col items-center justify-center text-gray-400 border-r-3 border-[#111827] relative py-2"><i class="fa-solid fa-inbox text-xl mb-1"></i><span class="text-[9px] font-bold">คำขอ</span><span id="dot-pending-leave" class="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full border-2 border-white hidden"></span></button>
                 <button onclick="switchOwnerTab('payroll')" id="nav-owner-payroll" class="flex-[1.2] flex flex-col items-center justify-center text-gray-400 border-r-3 border-[#111827] py-2"><i class="fa-solid fa-file-invoice-dollar text-xl mb-1"></i><span class="text-[9px] font-bold">เงินเดือน</span></button>
-                <button onclick="logout()" class="flex-[0.6] flex flex-col items-center justify-center text-red-500 bg-red-50 py-2"><i class="fa-solid fa-power-off text-xl mb-1"></i></button>
+                <button onclick="logout()" class="flex-[0.6] flex flex-col items-center justify-center text-red-500 bg-red-50 py-2 active:bg-red-200 transition-colors"><i class="fa-solid fa-power-off text-xl mb-1"></i></button>
             </div>
         </div>
 
@@ -326,24 +348,54 @@
             </div>
         </div>
 
-        <!-- Modal: ยืนยัน -->
+        <!-- Modal: ยืนยัน (Updated) -->
         <div id="modal-confirm" class="absolute inset-0 z-[80] modal-backdrop flex items-center justify-center hidden p-4">
             <div class="bg-white w-full max-w-sm rounded-2xl p-6 neo-border neo-shadow text-center flex flex-col max-h-[85vh]">
-                <div class="overflow-y-auto hide-scrollbar flex-1 mb-6"><div id="confirm-icon-bg" class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-yellow-500"><i id="confirm-icon" class="fa-solid fa-triangle-exclamation text-3xl text-yellow-500"></i></div><h3 class="text-2xl font-extrabold text-[#111827] mb-2" id="confirm-title">แจ้งเตือน</h3><p class="text-gray-600 font-medium text-sm break-words" id="confirm-msg"></p></div>
-                <div class="flex gap-3 shrink-0"><button onclick="closeConfirmModal()" class="flex-1 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl border-2 border-gray-300 active:scale-95">ยกเลิก</button><button id="confirm-btn-action" class="flex-1 bg-[#ffde59] text-[#111827] font-bold py-3 rounded-xl neo-border neo-shadow-sm active:scale-95">ยืนยัน</button></div>
+                <div class="overflow-y-auto hide-scrollbar flex-1 mb-6">
+                    <div id="confirm-icon-bg" class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-yellow-500">
+                        <i id="confirm-icon" class="fa-solid fa-triangle-exclamation text-3xl text-yellow-500"></i>
+                    </div>
+                    <h3 class="text-2xl font-extrabold text-[#111827] mb-2" id="confirm-title">แจ้งเตือน</h3>
+                    <p class="text-gray-600 font-medium text-sm break-words" id="confirm-msg"></p>
+                </div>
+                <div class="flex gap-3 shrink-0">
+                    <button onclick="closeConfirmModal()" class="flex-1 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl border-2 border-gray-300 active:scale-95">ยกเลิก</button>
+                    <button id="confirm-btn-action" class="flex-1 bg-[#ffde59] text-[#111827] font-bold py-3 rounded-xl neo-border neo-shadow-sm active:scale-95">ยืนยัน</button>
+                </div>
             </div>
         </div>
 
         <!-- Modal: สลิปเงินเดือน -->
         <div id="modal-payslip" class="absolute inset-0 z-[80] modal-backdrop flex items-center justify-center hidden p-4">
             <div class="bg-white w-full max-w-sm rounded-xl p-0 neo-border neo-shadow transform transition-transform duration-300 scale-95 opacity-0 flex flex-col max-h-[90vh]" id="modal-payslip-content">
-                <div class="bg-[#111827] text-white p-5 rounded-t-lg text-center relative shrink-0"><button onclick="closePaySlipModal()" class="absolute top-3 right-3 text-white opacity-70 hover:opacity-100 p-2"><i class="fa-solid fa-xmark text-xl"></i></button><h2 class="text-2xl font-extrabold tracking-widest uppercase">PAY SLIP</h2><p class="text-sm text-gray-300 mt-1" id="slip-month-year"></p></div>
-                <div class="p-6 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] overflow-y-auto hide-scrollbar flex-1"><div class="mb-5 border-b-2 border-dashed border-gray-300 pb-4"><p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">ข้อมูลพนักงาน</p><h3 class="text-xl font-extrabold text-[#111827] break-words" id="slip-emp-name"></h3><p class="text-sm font-bold text-gray-600 break-words" id="slip-emp-pos"></p></div><div class="space-y-3 mb-6"><div class="flex justify-between items-center text-sm font-medium"><span class="text-gray-600 shrink-0" id="slip-base-label"></span><span class="font-extrabold text-[#111827] text-right ml-2" id="slip-base-amount"></span></div><div class="flex justify-between items-center text-sm font-medium"><span class="text-gray-600 shrink-0">ค่าล่วงเวลา (OT) <span id="slip-ot-hrs" class="text-xs"></span></span><span class="font-extrabold text-green-600 text-right ml-2" id="slip-ot-amount"></span></div><div class="flex justify-between items-center text-sm font-medium"><span class="text-gray-600 text-xs shrink-0" id="slip-work-summary"></span><span></span></div></div><div class="bg-[#ffde59] p-4 rounded-xl border-2 border-[#111827] shadow-[2px_2px_0px_#111827] flex justify-between items-center"><span class="font-extrabold text-[#111827]">รับสุทธิ</span><span class="text-2xl font-extrabold text-[#111827] tracking-tighter" id="slip-net-total"></span></div></div>
+                <div class="bg-[#111827] text-white p-5 rounded-t-lg text-center relative shrink-0 no-print">
+                    <button onclick="closePaySlipModal()" class="absolute top-3 right-3 text-white opacity-70 hover:opacity-100 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
+                    <h2 class="text-2xl font-extrabold tracking-widest uppercase">PAY SLIP</h2>
+                    <p class="text-sm text-gray-300 mt-1" id="slip-month-year"></p>
+                </div>
+                <div class="p-6 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] overflow-y-auto hide-scrollbar flex-1">
+                    <div class="mb-5 border-b-2 border-dashed border-gray-300 pb-4"><p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">ข้อมูลพนักงาน</p><h3 class="text-xl font-extrabold text-[#111827] break-words" id="slip-emp-name"></h3><p class="text-sm font-bold text-gray-600 break-words" id="slip-emp-pos"></p></div>
+                    <div class="space-y-3 mb-6">
+                        <div class="flex justify-between items-center text-sm font-medium"><span class="text-gray-600 shrink-0" id="slip-base-label"></span><span class="font-extrabold text-[#111827] text-right ml-2" id="slip-base-amount"></span></div>
+                        <div class="flex justify-between items-center text-sm font-medium"><span class="text-gray-600 shrink-0">ค่าล่วงเวลา (OT) <span id="slip-ot-hrs" class="text-xs"></span></span><span class="font-extrabold text-green-600 text-right ml-2" id="slip-ot-amount"></span></div>
+                        <div class="flex justify-between items-center text-sm font-medium"><span class="text-gray-600 text-xs shrink-0" id="slip-work-summary"></span><span></span></div>
+                    </div>
+                    <div class="bg-[#ffde59] p-4 rounded-xl border-2 border-[#111827] shadow-[2px_2px_0px_#111827] flex justify-between items-center mb-4">
+                        <span class="font-extrabold text-[#111827]">รับสุทธิ</span><span class="text-2xl font-extrabold text-[#111827] tracking-tighter" id="slip-net-total"></span>
+                    </div>
+                    
+                    <!-- Print Button Mockup -->
+                    <button onclick="mockPrintPayslip()" class="no-print w-full bg-[#38bdf8] text-[#111827] font-bold py-3 rounded-xl neo-border shadow-[2px_2px_0px_#111827] active:translate-y-1 transition-all"><i class="fa-solid fa-download"></i> บันทึกรูปสลิป / พิมพ์</button>
+                </div>
                 <div class="p-4 bg-gray-50 rounded-b-lg border-t border-gray-200 shrink-0 text-center"><p class="text-[10px] text-gray-400 font-medium">TimeTrack System</p></div>
             </div>
         </div>
 
-        <div id="toast" class="absolute top-10 left-1/2 transform -translate-x-1/2 bg-[#111827] text-white px-6 py-4 rounded-xl font-bold shadow-2xl neo-border z-[100] hidden flex items-start gap-3 w-auto max-w-[90%] pt-safe"><i id="toast-icon" class="mt-1 shrink-0"></i><span id="toast-msg" class="break-words text-sm leading-snug"></span></div>
+        <!-- Toast Notification (Updated) -->
+        <div id="toast" class="absolute top-[env(safe-area-inset-top,20px)] left-1/2 transform -translate-x-1/2 px-6 py-4 rounded-xl font-bold shadow-2xl neo-border z-[100] hidden flex items-center gap-3 w-auto max-w-[90%] transition-all">
+            <i id="toast-icon" class="mt-0.5 shrink-0"></i>
+            <span id="toast-msg" class="break-words text-sm leading-snug"></span>
+        </div>
 
     </div>
 
@@ -358,7 +410,7 @@
         let employees = [], timeLogs = [], requests = [], paySlips = []; 
 
         function loadData() {
-            const e = localStorage.getItem('tt_emps_v9'), l = localStorage.getItem('tt_logs_v9'), r = localStorage.getItem('tt_reqs_v9'), p = localStorage.getItem('tt_slips_v9');
+            const e = localStorage.getItem('tt_emps_v10'), l = localStorage.getItem('tt_logs_v10'), r = localStorage.getItem('tt_reqs_v10'), p = localStorage.getItem('tt_slips_v10');
             if (e) employees = JSON.parse(e);
             else {
                 employees = [
@@ -370,15 +422,96 @@
             }
             if (l) timeLogs = JSON.parse(l); if (r) requests = JSON.parse(r); if (p) paySlips = JSON.parse(p);
         }
-        function saveData() { localStorage.setItem('tt_emps_v9', JSON.stringify(employees)); localStorage.setItem('tt_logs_v9', JSON.stringify(timeLogs)); localStorage.setItem('tt_reqs_v9', JSON.stringify(requests)); localStorage.setItem('tt_slips_v9', JSON.stringify(paySlips)); }
-        function createMockLogsForPayroll() { const now = new Date(); const y = now.getFullYear(); const m = now.getMonth(); for(let d=1; d<=20; d++) { const date = new Date(y, m, d); if(date.getDay() !== 0) { timeLogs.push({ empId: 1, type: 'in', time: '09:00', timestamp: new Date(y,m,d,9,0).getTime() }); timeLogs.push({ empId: 1, type: 'out', time: '19:00', timestamp: new Date(y,m,d,19,0).getTime() }); timeLogs.push({ empId: 2, type: 'in', time: '08:30', timestamp: new Date(y,m,d,8,30).getTime() }); timeLogs.push({ empId: 2, type: 'out', time: '17:30', timestamp: new Date(y,m,d,17,30).getTime() }); } } }
+        function saveData() { localStorage.setItem('tt_emps_v10', JSON.stringify(employees)); localStorage.setItem('tt_logs_v10', JSON.stringify(timeLogs)); localStorage.setItem('tt_reqs_v10', JSON.stringify(requests)); localStorage.setItem('tt_slips_v10', JSON.stringify(paySlips)); }
+        
+        // Smart Mock Data Creation based on current date
+        function createMockLogsForPayroll() { 
+            const now = new Date(); 
+            const y = now.getFullYear(); 
+            const m = now.getMonth(); 
+            // Generate mock logs for the current month up to yesterday
+            let maxDay = now.getDate() > 15 ? 15 : now.getDate() - 1;
+            if(maxDay < 1) maxDay = 1; // Fallback
+            for(let d=1; d <= maxDay; d++) { 
+                const date = new Date(y, m, d); 
+                if(date.getDay() !== 0) { 
+                    timeLogs.push({ empId: 1, type: 'in', time: '09:00', timestamp: new Date(y,m,d,9,0).getTime() }); 
+                    timeLogs.push({ empId: 1, type: 'out', time: '19:00', timestamp: new Date(y,m,d,19,0).getTime() }); 
+                    timeLogs.push({ empId: 2, type: 'in', time: '08:30', timestamp: new Date(y,m,d,8,30).getTime() }); 
+                    timeLogs.push({ empId: 2, type: 'out', time: '17:30', timestamp: new Date(y,m,d,17,30).getTime() }); 
+                } 
+            } 
+        }
 
         let currentUserId = null, currentRole = null, pinTargetRole = null, pinTargetEmpId = null, enteredPin = "", clockInterval;
         function getLocalISODate(d = new Date()) { const date = new Date(d); date.setMinutes(date.getMinutes() - date.getTimezoneOffset()); return date.toISOString().split('T')[0]; }
         function formatDate(dateStr) { return new Date(dateStr).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' }); }
         function formatMoney(num) { return Number(num).toLocaleString('th-TH', {minimumFractionDigits: 0, maximumFractionDigits: 2}); }
         function generateAvatar(name) { return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}&backgroundColor=${['b6e3f4','ffdfbf','c0aede','fef08a','a7f3d0'][Math.floor(Math.random()*5)]}`; }
-        function showToast(message, isError=false) { const toast=document.getElementById('toast'); document.getElementById('toast-msg').innerText=message; document.getElementById('toast-icon').className=isError?"fa-solid fa-circle-exclamation text-[#f87171] text-xl":"fa-solid fa-circle-check text-[#4ade80] text-xl"; toast.classList.remove('hidden'); toast.classList.add('toast-enter'); setTimeout(()=>{toast.classList.remove('toast-enter'); toast.classList.add('hidden');}, 3000); }
+        
+        // ================= NOTIFICATION SYSTEM =================
+        function showToast(message, type = 'success') { 
+            const toast = document.getElementById('toast'); 
+            const msg = document.getElementById('toast-msg');
+            const icon = document.getElementById('toast-icon');
+            
+            msg.innerText = message; 
+            toast.className = `absolute top-[env(safe-area-inset-top,20px)] left-1/2 transform -translate-x-1/2 px-5 py-3.5 rounded-xl font-bold shadow-2xl neo-border z-[100] flex items-center gap-3 w-auto max-w-[90%] toast-enter`;
+            
+            if(type === 'error') {
+                toast.classList.add('bg-red-50', 'text-red-600', 'border-red-600');
+                icon.className = "fa-solid fa-circle-xmark text-red-500 text-xl";
+            } else if (type === 'warning') {
+                toast.classList.add('bg-yellow-50', 'text-yellow-700', 'border-yellow-500');
+                icon.className = "fa-solid fa-triangle-exclamation text-yellow-500 text-xl";
+            } else if (type === 'info') {
+                toast.classList.add('bg-blue-50', 'text-blue-700', 'border-blue-500');
+                icon.className = "fa-solid fa-circle-info text-blue-500 text-xl";
+            } else { // success
+                toast.classList.add('bg-[#111827]', 'text-white');
+                icon.className = "fa-solid fa-circle-check text-[#4ade80] text-xl";
+            }
+
+            toast.classList.remove('hidden'); 
+            setTimeout(() => { toast.classList.remove('toast-enter'); toast.classList.add('hidden'); }, 3000); 
+        }
+
+        // Centralized Confirm Modal
+        function showConfirm(title, message, type = 'warning', confirmBtnText = 'ยืนยัน', onConfirmCallback) {
+            document.getElementById('confirm-title').innerText = title;
+            document.getElementById('confirm-msg').innerHTML = message;
+            
+            const iconBg = document.getElementById('confirm-icon-bg');
+            const icon = document.getElementById('confirm-icon');
+            const btnAction = document.getElementById('confirm-btn-action');
+
+            if (type === 'danger') {
+                iconBg.className = "w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-red-500";
+                icon.className = "fa-solid fa-trash text-3xl text-red-500";
+                btnAction.className = "flex-1 bg-[#f87171] text-white font-bold py-3 rounded-xl neo-border neo-shadow-sm active:scale-95";
+            } else { // warning
+                iconBg.className = "w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-yellow-500";
+                icon.className = "fa-solid fa-triangle-exclamation text-3xl text-yellow-500";
+                btnAction.className = "flex-1 bg-[#ffde59] text-[#111827] font-bold py-3 rounded-xl neo-border neo-shadow-sm active:scale-95";
+            }
+
+            btnAction.innerText = confirmBtnText;
+            btnAction.onclick = () => {
+                if(onConfirmCallback) onConfirmCallback();
+                closeConfirmModal();
+            };
+
+            document.getElementById('modal-confirm').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() { 
+            document.getElementById('modal-confirm').classList.add('hidden'); 
+            empIdToDelete = null; 
+            empNameToDelete = null;
+            reqIdToCancel = null; 
+        }
+        // ===============================================================
+
         function showScreen(screenId) { ['screen-role', 'screen-select-emp', 'screen-pin', 'screen-employee', 'screen-owner'].forEach(id => { const el=document.getElementById(id); if(id==='screen-select-emp') el.classList.add('translate-x-full'); else if(id==='screen-pin') el.classList.add('translate-y-full'); else el.classList.add('hidden'); }); const target=document.getElementById(screenId); target.classList.remove('hidden'); if(screenId==='screen-select-emp' || screenId==='screen-pin') setTimeout(()=>target.classList.remove('translate-x-full', 'translate-y-full'), 10); }
 
         function checkIsWorkDay(empId, dateStr) {
@@ -398,15 +531,31 @@
         }
 
         // Login
-        function gotoSelectEmployee() { if(employees.length===0) return showToast('ไม่พบข้อมูลพนักงาน', true); document.getElementById('emp-selection-list').innerHTML = employees.map(emp => `<button onclick="openPinPad('employee', ${emp.id})" class="w-full bg-white p-4 rounded-xl neo-border neo-shadow-sm flex items-center gap-4 text-left active:scale-[0.98] transition-transform"><img src="${emp.avatar}" class="w-14 h-14 rounded-full bg-gray-100 shrink-0"><div class="flex-1 min-w-0"><h4 class="font-extrabold text-[#111827] text-xl truncate">${emp.name}</h4><p class="text-sm text-gray-500 truncate">${emp.position}</p></div><i class="fa-solid fa-chevron-right shrink-0 text-gray-400"></i></button>`).join(''); showScreen('screen-select-emp'); }
+        function gotoSelectEmployee() { if(employees.length===0) return showToast('ไม่พบข้อมูลพนักงานในระบบ', 'warning'); document.getElementById('emp-selection-list').innerHTML = employees.map(emp => `<button onclick="openPinPad('employee', ${emp.id})" class="w-full bg-white p-4 rounded-xl neo-border neo-shadow-sm flex items-center gap-4 text-left active:scale-[0.98] transition-transform"><img src="${emp.avatar}" class="w-14 h-14 rounded-full bg-gray-100 shrink-0"><div class="flex-1 min-w-0"><h4 class="font-extrabold text-[#111827] text-xl truncate">${emp.name}</h4><p class="text-sm text-gray-500 truncate">${emp.position}</p></div><i class="fa-solid fa-chevron-right shrink-0 text-gray-400"></i></button>`).join(''); showScreen('screen-select-emp'); }
         function backToRole() { showScreen('screen-role'); }
         function openPinPad(role, empId = null) { pinTargetRole=role; pinTargetEmpId=empId; enteredPin=""; updatePinDots(); if (role === 'owner') { document.getElementById('pin-title').innerText="รหัสเจ้าของ"; document.getElementById('pin-subtitle').innerText="เข้าสู่ระบบจัดการ"; document.getElementById('pin-icon').classList.remove('hidden'); document.getElementById('pin-avatar').classList.add('hidden'); } else { const emp=employees.find(e=>e.id===empId); document.getElementById('pin-title').innerText="รหัสพนักงาน"; document.getElementById('pin-subtitle').innerText=emp.name; document.getElementById('pin-avatar').src=emp.avatar; document.getElementById('pin-avatar').classList.remove('hidden'); document.getElementById('pin-icon').classList.add('hidden'); } showScreen('screen-pin'); }
         function backFromPin() { if(pinTargetRole==='owner') showScreen('screen-role'); else showScreen('screen-select-emp'); }
         function pressPin(num) { if(enteredPin.length<4){ enteredPin+=num; updatePinDots(); if(enteredPin.length===4) setTimeout(verifyPin, 100); } }
         function deletePin() { if(enteredPin.length>0){ enteredPin=enteredPin.slice(0,-1); updatePinDots(); } }
         function updatePinDots() { const dots=document.getElementById('pin-dots').children; for(let i=0;i<4;i++) dots[i].className=i<enteredPin.length?"w-5 h-5 rounded-full border-2 border-white bg-white":"w-5 h-5 rounded-full border-2 border-white"; }
-        function verifyPin() { let success = pinTargetRole==='owner' ? enteredPin===MASTER_OWNER_PIN : enteredPin===employees.find(e=>e.id===pinTargetEmpId).pin; if(success){ currentRole=pinTargetRole; if(currentRole==='employee'){ currentUserId=pinTargetEmpId; switchEmpTab('time'); initEmployeeScreen(); showScreen('screen-employee'); clockInterval=setInterval(updateClock,1000); } else { switchOwnerTab('dashboard'); initOwnerScreen(); showScreen('screen-owner'); } showToast('เข้าสู่ระบบสำเร็จ'); } else { document.getElementById('pin-dots').classList.add('shake'); showToast('รหัสผ่านไม่ถูกต้อง', true); setTimeout(()=>{ document.getElementById('pin-dots').classList.remove('shake'); enteredPin=""; updatePinDots(); },400); } }
-        function logout() { currentRole=null; currentUserId=null; clearInterval(clockInterval); showScreen('screen-role'); }
+        function verifyPin() { 
+            let success = pinTargetRole==='owner' ? enteredPin===MASTER_OWNER_PIN : enteredPin===employees.find(e=>e.id===pinTargetEmpId).pin; 
+            if(success){ 
+                currentRole=pinTargetRole; 
+                if(currentRole==='employee'){ 
+                    currentUserId=pinTargetEmpId; switchEmpTab('time'); initEmployeeScreen(); showScreen('screen-employee'); clockInterval=setInterval(updateClock,1000); 
+                } else { 
+                    switchOwnerTab('dashboard'); initOwnerScreen(); showScreen('screen-owner'); 
+                } 
+                showToast('เข้าสู่ระบบสำเร็จ', 'success'); 
+            } else { 
+                document.getElementById('pin-dots').classList.add('shake'); 
+                showToast('รหัส PIN ไม่ถูกต้อง', 'error'); 
+                if(navigator.vibrate) navigator.vibrate([100, 50, 100]); // Vibrate on wrong pin
+                setTimeout(()=>{ document.getElementById('pin-dots').classList.remove('shake'); enteredPin=""; updatePinDots(); },400); 
+            } 
+        }
+        function logout() { currentRole=null; currentUserId=null; clearInterval(clockInterval); showScreen('screen-role'); showToast('ออกจากระบบเรียบร้อย', 'info'); }
 
         // Employee
         function switchEmpTab(tab) {
@@ -418,38 +567,101 @@
             if(tab==='leave') renderEmployeeRequestHistory(); if(tab==='payroll') renderEmployeePaySlips();
         }
         function initEmployeeScreen() { const user=employees.find(e=>e.id===currentUserId); document.getElementById('emp-name').innerText=user.name; document.getElementById('emp-avatar').src=user.avatar; updateDate(); updateClock(); updatePunchButtonState(); renderEmployeeTimeHistory(); }
-        function updateClock() { document.getElementById('current-time').innerText=new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
-        function updateDate() { document.getElementById('current-date').innerText=new Date().toLocaleDateString('th-TH', { weekday: 'long', month: 'long', day: 'numeric' }); document.getElementById('owner-date').innerText=new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'short' }); }
+        
+        function updateClock() { 
+            document.getElementById('current-time').innerText=new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); 
+            if(currentRole === 'employee') updateTodayHours(); // Update working hours dynamically
+        }
+        function updateDate() { 
+            document.getElementById('current-date').innerText=new Date().toLocaleDateString('th-TH', { weekday: 'long', month: 'long', day: 'numeric' }); 
+            document.getElementById('owner-date').innerText=new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'short' }); 
+        }
+
+        // New Feature: Calculate working hours today dynamically
+        function updateTodayHours() {
+            const todayStr = new Date().toDateString();
+            const logs = timeLogs.filter(l => l.empId === currentUserId && new Date(l.timestamp).toDateString() === todayStr).sort((a,b) => a.timestamp - b.timestamp);
+            let totalMs = 0; let inTime = null;
+            
+            logs.forEach(l => {
+                if(l.type === 'in' && !inTime) inTime = l.timestamp;
+                else if(l.type === 'out' && inTime) { totalMs += (l.timestamp - inTime); inTime = null; }
+            });
+            if(inTime) totalMs += (Date.now() - inTime); // Currently working
+            
+            const hrs = Math.floor(totalMs / 3600000);
+            const mins = Math.floor((totalMs % 3600000) / 60000);
+            document.getElementById('emp-today-hours').innerText = `${hrs} ชม. ${mins} นาที`;
+        }
         
         function analyzePunchStatus() { const logs = timeLogs.filter(l => l.empId === currentUserId).sort((a,b) => b.timestamp - a.timestamp); if (logs.length === 0) return { action: 'in', warning: null }; const lastLog = logs[0], todayStr = new Date().toDateString(), logDateStr = new Date(lastLog.timestamp).toDateString(); if (lastLog.type === 'in') { if (logDateStr === todayStr) return { action: 'out', warning: null }; else return { action: 'in', warning: 'ระบบขึ้นรอบใหม่ (คุณลืมกดออกงานรอบที่แล้ว)' }; } else return { action: 'in', warning: null }; }
-        function updatePunchButtonState() { const s = analyzePunchStatus(), btn=document.getElementById('btn-punch'), icon=document.getElementById('punch-icon'), text=document.getElementById('punch-text'), st=document.getElementById('punch-status-text'); if(s.action === 'in') { btn.className="w-52 h-52 rounded-full bg-[#4ade80] text-[#111827] font-bold text-3xl neo-border neo-shadow flex flex-col items-center justify-center gap-3 transition-all active:scale-95"; icon.className="fa-solid fa-sign-in-alt text-6xl"; text.innerText="เข้างาน"; st.innerHTML='พร้อมบันทึกเวลาเข้างาน'; } else { btn.className="w-52 h-52 rounded-full bg-[#f87171] text-white font-bold text-3xl neo-border neo-shadow flex flex-col items-center justify-center gap-3 transition-all active:scale-95"; icon.className="fa-solid fa-sign-out-alt text-6xl"; text.innerText="ออกงาน"; st.innerHTML='กำลังปฏิบัติงาน...'; } }
+        function updatePunchButtonState() { const s = analyzePunchStatus(), btn=document.getElementById('btn-punch'), icon=document.getElementById('punch-icon'), text=document.getElementById('punch-text'), st=document.getElementById('punch-status-text'); if(s.action === 'in') { btn.className="w-52 h-52 rounded-full bg-[#4ade80] text-[#111827] font-bold text-3xl neo-border neo-shadow flex flex-col items-center justify-center gap-3 transition-all active:scale-95"; icon.className="fa-solid fa-sign-in-alt text-6xl"; text.innerText="เข้างาน"; st.innerHTML='พร้อมบันทึกเวลาเข้างาน'; } else { btn.className="w-52 h-52 rounded-full bg-[#f87171] text-white font-bold text-3xl neo-border neo-shadow flex flex-col items-center justify-center gap-3 transition-all active:scale-95"; icon.className="fa-solid fa-sign-out-alt text-6xl"; text.innerText="ออกงาน"; st.innerHTML='<span class="text-red-500"><i class="fa-solid fa-circle-dot animate-pulse"></i> กำลังปฏิบัติงาน...</span>'; } }
 
         let isPunchCooldown = false;
-        function attemptPunch() { if(isPunchCooldown) return; const s = analyzePunchStatus(); if (s.action === 'in') { if (!checkIsWorkDay(currentUserId, getLocalISODate())) { document.getElementById('confirm-title').innerText = "เตือนวันหยุด"; document.getElementById('confirm-msg').innerText = "วันนี้ไม่ใช่คิวงานของคุณ\nแน่ใจหรือไม่ที่จะลงเวลา (ทำ OT/ทำแทน)?"; document.getElementById('confirm-icon-bg').className = "w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-yellow-500"; document.getElementById('confirm-icon').className = "fa-solid fa-triangle-exclamation text-3xl text-yellow-500"; document.getElementById('confirm-btn-action').className = "flex-1 bg-[#ffde59] text-[#111827] font-bold py-3 rounded-xl neo-border neo-shadow-sm active:scale-95"; document.getElementById('confirm-btn-action').innerText = "ยืนยันลงเวลา"; document.getElementById('confirm-btn-action').onclick = () => { closeConfirmModal(); executePunch(s.action, s.warning); }; document.getElementById('modal-confirm').classList.remove('hidden'); return; } } executePunch(s.action, s.warning); }
-        function executePunch(action, warn) { if(navigator.vibrate) navigator.vibrate(100); isPunchCooldown = true; document.getElementById('btn-punch').classList.add('btn-cooldown'); timeLogs.push({ empId: currentUserId, type: action, time: new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}), timestamp: Date.now() }); saveData(); updatePunchButtonState(); renderEmployeeTimeHistory(); showToast(warn||(action==='in'?'เข้างานเรียบร้อย':'ออกงานเรียบร้อย'), !!warn); setTimeout(() => { isPunchCooldown = false; document.getElementById('btn-punch').classList.remove('btn-cooldown'); }, 3000); }
+        function attemptPunch() { 
+            if(isPunchCooldown) return; 
+            const s = analyzePunchStatus(); 
+            if (s.action === 'in') { 
+                if (!checkIsWorkDay(currentUserId, getLocalISODate())) { 
+                    showConfirm("เตือนวันหยุด", "วันนี้ไม่ใช่คิวงานของคุณ<br>แน่ใจหรือไม่ที่จะลงเวลา (ทำ OT/ทำแทน)?", "warning", "ยืนยันลงเวลา", () => {
+                        executePunch(s.action, s.warning);
+                    });
+                    return; 
+                } 
+            } 
+            executePunch(s.action, s.warning); 
+        }
+        function executePunch(action, warn) { 
+            if(navigator.vibrate) navigator.vibrate(100); 
+            isPunchCooldown = true; document.getElementById('btn-punch').classList.add('btn-cooldown'); 
+            timeLogs.push({ empId: currentUserId, type: action, time: new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}), timestamp: Date.now() }); 
+            saveData(); updatePunchButtonState(); renderEmployeeTimeHistory(); updateTodayHours();
+            
+            if(warn) showToast(warn, 'warning');
+            else showToast(action==='in'?'บันทึกเวลาเข้างานเรียบร้อย':'บันทึกเวลาออกงานเรียบร้อย', 'success');
+            
+            setTimeout(() => { isPunchCooldown = false; document.getElementById('btn-punch').classList.remove('btn-cooldown'); }, 3000); 
+        }
 
         function renderEmployeeTimeHistory() { const c=document.getElementById('emp-history-list'), logs=timeLogs.filter(l=>l.empId===currentUserId).sort((a,b)=>b.timestamp-a.timestamp); if(logs.length===0){ c.innerHTML='<div class="text-center bg-white p-4 rounded-xl border-dashed border-2 text-gray-400">ไม่มีประวัติ</div>'; return; } c.innerHTML=logs.map(l=>{ const isCheckIn=l.type==='in'; const dateMark = new Date(l.timestamp).toLocaleDateString('th-TH', {day:'numeric', month:'short'}); return `<div class="bg-white p-4 rounded-xl neo-border flex justify-between items-center"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-lg flex justify-center items-center neo-border shrink-0 ${isCheckIn?'bg-green-100 text-green-500':'bg-red-100 text-red-500'}"><i class="fa-solid ${isCheckIn?'fa-arrow-right-to-bracket':'fa-arrow-right-from-bracket'}"></i></div><div><p class="font-extrabold text-[#111827]">${isCheckIn?'เข้างาน':'ออกงาน'}</p><p class="text-[10px] text-gray-500">${dateMark}</p></div></div><p class="font-bold text-xl text-[#111827]">${l.time}</p></div>`; }).join(''); }
 
-        // Modyfied Submit Function for Modals to read inputs properly before saving
         function submitLeaveForm() {
             const type = document.getElementById('leave-type').value;
             const start = document.getElementById('leave-start').value;
             const end = document.getElementById('leave-end').value;
             const reason = document.getElementById('leave-reason').value.trim();
-            if(!start || !end) { showToast('กรุณาเลือกวันที่ให้ครบ', true); return; }
-            if(!reason) { showToast('กรุณาระบุเหตุผล', true); return; }
+            if(!start || !end) { showToast('กรุณาเลือกวันที่ให้ครบถ้วน', 'error'); return; }
+            if(!reason) { showToast('กรุณาระบุเหตุผลการลา', 'error'); return; }
             requests.push({id:Date.now(), empId:currentUserId, reqType:'leave', type:type, startDate:start, endDate:end, reason:reason, status:'pending', timestamp:Date.now()}); 
-            saveData(); closeLeaveModal(); renderEmployeeRequestHistory(); showToast('ส่งคำขอลาเรียบร้อย');
+            saveData(); closeLeaveModal(); renderEmployeeRequestHistory(); 
+            showToast('ส่งคำขอลาเรียบร้อย รอเจ้าของร้านตรวจสอบ', 'success');
         }
 
         function submitSwapForm() {
-            const t=document.getElementById('swap-type-select').value, r=document.getElementById('swap-reason').value.trim(); if(!r) return showToast('ระบุเหตุผล',true); 
-            if (t==='self') { const o=document.getElementById('swap-original').value, n=document.getElementById('swap-new').value; if(!o||!n) return showToast('เลือกวันที่ให้ครบ',true); if(o===n) return showToast('วันที่ต้องไม่ซ้ำกัน',true); if(checkIsWorkDay(currentUserId,o)) return showToast('วันหยุดเดิมต้องเป็นวันที่หยุดปกติ',true); if(!checkIsWorkDay(currentUserId,n)) return showToast('ต้องขอหยุดในวันทำงานปกติ',true); requests.push({id:Date.now(), empId:currentUserId, reqType:'swap', originalDate:o, newDate:n, reason:r, status:'pending', timestamp:Date.now()}); } 
-            else { const te=parseInt(document.getElementById('swap-target-emp').value), d1=document.getElementById('swap-co-date1').value, d2=document.getElementById('swap-co-date2').value; if(!te||!d1||!d2) return showToast('กรอกให้ครบ',true); if(d1===d2) return showToast('วันห้ามซ้ำ',true); if(!checkIsWorkDay(currentUserId,d1)||checkIsWorkDay(te,d1)) return showToast('ข้อมูลวันที่ 1 ไม่ถูกต้อง',true); if(!checkIsWorkDay(te,d2)||checkIsWorkDay(currentUserId,d2)) return showToast('ข้อมูลวันที่ 2 ไม่ถูกต้อง',true); requests.push({id:Date.now(), empId:currentUserId, targetEmpId:te, reqType:'swap_co', dateAOff:d1, dateBOff:d2, reason:r, status:'pending', timestamp:Date.now()}); } 
-            saveData(); closeSwapModal(); renderEmployeeRequestHistory(); showToast('ส่งคำขอสลับวันแล้ว');
+            const t=document.getElementById('swap-type-select').value, r=document.getElementById('swap-reason').value.trim(); 
+            if(!r) return showToast('กรุณาระบุเหตุผล', 'error'); 
+            
+            if (t==='self') { 
+                const o=document.getElementById('swap-original').value, n=document.getElementById('swap-new').value; 
+                if(!o||!n) return showToast('กรุณาเลือกวันที่ให้ครบถ้วน', 'error'); 
+                if(o===n) return showToast('วันที่ขอสลับต้องไม่ซ้ำกัน', 'error'); 
+                if(checkIsWorkDay(currentUserId,o)) return showToast('วันหยุดเดิมต้องเป็นวันที่คุณหยุดปกติ', 'warning'); 
+                if(!checkIsWorkDay(currentUserId,n)) return showToast('วันที่ขอหยุดแทน ต้องเป็นวันทำงานปกติ', 'warning'); 
+                requests.push({id:Date.now(), empId:currentUserId, reqType:'swap', originalDate:o, newDate:n, reason:r, status:'pending', timestamp:Date.now()}); 
+            } 
+            else { 
+                const te=parseInt(document.getElementById('swap-target-emp').value), d1=document.getElementById('swap-co-date1').value, d2=document.getElementById('swap-co-date2').value; 
+                if(!te) return showToast('กรุณาเลือกเพื่อนร่วมงาน', 'error');
+                if(!d1||!d2) return showToast('กรุณาระบุวันที่ให้ครบถ้วน', 'error'); 
+                if(d1===d2) return showToast('วันที่ขอหยุดต้องไม่ซ้ำกัน', 'error'); 
+                if(!checkIsWorkDay(currentUserId,d1)||checkIsWorkDay(te,d1)) return showToast('วันที่ 1 ไม่ตรงกับเงื่อนไขการทำงาน', 'warning'); 
+                if(!checkIsWorkDay(te,d2)||checkIsWorkDay(currentUserId,d2)) return showToast('วันที่ 2 ไม่ตรงกับเงื่อนไขการทำงาน', 'warning'); 
+                requests.push({id:Date.now(), empId:currentUserId, targetEmpId:te, reqType:'swap_co', dateAOff:d1, dateBOff:d2, reason:r, status:'pending', timestamp:Date.now()}); 
+            } 
+            saveData(); closeSwapModal(); renderEmployeeRequestHistory(); 
+            showToast('ส่งคำขอสลับกะเรียบร้อย รอเจ้าของร้านตรวจสอบ', 'success');
         }
 
-        // Leave & Swap Forms Setup
         function openLeaveModal() { const d=getLocalISODate(); document.getElementById('form-leave').reset(); document.getElementById('leave-start').value=d; document.getElementById('leave-start').min=d; document.getElementById('leave-end').value=d; document.getElementById('leave-end').min=d; document.getElementById('modal-leave').classList.remove('hidden'); setTimeout(()=>document.getElementById('modal-leave-content').classList.remove('translate-y-full'),10); }
         function closeLeaveModal() { document.getElementById('modal-leave-content').classList.add('translate-y-full'); setTimeout(()=>{document.getElementById('modal-leave').classList.add('hidden');},300); }
         function validateLeaveDates() { const s=document.getElementById('leave-start').value, e=document.getElementById('leave-end'); e.min=s; if(e.value<s) e.value=s; }
@@ -458,88 +670,68 @@
         function closeSwapModal() { document.getElementById('modal-swap-content').classList.add('translate-y-full'); setTimeout(()=>{document.getElementById('modal-swap').classList.add('hidden');},300); }
         function toggleSwapMode() { const t=document.getElementById('swap-type-select').value; if(t==='self'){document.getElementById('swap-mode-self').classList.remove('hidden'); document.getElementById('swap-mode-coworker').classList.add('hidden');}else{document.getElementById('swap-mode-self').classList.add('hidden'); document.getElementById('swap-mode-coworker').classList.remove('hidden');} }
         
-function renderEmployeeRequestHistory() { 
-    const c = document.getElementById('emp-leave-history');
-    const myReqs = requests.filter(l => l.empId === currentUserId || l.targetEmpId === currentUserId).sort((a,b) => b.timestamp - a.timestamp); 
-    
-    if(myReqs.length === 0) { 
-        c.innerHTML = '<div class="text-center p-4 border-2 border-dashed bg-white rounded-xl text-gray-400">ไม่มีประวัติ</div>'; 
-        return; 
-    } 
-    
-    c.innerHTML = myReqs.map(req => { 
-        let ui = req.status === 'pending' ? '<span class="bg-yellow-300 text-[10px] px-2 py-0.5 rounded font-bold neo-border shrink-0">รออนุมัติ</span>' : req.status === 'approved' ? '<span class="bg-[#4ade80] text-[10px] px-2 py-0.5 rounded font-bold neo-border shrink-0">อนุมัติ</span>' : '<span class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded font-bold neo-border shrink-0">ไม่อนุมัติ</span>'; 
-        let icon = '', title = '', desc = ''; 
-        
-        if(req.reqType === 'leave') { 
-            icon = '<i class="fa-solid fa-calendar-minus"></i>'; 
-            title = req.type; 
-            desc = `${formatDate(req.startDate)}`; 
-        } else { 
-            icon = '<i class="fa-solid fa-rotate"></i>'; 
-            title = 'สลับวัน'; 
-            desc = 'แลกเปลี่ยนกะ'; 
-        } 
-        
-        // เพิ่มปุ่มลบ (แสดงเฉพาะตอนที่สถานะยังเป็น pending และเป็นคำขอของตัวเอง)
-        let cancelBtn = (req.status === 'pending' && req.empId === currentUserId) 
-            ? `<button onclick="confirmCancelRequest(${req.id})" class="ml-2 w-8 h-8 rounded-lg bg-red-100 text-red-500 flex justify-center items-center shrink-0 border-2 border-[#111827] active:scale-95 transition-transform"><i class="fa-solid fa-trash"></i></button>` 
-            : '';
+        function renderEmployeeRequestHistory() { 
+            const c = document.getElementById('emp-leave-history');
+            const myReqs = requests.filter(l => l.empId === currentUserId || l.targetEmpId === currentUserId).sort((a,b) => b.timestamp - a.timestamp); 
+            
+            if(myReqs.length === 0) { 
+                c.innerHTML = '<div class="text-center p-4 border-2 border-dashed bg-white rounded-xl text-gray-400">ไม่มีประวัติ</div>'; 
+                return; 
+            } 
+            
+            c.innerHTML = myReqs.map(req => { 
+                let ui = req.status === 'pending' ? '<span class="bg-yellow-300 text-[10px] px-2 py-0.5 rounded font-bold neo-border shrink-0">รออนุมัติ</span>' : req.status === 'approved' ? '<span class="bg-[#4ade80] text-[10px] px-2 py-0.5 rounded font-bold neo-border shrink-0">อนุมัติ</span>' : '<span class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded font-bold neo-border shrink-0">ไม่อนุมัติ</span>'; 
+                let icon = '', title = '', desc = ''; 
+                
+                if(req.reqType === 'leave') { 
+                    icon = '<i class="fa-solid fa-calendar-minus"></i>'; 
+                    title = req.type; 
+                    desc = `${formatDate(req.startDate)}`; 
+                } else { 
+                    icon = '<i class="fa-solid fa-rotate"></i>'; 
+                    title = 'สลับวัน'; 
+                    desc = 'แลกเปลี่ยนกะ'; 
+                } 
+                
+                let cancelBtn = (req.status === 'pending' && req.empId === currentUserId) 
+                    ? `<button onclick="confirmCancelRequest(${req.id})" class="ml-2 w-8 h-8 rounded-lg bg-red-100 text-red-500 flex justify-center items-center shrink-0 border-2 border-[#111827] active:scale-95 transition-transform"><i class="fa-solid fa-trash"></i></button>` 
+                    : '';
 
-        return `<div class="bg-white p-3 rounded-xl neo-border flex gap-3 items-center">
-            <div class="w-8 h-8 rounded bg-gray-100 flex justify-center items-center shrink-0 border border-gray-300 text-[#111827]">${icon}</div>
-            <div class="flex-1 min-w-0">
-                <div class="flex justify-between items-start">
-                    <h4 class="font-extrabold text-[#111827] text-sm">${title}</h4>
-                    ${ui}
-                </div>
-                <p class="text-xs text-gray-600 font-medium truncate">${desc}</p>
-            </div>
-            ${cancelBtn}
-        </div>`; 
-    }).join(''); 
-}
-// ตัวแปรสำหรับเก็บ ID ของคำขอที่กำลังจะลบ
-let reqIdToCancel = null;
+                return `<div class="bg-white p-3 rounded-xl neo-border flex gap-3 items-center">
+                    <div class="w-8 h-8 rounded bg-gray-100 flex justify-center items-center shrink-0 border border-gray-300 text-[#111827]">${icon}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-extrabold text-[#111827] text-sm">${title}</h4>
+                            ${ui}
+                        </div>
+                        <p class="text-xs text-gray-600 font-medium truncate">${desc}</p>
+                    </div>
+                    ${cancelBtn}
+                </div>`; 
+            }).join(''); 
+        }
 
-// ฟังก์ชันเรียก Modal ยืนยันการยกเลิก
-function confirmCancelRequest(reqId) { 
-    reqIdToCancel = reqId; 
-    document.getElementById('confirm-title').innerText = "ยกเลิกคำขอ"; 
-    document.getElementById('confirm-msg').innerText = "คุณแน่ใจหรือไม่ว่าต้องการยกเลิกคำขอนี้?"; 
-    document.getElementById('confirm-icon-bg').className = "w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-red-500"; 
-    document.getElementById('confirm-icon').className = "fa-solid fa-trash text-3xl text-red-500"; 
-    
-    // ปรับแต่งปุ่มยืนยันให้เป็นสีแดงเข้ากับ UI
-    const actionBtn = document.getElementById('confirm-btn-action');
-    actionBtn.className = "flex-1 bg-[#f87171] text-white font-bold py-3 rounded-xl neo-border neo-shadow-sm active:scale-95"; 
-    actionBtn.innerText = "ยืนยันยกเลิก"; 
-    actionBtn.onclick = executeCancelRequest; 
-    
-    document.getElementById('modal-confirm').classList.remove('hidden'); 
-}
+        let reqIdToCancel = null;
+        function confirmCancelRequest(reqId) { 
+            reqIdToCancel = reqId; 
+            showConfirm("ยกเลิกคำขอ", "คุณแน่ใจหรือไม่ว่าต้องการยกเลิกหรือลบคำขอนี้?", "danger", "ยืนยันยกเลิก", executeCancelRequest);
+        }
 
-// ฟังก์ชันที่จะลบข้อมูลจริงๆ หลังจากกดยืนยัน (อัปเดตใหม่รองรับทั้ง 2 บทบาท)
-function executeCancelRequest() { 
-    if(!reqIdToCancel) return; 
-    
-    // คัดกรองเอาคำขอที่ต้องการลบออกจาก Array
-    requests = requests.filter(r => r.id !== reqIdToCancel); 
-    saveData(); 
-    closeConfirmModal(); 
-    
-    // เช็คว่าใครเป็นคนกดลบ เพื่อรีเฟรชหน้าจอให้ถูกต้อง
-    if (currentRole === 'employee') {
-        renderEmployeeRequestHistory(); 
-    } else if (currentRole === 'owner') {
-        renderOwnerInboxList(); // รีเฟรชรายการคำขอฝั่งเจ้าของ
-        updateOwnerBadge();     // อัปเดตตัวเลขแจ้งเตือน
-        renderOwnerDashboard(); // รีเฟรชแดชบอร์ดเผื่อมีผลกระทบกับสถิติ
-    }
-    
-    showToast('ลบข้อมูลเรียบร้อยแล้ว'); 
-    reqIdToCancel = null; 
-}
+        function executeCancelRequest() { 
+            if(!reqIdToCancel) return; 
+            requests = requests.filter(r => r.id !== reqIdToCancel); 
+            saveData(); 
+            
+            if (currentRole === 'employee') {
+                renderEmployeeRequestHistory(); 
+            } else if (currentRole === 'owner') {
+                renderOwnerInboxList(); 
+                updateOwnerBadge();     
+                renderOwnerDashboard(); 
+            }
+            showToast('ยกเลิกคำขอเรียบร้อยแล้ว', 'info'); 
+        }
+
         function renderEmployeePaySlips() { const c = document.getElementById('emp-payslip-list'); const mySlips = paySlips.filter(p => p.empId === currentUserId).sort((a,b) => b.timestamp - a.timestamp); if(mySlips.length === 0) { c.innerHTML='<div class="text-center p-6 border-2 border-dashed bg-white rounded-xl text-gray-400 font-bold">ยังไม่มีสลิปเงินเดือน</div>'; return; } c.innerHTML = mySlips.map(s => `<div class="bg-white p-4 rounded-xl neo-border neo-shadow-sm flex justify-between items-center"><div class="flex items-center gap-3"><div class="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center neo-border shrink-0"><i class="fa-solid fa-file-invoice-dollar text-xl"></i></div><div class="min-w-0"><h4 class="font-extrabold text-[#111827] truncate">สลิปเดือน ${s.monthLabel}</h4><p class="text-xs font-bold text-gray-500">สุทธิ: <span class="text-green-600">${formatMoney(s.netPay)} ฿</span></p></div></div><button onclick="viewSlip(${s.id})" class="w-10 h-10 bg-[#111827] text-white rounded-lg flex items-center justify-center active:scale-95 shrink-0"><i class="fa-solid fa-eye"></i></button></div>`).join(''); }
 
         // ================= Owner =================
@@ -549,114 +741,126 @@ function executeCancelRequest() {
             document.getElementById(`owner-tab-${tab}`).classList.remove('hidden');
             let color = tab==='dashboard'?'text-[#fb923c] bg-orange-50':tab==='employees'?'text-[#c084fc] bg-purple-50':tab==='leave'?'text-[#38bdf8] bg-blue-50':'text-green-600 bg-green-50';
             document.getElementById(`nav-owner-${tab}`).className=`flex-[1.2] flex flex-col items-center justify-center border-r-3 border-[#111827] py-2 ${color}`+(tab==='leave'?' relative':'');
-            if(tab==='dashboard') renderOwnerDashboard(); if(tab==='employees') renderOwnerEmployeeList(); if(tab==='leave') renderOwnerInboxList(); 
+            
+            if(tab==='dashboard') renderOwnerDashboard(); 
+            if(tab==='employees') { document.getElementById('search-emp').value = ''; renderOwnerEmployeeList(); }
+            if(tab==='leave') renderOwnerInboxList(); 
             if(tab==='payroll') { const now = new Date(); document.getElementById('payroll-month').value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`; renderOwnerPayroll(); }
         }
         function initOwnerScreen() { renderOwnerDashboard(); updateOwnerBadge(); }
- function renderOwnerDashboard() {
-    const container = document.getElementById('owner-employee-status-list'); 
-    const activityContainer = document.getElementById('owner-recent-activity');
-    const alertContainer = document.getElementById('dashboard-alerts');
-    
-    let wCount = 0, leaveCount = 0, absentCount = 0;
-    const todayStr = getLocalISODate();
-    const todayDateStr = new Date().toDateString();
-
-    // 1. ระบบแจ้งเตือน (Smart Alerts)
-    const pendingReqs = requests.filter(r => r.status === 'pending').length;
-    if (pendingReqs > 0) {
-        alertContainer.innerHTML = `
-            <div onclick="switchOwnerTab('leave')" class="bg-[#ffde59] p-4 rounded-xl neo-border shadow-[4px_4px_0px_#111827] flex items-center justify-between cursor-pointer active:translate-y-1 transition-all">
-                <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center neo-border text-yellow-500 relative">
-                        <i class="fa-solid fa-bell text-lg"></i>
-                        <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
-                    </div>
-                    <div><p class="font-extrabold text-[#111827] text-sm">มีคำขอรอตรวจสอบ</p><p class="text-[11px] font-bold text-gray-700 mt-0.5">กดเพื่อดู ${pendingReqs} รายการ</p></div>
-                </div>
-                <i class="fa-solid fa-chevron-right text-[#111827]"></i>
-            </div>`;
-    } else {
-        alertContainer.innerHTML = '';
-    }
-
-    // 2. คำนวณสถานะรายบุคคล (Status List)
-    if(employees.length === 0){ 
-        container.innerHTML='<div class="bg-white p-6 rounded-xl border-2 border-dashed border-gray-300 text-center"><p class="font-bold text-gray-400">ยังไม่มีข้อมูลพนักงาน</p></div>'; 
-    } else {
-        container.innerHTML = employees.map(emp => {
-            const isWorkDay = checkIsWorkDay(emp.id, todayStr);
-            const logs = timeLogs.filter(l => l.empId === emp.id).sort((a,b) => b.timestamp - a.timestamp);
-            const lastLog = logs.length > 0 ? logs[0] : null;
+        function renderOwnerDashboard() {
+            const container = document.getElementById('owner-employee-status-list'); 
+            const activityContainer = document.getElementById('owner-recent-activity');
+            const alertContainer = document.getElementById('dashboard-alerts');
             
-            let badge = isWorkDay ? 'ยังไม่เข้า' : 'วันหยุด';
-            let col = isWorkDay ? 'bg-red-100 text-red-600 border-red-300' : 'bg-gray-100 text-gray-500 border-gray-300';
-            let time = isWorkDay ? 'รอดำเนินการ' : '-';
+            let wCount = 0, leaveCount = 0, absentCount = 0;
+            const todayStr = getLocalISODate();
+            const todayDateStr = new Date().toDateString();
 
-            const isOnLeave = requests.find(l => l.empId === emp.id && l.reqType === 'leave' && l.status === 'approved' && l.startDate <= todayStr && l.endDate >= todayStr);
-            
-            if(isOnLeave){ 
-                badge = 'ลา' + isOnLeave.type; 
-                col = 'bg-[#c084fc] text-white border-[#111827] shadow-[2px_2px_0px_#111827]'; 
-                time = 'ลาหยุดวันนี้'; 
-                leaveCount++;
+            const pendingReqs = requests.filter(r => r.status === 'pending').length;
+            if (pendingReqs > 0) {
+                alertContainer.innerHTML = `
+                    <div onclick="switchOwnerTab('leave')" class="bg-[#ffde59] p-4 rounded-xl neo-border shadow-[4px_4px_0px_#111827] flex items-center justify-between cursor-pointer active:translate-y-1 transition-all">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center neo-border text-yellow-500 relative">
+                                <i class="fa-solid fa-bell text-lg"></i>
+                                <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
+                            </div>
+                            <div><p class="font-extrabold text-[#111827] text-sm">มีคำขอรอตรวจสอบ</p><p class="text-[11px] font-bold text-gray-700 mt-0.5">กดเพื่อดู ${pendingReqs} รายการ</p></div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-[#111827]"></i>
+                    </div>`;
+            } else { alertContainer.innerHTML = ''; }
+
+            if(employees.length === 0){ 
+                container.innerHTML='<div class="bg-white p-6 rounded-xl border-2 border-dashed border-gray-300 text-center"><p class="font-bold text-gray-400">ยังไม่มีข้อมูลพนักงาน</p></div>'; 
             } else {
-                // ตรวจสอบประวัติของวันนี้
-                const todayLogs = logs.filter(l => new Date(l.timestamp).toDateString() === todayDateStr);
-                if (todayLogs.length > 0) {
-                    wCount++; // นับว่ามาทำงานแล้ว
-                    if (lastLog.type === 'in') {
-                        badge = 'กำลังทำงาน'; 
-                        col = 'bg-[#4ade80] text-[#111827] border-[#111827] shadow-[2px_2px_0px_#111827]'; 
-                        time = `เข้า: ${lastLog.time}`;
+                container.innerHTML = employees.map(emp => {
+                    const isWorkDay = checkIsWorkDay(emp.id, todayStr);
+                    const logs = timeLogs.filter(l => l.empId === emp.id).sort((a,b) => b.timestamp - a.timestamp);
+                    const lastLog = logs.length > 0 ? logs[0] : null;
+                    
+                    let badge = isWorkDay ? 'ยังไม่เข้า' : 'วันหยุด';
+                    let col = isWorkDay ? 'bg-red-100 text-red-600 border-red-300' : 'bg-gray-100 text-gray-500 border-gray-300';
+                    let time = isWorkDay ? 'รอดำเนินการ' : '-';
+
+                    const isOnLeave = requests.find(l => l.empId === emp.id && l.reqType === 'leave' && l.status === 'approved' && l.startDate <= todayStr && l.endDate >= todayStr);
+                    
+                    if(isOnLeave){ 
+                        badge = 'ลา' + isOnLeave.type; col = 'bg-[#c084fc] text-white border-[#111827] shadow-[2px_2px_0px_#111827]'; time = 'ลาหยุดวันนี้'; leaveCount++;
                     } else {
-                        badge = 'เลิกงานแล้ว'; 
-                        col = 'bg-gray-800 text-white border-[#111827] shadow-[2px_2px_0px_#111827]'; 
-                        time = `ออก: ${lastLog.time}`;
+                        const todayLogs = logs.filter(l => new Date(l.timestamp).toDateString() === todayDateStr);
+                        if (todayLogs.length > 0) {
+                            wCount++; 
+                            if (lastLog.type === 'in') { badge = 'กำลังทำงาน'; col = 'bg-[#4ade80] text-[#111827] border-[#111827] shadow-[2px_2px_0px_#111827]'; time = `เข้า: ${lastLog.time}`; } 
+                            else { badge = 'เลิกงานแล้ว'; col = 'bg-gray-800 text-white border-[#111827] shadow-[2px_2px_0px_#111827]'; time = `ออก: ${lastLog.time}`; }
+                        } else if (isWorkDay) { absentCount++; }
                     }
-                } else if (isWorkDay) {
-                    absentCount++; // ถือว่าขาด หรือยังไม่มา
-                }
+                    return `<div class="bg-white p-3.5 rounded-xl neo-border flex items-center gap-3"><img src="${emp.avatar}" class="w-10 h-10 rounded-full border border-gray-300 shrink-0"><div class="flex-1 min-w-0"><h4 class="font-extrabold text-[#111827] text-sm truncate">${emp.name}</h4><p class="text-[10px] font-bold text-gray-500 mt-0.5"><i class="fa-regular fa-clock"></i> ${time}</p></div><div class="px-2 py-1 rounded-md text-[10px] font-bold border-2 ${col} shrink-0 text-center min-w-[70px]">${badge}</div></div>`;
+                }).join('');
             }
 
-            return `<div class="bg-white p-3.5 rounded-xl neo-border flex items-center gap-3"><img src="${emp.avatar}" class="w-10 h-10 rounded-full border border-gray-300 shrink-0"><div class="flex-1 min-w-0"><h4 class="font-extrabold text-[#111827] text-sm truncate">${emp.name}</h4><p class="text-[10px] font-bold text-gray-500 mt-0.5"><i class="fa-regular fa-clock"></i> ${time}</p></div><div class="px-2 py-1 rounded-md text-[10px] font-bold border-2 ${col} shrink-0 text-center min-w-[70px]">${badge}</div></div>`;
-        }).join('');
-    }
+            document.getElementById('stat-total').innerText = employees.length;
+            document.getElementById('stat-working').innerText = wCount; 
+            document.getElementById('stat-leave').innerText = leaveCount;
+            document.getElementById('stat-absent').innerText = absentCount;
 
-    // 3. อัปเดตตัวเลขในการ์ดสถิติ 4 ช่อง
-    document.getElementById('stat-total').innerText = employees.length;
-    document.getElementById('stat-working').innerText = wCount; 
-    document.getElementById('stat-leave').innerText = leaveCount;
-    document.getElementById('stat-absent').innerText = absentCount;
+            const todayAllLogs = timeLogs.filter(l => new Date(l.timestamp).toDateString() === todayDateStr).sort((a,b) => b.timestamp - a.timestamp).slice(0, 3);
+            
+            if(todayAllLogs.length === 0) {
+                activityContainer.innerHTML = '<div class="bg-white p-4 rounded-xl border-2 border-dashed border-gray-300 text-center"><p class="text-xs font-bold text-gray-400">ยังไม่มีการเคลื่อนไหวในวันนี้</p></div>';
+            } else {
+                activityContainer.innerHTML = todayAllLogs.map(l => {
+                    const emp = employees.find(e => e.id === l.empId) || {name: 'ไม่ทราบชื่อ', avatar: ''};
+                    const isCheckIn = l.type === 'in';
+                    return `<div class="flex items-center gap-3 bg-white p-3 rounded-xl border-2 ${isCheckIn?'border-green-200':'border-red-200'}">
+                        <div class="w-8 h-8 rounded-lg flex justify-center items-center shrink-0 border-2 ${isCheckIn?'bg-green-50 text-green-500 border-green-300':'bg-red-50 text-red-500 border-red-300'}">
+                            <i class="fa-solid ${isCheckIn?'fa-arrow-right-to-bracket':'fa-arrow-right-from-bracket'} text-xs"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-extrabold text-[#111827] text-xs truncate">${emp.name}</p>
+                            <p class="text-[10px] text-gray-500 font-medium">${isCheckIn ? 'เข้างาน' : 'ออกงาน'}</p>
+                        </div>
+                        <p class="font-extrabold text-[#111827] text-sm shrink-0 bg-gray-100 px-2 py-1 rounded-md border border-gray-200">${l.time}</p>
+                    </div>`;
+                }).join('');
+            }
+        }
 
-    // 4. ความเคลื่อนไหวล่าสุด (Recent Activity) โชว์ 3 รายการล่าสุดของวันนี้
-    const todayAllLogs = timeLogs.filter(l => new Date(l.timestamp).toDateString() === todayDateStr).sort((a,b) => b.timestamp - a.timestamp).slice(0, 3);
-    
-    if(todayAllLogs.length === 0) {
-        activityContainer.innerHTML = '<div class="bg-white p-4 rounded-xl border-2 border-dashed border-gray-300 text-center"><p class="text-xs font-bold text-gray-400">ยังไม่มีการเคลื่อนไหวในวันนี้</p></div>';
-    } else {
-        activityContainer.innerHTML = todayAllLogs.map(l => {
-            const emp = employees.find(e => e.id === l.empId) || {name: 'ไม่ทราบชื่อ', avatar: ''};
-            const isCheckIn = l.type === 'in';
-            return `
-            <div class="flex items-center gap-3 bg-white p-3 rounded-xl border-2 ${isCheckIn?'border-green-200':'border-red-200'}">
-                <div class="w-8 h-8 rounded-lg flex justify-center items-center shrink-0 border-2 ${isCheckIn?'bg-green-50 text-green-500 border-green-300':'bg-red-50 text-red-500 border-red-300'}">
-                    <i class="fa-solid ${isCheckIn?'fa-arrow-right-to-bracket':'fa-arrow-right-from-bracket'} text-xs"></i>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="font-extrabold text-[#111827] text-xs truncate">${emp.name}</p>
-                    <p class="text-[10px] text-gray-500 font-medium">${isCheckIn ? 'เข้างาน' : 'ออกงาน'}</p>
-                </div>
-                <p class="font-extrabold text-[#111827] text-sm shrink-0 bg-gray-100 px-2 py-1 rounded-md border border-gray-200">${l.time}</p>
-            </div>`;
-        }).join('');
-    }
-}
-
-        let editingWorkDays = []; let empIdToDelete = null;
+        let editingWorkDays = []; 
+        let empIdToDelete = null;
+        let empNameToDelete = null;
+        
         function updateSalaryUnit() { const type = document.getElementById('emp-salary-type').value; const label = document.getElementById('salary-unit-text'); const input = document.getElementById('emp-base-rate'); if(type === 'monthly') { label.innerText = '(฿/เดือน)'; input.placeholder = 'เช่น 15000'; } else if(type === 'weekly') { label.innerText = '(฿/สัปดาห์)'; input.placeholder = 'เช่น 3500'; } else if(type === 'daily') { label.innerText = '(฿/วัน)'; input.placeholder = 'เช่น 500'; } else if(type === 'hourly') { label.innerText = '(฿/ชม.)'; input.placeholder = 'เช่น 60'; } }
 
-        function renderOwnerEmployeeList() { const container=document.getElementById('owner-employee-management-list'); if(employees.length===0){ container.innerHTML='<div class="text-center font-bold text-gray-400 py-4">ไม่มีพนักงาน</div>'; return; } container.innerHTML=employees.map(emp=>{ const sType = emp.payrollConfig.salaryType === 'monthly' ? 'รายเดือน' : emp.payrollConfig.salaryType === 'weekly' ? 'รายสัปดาห์' : emp.payrollConfig.salaryType === 'daily' ? 'รายวัน' : 'รายชม.'; return ` <div class="bg-white p-4 rounded-xl neo-border neo-shadow-sm flex items-center gap-4"> <img src="${emp.avatar}" class="w-14 h-14 rounded-full neo-border bg-gray-100 shrink-0"> <div class="flex-1 min-w-0"><h4 class="font-extrabold text-[#111827] text-lg truncate">${emp.name}</h4><div class="flex flex-wrap gap-1 items-center mt-1"><span class="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[9px] font-bold border border-blue-300"><i class="fa-regular fa-clock"></i> ${emp.workConfig.startTime}-${emp.workConfig.endTime}</span><span class="bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-[9px] font-bold border border-green-300"><i class="fa-solid fa-coins"></i> ${sType}</span></div></div> <button onclick="openEmployeeModal(${emp.id})" class="w-10 h-10 bg-[#ffde59] rounded-xl neo-border shadow-[2px_2px_0px_#111827] active:shadow-none active:translate-y-1 flex justify-center items-center text-[#111827] shrink-0"><i class="fa-solid fa-gear"></i></button> </div>`}).join(''); }
+        // Updated Render function with Search feature
+        function renderOwnerEmployeeList() { 
+            const container = document.getElementById('owner-employee-management-list'); 
+            const searchTerm = (document.getElementById('search-emp')?.value || '').toLowerCase().trim();
+            
+            const filteredEmps = employees.filter(e => e.name.toLowerCase().includes(searchTerm) || e.position.toLowerCase().includes(searchTerm));
+            
+            if(filteredEmps.length === 0){ 
+                container.innerHTML='<div class="text-center font-bold text-gray-400 py-6 bg-white rounded-xl border-dashed border-2 neo-border">ไม่พบพนักงานที่ค้นหา</div>'; 
+                return; 
+            } 
+            
+            container.innerHTML = filteredEmps.map(emp => { 
+                const sType = emp.payrollConfig.salaryType === 'monthly' ? 'รายเดือน' : emp.payrollConfig.salaryType === 'weekly' ? 'รายสัปดาห์' : emp.payrollConfig.salaryType === 'daily' ? 'รายวัน' : 'รายชม.'; 
+                return `<div class="bg-white p-4 rounded-xl neo-border neo-shadow-sm flex items-center gap-4"> 
+                    <img src="${emp.avatar}" class="w-14 h-14 rounded-full neo-border bg-gray-100 shrink-0"> 
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-extrabold text-[#111827] text-lg truncate">${emp.name}</h4>
+                        <div class="flex flex-wrap gap-1 items-center mt-1">
+                            <span class="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[9px] font-bold border border-blue-300"><i class="fa-regular fa-clock"></i> ${emp.workConfig.startTime}-${emp.workConfig.endTime}</span>
+                            <span class="bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-[9px] font-bold border border-green-300"><i class="fa-solid fa-coins"></i> ${sType}</span>
+                        </div>
+                    </div> 
+                    <button onclick="openEmployeeModal(${emp.id})" class="w-10 h-10 bg-[#ffde59] rounded-xl neo-border shadow-[2px_2px_0px_#111827] active:shadow-none active:translate-y-1 flex justify-center items-center text-[#111827] shrink-0 transition-all"><i class="fa-solid fa-gear"></i></button> 
+                </div>`
+            }).join(''); 
+        }
+
         function setupDayPicker() { const btns = document.querySelectorAll('.day-btn'); btns.forEach(btn => { const newBtn = btn.cloneNode(true); btn.parentNode.replaceChild(newBtn, btn); newBtn.addEventListener('click', function() { const dayVal = parseInt(this.getAttribute('data-day')); if (editingWorkDays.includes(dayVal)) { editingWorkDays = editingWorkDays.filter(d => d !== dayVal); this.classList.remove('selected'); } else { editingWorkDays.push(dayVal); this.classList.add('selected'); } }); }); }
         function updateDayPickerUI() { document.querySelectorAll('.day-btn').forEach(btn => { const dayVal = parseInt(btn.getAttribute('data-day')); if (editingWorkDays.includes(dayVal)) btn.classList.add('selected'); else btn.classList.remove('selected'); }); }
         
@@ -666,17 +870,17 @@ function executeCancelRequest() {
             const startT = document.getElementById('emp-start-time').value, endT = document.getElementById('emp-end-time').value;
             const sType = document.getElementById('emp-salary-type').value, bRate = document.getElementById('emp-base-rate').value;
             
-            if(!name || !pos || !pin || !startT || !endT || !bRate) { showToast('กรุณากรอกข้อมูลให้ครบ', true); return; }
-            if (pin.length !== 4) { showToast('PIN ต้องมี 4 หลัก', true); return; }
-            if (editingWorkDays.length === 0) { showToast('ต้องเลือกวันทำงาน', true); return; }
-            const pinExists = employees.find(e => e.pin === pin && e.id != id); if(pinExists) { showToast('PIN ซ้ำ กรุณาใช้เลขอื่น', true); return; }
+            if(!name || !pos || !pin || !startT || !endT || !bRate) { showToast('กรุณากรอกข้อมูลให้ครบถ้วน', 'error'); return; }
+            if (pin.length !== 4) { showToast('รหัส PIN ต้องมี 4 หลัก', 'error'); return; }
+            if (editingWorkDays.length === 0) { showToast('กรุณาเลือกวันทำงานอย่างน้อย 1 วัน', 'warning'); return; }
+            const pinExists = employees.find(e => e.pin === pin && e.id != id); if(pinExists) { showToast('PIN ซ้ำ กรุณาใช้เลขอื่น', 'error'); return; }
             
             const newWorkConfig = { workDays: [...editingWorkDays].sort(), startTime: startT, endTime: endT, allowOT: true };
             const newPayrollConfig = { salaryType: sType, baseRate: parseFloat(bRate) || 0, otRate: parseFloat(document.getElementById('emp-ot-rate').value) || 0 };
             const baseData = { name: name, position: pos, pin: pin, workConfig: newWorkConfig, payrollConfig: newPayrollConfig };
             
-            if (id) { const idx = employees.findIndex(e => e.id == id); if(idx > -1) { employees[idx] = { ...employees[idx], ...baseData, avatar: generateAvatar(baseData.name) }; showToast('อัปเดตข้อมูลสำเร็จ'); } } 
-            else { employees.push({ id: Date.now(), ...baseData, avatar: generateAvatar(baseData.name) }); showToast('เพิ่มพนักงานสำเร็จ'); }
+            if (id) { const idx = employees.findIndex(e => e.id == id); if(idx > -1) { employees[idx] = { ...employees[idx], ...baseData, avatar: generateAvatar(baseData.name) }; showToast('อัปเดตข้อมูลพนักงานสำเร็จ', 'success'); } } 
+            else { employees.push({ id: Date.now(), ...baseData, avatar: generateAvatar(baseData.name) }); showToast('เพิ่มพนักงานสำเร็จ', 'success'); }
             
             saveData(); closeEmployeeModal(); renderOwnerEmployeeList();
         }
@@ -689,65 +893,83 @@ function executeCancelRequest() {
         }
         function closeEmployeeModal() { document.getElementById('modal-employee-content').classList.add('translate-y-full'); setTimeout(() => document.getElementById('modal-employee').classList.add('hidden'), 300); }
         
-        function confirmDeleteEmployee(empId, empName) { empIdToDelete = empId; document.getElementById('confirm-title').innerText = "ลบพนักงาน"; document.getElementById('confirm-msg').innerHTML = `ลบ <span class="font-bold text-red-600">${empName}</span> ออกจากระบบหรือไม่?<br><span class="text-[10px] text-gray-500">ข้อมูลที่เกี่ยวข้องจะถูกลบทิ้งทั้งหมด</span>`; document.getElementById('confirm-icon-bg').className = "w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-red-500"; document.getElementById('confirm-icon').className = "fa-solid fa-trash text-3xl text-red-500"; document.getElementById('confirm-btn-action').className = "flex-1 bg-[#f87171] text-white font-bold py-3 rounded-xl neo-border neo-shadow-sm active:scale-95"; document.getElementById('confirm-btn-action').innerText = "ยืนยันลบ"; document.getElementById('confirm-btn-action').onclick = executeDeleteEmployee; document.getElementById('modal-confirm').classList.remove('hidden'); }
-        function executeDeleteEmployee() { if(!empIdToDelete) return; employees = employees.filter(e => e.id !== empIdToDelete); timeLogs = timeLogs.filter(l => l.empId !== empIdToDelete); requests = requests.filter(r => r.empId !== empIdToDelete && r.targetEmpId !== empIdToDelete); paySlips = paySlips.filter(p => p.empId !== empIdToDelete); saveData(); closeConfirmModal(); closeEmployeeModal(); renderOwnerEmployeeList(); renderOwnerDashboard(); updateOwnerBadge(); showToast('ลบข้อมูลเรียบร้อย'); empIdToDelete = null; }
-function closeConfirmModal() { 
-    document.getElementById('modal-confirm').classList.add('hidden'); 
-    empIdToDelete = null; 
-    reqIdToCancel = null; 
-}
+        function confirmDeleteEmployee(empId, empName) { 
+            empIdToDelete = empId; 
+            empNameToDelete = empName;
+            showConfirm("ลบพนักงาน", `ลบ <span class="font-bold text-red-600">${empName}</span> ออกจากระบบหรือไม่?<br><span class="text-[10px] text-gray-500">ข้อมูลที่เกี่ยวข้องจะถูกลบทิ้งทั้งหมด</span>`, "danger", "ยืนยันลบ", executeDeleteEmployee);
+        }
+        function executeDeleteEmployee() { 
+            if(!empIdToDelete) return; 
+            employees = employees.filter(e => e.id !== empIdToDelete); 
+            timeLogs = timeLogs.filter(l => l.empId !== empIdToDelete); 
+            requests = requests.filter(r => r.empId !== empIdToDelete && r.targetEmpId !== empIdToDelete); 
+            paySlips = paySlips.filter(p => p.empId !== empIdToDelete); 
+            saveData(); closeEmployeeModal(); renderOwnerEmployeeList(); renderOwnerDashboard(); updateOwnerBadge(); 
+            showToast(`ลบข้อมูลพนักงาน (${empNameToDelete}) เรียบร้อย`, 'success'); 
+            empNameToDelete = null;
+        }
 
         let selectedReqIdForReview = null;
         function updateOwnerBadge() { const p=requests.filter(l=>l.status==='pending').length; document.getElementById('badge-pending').innerText=p; const d=document.getElementById('dot-pending-leave'); if(p>0)d.classList.remove('hidden'); else d.classList.add('hidden'); }
         function renderOwnerInboxList() { 
-    const c = document.getElementById('owner-leave-list'); 
-    const s = [...requests].sort((a,b) => {
-        if(a.status === 'pending' && b.status !== 'pending') return -1; 
-        if(a.status !== 'pending' && b.status === 'pending') return 1; 
-        return b.timestamp - a.timestamp;
-    }); 
+            const c = document.getElementById('owner-leave-list'); 
+            const s = [...requests].sort((a,b) => {
+                if(a.status === 'pending' && b.status !== 'pending') return -1; 
+                if(a.status !== 'pending' && b.status === 'pending') return 1; 
+                return b.timestamp - a.timestamp;
+            }); 
 
-    if(s.length === 0){
-        c.innerHTML = '<div class="text-center font-bold text-gray-400 py-4">ไม่มีคำขอในระบบ</div>';
-        return;
-    } 
+            if(s.length === 0){ c.innerHTML = '<div class="text-center font-bold text-gray-400 py-4">ไม่มีคำขอในระบบ</div>'; return; } 
 
-    c.innerHTML = s.map(req => { 
-        const emp = employees.find(e => e.id === req.empId) || {name: 'ไม่ทราบชื่อ', avatar: ''}; 
-        
-        let ui = req.status === 'pending' ? '<span class="bg-yellow-300 text-[10px] px-2 py-0.5 rounded font-bold neo-border shadow-[2px_2px_0px_#111827] shrink-0">รอตรวจสอบ</span>' : req.status === 'approved' ? '<span class="text-green-500 font-bold text-xs shrink-0"><i class="fa-solid fa-check"></i> อนุมัติแล้ว</span>' : '<span class="text-red-500 font-bold text-xs shrink-0"><i class="fa-solid fa-xmark"></i> ไม่อนุมัติ</span>'; 
-        
-        let btn = req.status === 'pending' ? `<button onclick="openReviewModal(${req.id})" class="mt-3 w-full bg-[#111827] text-white py-2 rounded-lg font-bold text-sm active:scale-95 transition-all">ตรวจสอบ</button>` : ''; 
-        
-        let iconClass = req.reqType === 'leave' ? 'fa-calendar-minus text-blue-600 bg-blue-100 border-blue-200' : req.reqType === 'swap' ? 'fa-rotate text-yellow-600 bg-yellow-100 border-yellow-200' : 'fa-people-arrows text-purple-600 bg-purple-100 border-purple-200'; 
-        let typeText = req.reqType === 'leave' ? req.type : req.reqType === 'swap' ? 'สลับวัน(ตัวเอง)' : 'สลับกะ(แลกเวร)'; 
+            c.innerHTML = s.map(req => { 
+                const emp = employees.find(e => e.id === req.empId) || {name: 'ไม่ทราบชื่อ', avatar: ''}; 
+                let ui = req.status === 'pending' ? '<span class="bg-yellow-300 text-[10px] px-2 py-0.5 rounded font-bold neo-border shadow-[2px_2px_0px_#111827] shrink-0">รอตรวจสอบ</span>' : req.status === 'approved' ? '<span class="text-green-500 font-bold text-xs shrink-0"><i class="fa-solid fa-check"></i> อนุมัติแล้ว</span>' : '<span class="text-red-500 font-bold text-xs shrink-0"><i class="fa-solid fa-xmark"></i> ไม่อนุมัติ</span>'; 
+                let btn = req.status === 'pending' ? `<button onclick="openReviewModal(${req.id})" class="mt-3 w-full bg-[#111827] text-white py-2 rounded-lg font-bold text-sm active:scale-95 transition-all">ตรวจสอบ</button>` : ''; 
+                let iconClass = req.reqType === 'leave' ? 'fa-calendar-minus text-blue-600 bg-blue-100 border-blue-200' : req.reqType === 'swap' ? 'fa-rotate text-yellow-600 bg-yellow-100 border-yellow-200' : 'fa-people-arrows text-purple-600 bg-purple-100 border-purple-200'; 
+                let typeText = req.reqType === 'leave' ? req.type : req.reqType === 'swap' ? 'สลับวัน(ตัวเอง)' : 'สลับกะ(แลกเวร)'; 
+                let deleteBtn = `<button onclick="confirmCancelRequest(${req.id})" class="ml-2 w-7 h-7 rounded-md bg-red-100 text-red-500 flex justify-center items-center shrink-0 border border-[#111827] active:scale-95"><i class="fa-solid fa-trash text-xs"></i></button>`;
 
-        // สร้างปุ่มลบสำหรับเจ้าของร้าน
-        let deleteBtn = `<button onclick="confirmCancelRequest(${req.id})" class="ml-2 w-7 h-7 rounded-md bg-red-100 text-red-500 flex justify-center items-center shrink-0 border border-[#111827] active:scale-95"><i class="fa-solid fa-trash text-xs"></i></button>`;
-
-        return `<div class="bg-white p-4 rounded-xl neo-border neo-shadow-sm ${req.status === 'pending' ? 'border-blue-500' : ''}">
-            <div class="flex justify-between items-start mb-2">
-                <div class="flex items-center gap-3">
-                    <img src="${emp.avatar}" class="w-8 h-8 rounded-full neo-border bg-gray-100 shrink-0">
-                    <div class="min-w-0">
-                        <h4 class="font-extrabold text-[#111827] text-sm leading-tight truncate">${emp.name}</h4>
-                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded border ${iconClass}"><i class="fa-solid ${iconClass.split(' ')[0]}"></i> ${typeText}</span>
+                return `<div class="bg-white p-4 rounded-xl neo-border neo-shadow-sm ${req.status === 'pending' ? 'border-blue-500' : ''}">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="flex items-center gap-3">
+                            <img src="${emp.avatar}" class="w-8 h-8 rounded-full neo-border bg-gray-100 shrink-0">
+                            <div class="min-w-0">
+                                <h4 class="font-extrabold text-[#111827] text-sm leading-tight truncate">${emp.name}</h4>
+                                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded border ${iconClass}"><i class="fa-solid ${iconClass.split(' ')[0]}"></i> ${typeText}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            ${ui}
+                            ${deleteBtn}
+                        </div>
                     </div>
-                </div>
-                <div class="flex items-center">
-                    ${ui}
-                    ${deleteBtn}
-                </div>
-            </div>
-            <p class="text-xs text-gray-600 break-words bg-gray-50 p-2 rounded border border-gray-200">${req.reason}</p>
-            ${btn}
-        </div>`; 
-    }).join(''); 
-}
+                    <p class="text-xs text-gray-600 break-words bg-gray-50 p-2 rounded border border-gray-200">${req.reason}</p>
+                    ${btn}
+                </div>`; 
+            }).join(''); 
+        }
         function openReviewModal(id) { selectedReqIdForReview=id; const req=requests.find(x=>x.id===id), emp=employees.find(e=>e.id===req.empId)||{name:'?'}; document.getElementById('rev-name').innerText=emp.name; document.getElementById('rev-reason').innerText=req.reason; document.getElementById('rev-icon').className = req.reqType === 'leave' ? "fa-solid fa-calendar-minus" : "fa-solid fa-rotate"; document.getElementById('rev-icon-bg').className = req.reqType === 'leave' ? "w-10 h-10 rounded-lg flex items-center justify-center neo-border text-xl bg-blue-100 text-blue-600" : "w-10 h-10 rounded-lg flex items-center justify-center neo-border text-xl bg-yellow-100 text-yellow-600"; document.getElementById('rev-modal-title').innerText = req.reqType === 'leave' ? "คำขอลา" : "คำขอสลับกะ"; document.getElementById('rev-type').innerText = req.reqType === 'leave' ? req.type : "สลับวันทำงาน"; document.getElementById('rev-type').className = req.reqType === 'leave' ? "bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-bold ml-2 text-xs border border-blue-200" : "bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded font-bold ml-2 text-xs border border-yellow-300"; document.getElementById('rev-dynamic-content').innerHTML = `<p class="text-xs font-bold text-blue-600">วันที่: ${formatDate(req.startDate || req.originalDate || req.dateAOff)}</p>`; document.getElementById('modal-review').classList.remove('hidden'); setTimeout(()=>document.getElementById('modal-review-content').classList.remove('scale-95','opacity-0'),10); }
         function closeReviewModal() { document.getElementById('modal-review-content').classList.add('scale-95','opacity-0'); setTimeout(()=>{document.getElementById('modal-review').classList.add('hidden'); selectedReqIdForReview=null;},300); }
-        function approveRequest() { const idx=requests.findIndex(l=>l.id===selectedReqIdForReview); if(idx>-1){requests[idx].status='approved'; saveData(); showToast('อนุมัติเรียบร้อย'); closeReviewModal(); renderOwnerInboxList(); updateOwnerBadge();} }
-        function rejectRequest() { const idx=requests.findIndex(l=>l.id===selectedReqIdForReview); if(idx>-1){requests[idx].status='rejected'; saveData(); showToast('ปฏิเสธคำขอเรียบร้อย',true); closeReviewModal(); renderOwnerInboxList(); updateOwnerBadge();} }
+        function approveRequest() { 
+            const idx=requests.findIndex(l=>l.id===selectedReqIdForReview); 
+            if(idx>-1){
+                requests[idx].status='approved'; 
+                const emp = employees.find(e => e.id === requests[idx].empId);
+                saveData(); 
+                showToast(`อนุมัติคำขอของ ${emp ? emp.name : 'พนักงาน'} เรียบร้อย`, 'success'); 
+                closeReviewModal(); renderOwnerInboxList(); updateOwnerBadge(); renderOwnerDashboard();
+            } 
+        }
+        function rejectRequest() { 
+            const idx=requests.findIndex(l=>l.id===selectedReqIdForReview); 
+            if(idx>-1){
+                requests[idx].status='rejected'; 
+                const emp = employees.find(e => e.id === requests[idx].empId);
+                saveData(); 
+                showToast(`ปฏิเสธคำขอของ ${emp ? emp.name : 'พนักงาน'} เรียบร้อย`, 'warning'); 
+                closeReviewModal(); renderOwnerInboxList(); updateOwnerBadge();
+            } 
+        }
 
         // Payroll
         function calculateEmployeePayroll(empId, monthStr) {
@@ -756,8 +978,11 @@ function closeConfirmModal() {
             const monthLogs = timeLogs.filter(l => { const d = new Date(l.timestamp); return d.getFullYear() === y && d.getMonth() + 1 === m; }).sort((a,b) => a.timestamp - b.timestamp);
             let daysWorked = 0; let totalOTMinutes = 0; let totalWorkMinutes = 0; let logPairs = {}; 
             monthLogs.forEach(l => { const dateKey = new Date(l.timestamp).toDateString(); if(!logPairs[dateKey]) logPairs[dateKey] = { in: null, out: null }; if(l.type === 'in' && !logPairs[dateKey].in) logPairs[dateKey].in = l.time; if(l.type === 'out') logPairs[dateKey].out = l.time; });
+            
+            const timeToMins = (t) => { const [h,m] = t.split(':').map(Number); return h*60+m; };
             const stdStart = timeToMins(emp.workConfig.startTime), stdEnd = timeToMins(emp.workConfig.endTime);
             Object.values(logPairs).forEach(pair => { if(pair.in && pair.out) { daysWorked++; const actStart = timeToMins(pair.in), actEnd = timeToMins(pair.out); let workStart = Math.max(actStart, stdStart), workEnd = Math.min(actEnd, stdEnd); if(workEnd > workStart) totalWorkMinutes += (workEnd - workStart); if(emp.workConfig.allowOT && actEnd > stdEnd) totalOTMinutes += (actEnd - stdEnd); } });
+            
             const otHoursFloat = totalOTMinutes / 60, workHoursFloat = totalWorkMinutes / 60;
             let basePay = 0;
             if(emp.payrollConfig.salaryType === 'monthly') basePay = emp.payrollConfig.baseRate;
@@ -779,17 +1004,30 @@ function closeConfirmModal() {
                     html += `<div class="bg-white p-4 rounded-xl neo-border neo-shadow-sm"><div class="flex justify-between items-start mb-3"><div class="flex items-center gap-3"><img src="${p.avatar}" class="w-10 h-10 rounded-full border border-gray-300 shrink-0"><div class="min-w-0"><h4 class="font-extrabold text-[#111827] leading-tight truncate">${p.name}</h4><p class="text-[10px] font-bold text-gray-500">${sTypeStr}</p></div></div><div class="text-right shrink-0"><p class="font-extrabold text-lg text-green-600">${formatMoney(p.netPay)} ฿</p></div></div><div class="flex justify-between text-xs text-gray-600 bg-gray-50 p-2 rounded-lg border border-gray-200"><span>ทำงาน: <span class="font-bold text-[#111827]">${p.daysWorked} วัน</span></span><span>OT: <span class="font-bold text-[#111827]">${p.otHours.toFixed(1)} ชม.</span></span></div>${btnHTML}</div>`;
                 }
             });
-            if(html === '') html = '<div class="text-center font-bold text-gray-400 py-10">ไม่มีข้อมูลพนักงาน</div>';
+            if(html === '') html = '<div class="text-center font-bold text-gray-400 py-10 bg-white rounded-xl border-dashed border-2 neo-border">ไม่มีข้อมูลพนักงาน</div>';
             else html = `<div class="bg-green-100 p-4 rounded-xl border-2 border-green-600 mb-4 flex justify-between items-center shadow-[2px_2px_0px_#16a34a]"><span class="font-extrabold text-green-900">ยอดรวมเดือนนี้</span><span class="text-2xl font-extrabold text-green-700">${formatMoney(totalCompanyPay)} ฿</span></div>` + html;
             container.innerHTML = html;
         }
-        function savePaySlip(empId, monthStr) { const p = calculateEmployeePayroll(empId, monthStr); if(p) { const slip = { id: Date.now(), timestamp: Date.now(), ...p }; paySlips.push(slip); saveData(); showToast('บันทึกสลิปสำเร็จ'); renderOwnerPayroll(); } }
+        function savePaySlip(empId, monthStr) { 
+            const p = calculateEmployeePayroll(empId, monthStr); 
+            if(p) { 
+                const slip = { id: Date.now(), timestamp: Date.now(), ...p }; 
+                paySlips.push(slip); 
+                saveData(); 
+                showToast(`ออกสลิปให้คุณ ${p.name} สำเร็จ`, 'success'); 
+                renderOwnerPayroll(); 
+            } 
+        }
         function viewSlip(slipId) {
             const s = paySlips.find(x => x.id === slipId); if(!s) return;
             document.getElementById('slip-month-year').innerText = "ประจำเดือน " + s.monthLabel; document.getElementById('slip-emp-name').innerText = s.name; document.getElementById('slip-emp-pos').innerText = s.position; document.getElementById('slip-base-label').innerText = s.salaryType === 'monthly' ? 'เงินเดือนพื้นฐาน' : s.salaryType === 'weekly' ? 'ค่าจ้างรายสัปดาห์' : s.salaryType === 'daily' ? 'ค่าจ้างรายวัน' : 'ค่าจ้างรายชั่วโมง'; document.getElementById('slip-base-amount').innerText = formatMoney(s.basePay) + " ฿"; document.getElementById('slip-ot-hrs').innerText = `(${s.otHours.toFixed(1)} ชม.)`; document.getElementById('slip-ot-amount').innerText = formatMoney(s.otPay) + " ฿"; document.getElementById('slip-work-summary').innerText = `ทำ ${s.daysWorked} วัน`; document.getElementById('slip-net-total').innerText = formatMoney(s.netPay) + " ฿";
             document.getElementById('modal-payslip').classList.remove('hidden'); setTimeout(() => document.getElementById('modal-payslip-content').classList.remove('scale-95', 'opacity-0'), 10);
         }
         function closePaySlipModal() { document.getElementById('modal-payslip-content').classList.add('scale-95', 'opacity-0'); setTimeout(() => document.getElementById('modal-payslip').classList.add('hidden'), 300); }
+        
+        function mockPrintPayslip() {
+            showToast('ระบบได้บันทึกรูปสลิปเงินเดือนเรียบร้อยแล้ว', 'success');
+        }
 
         loadData(); showScreen('screen-role');
     </script>
