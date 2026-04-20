@@ -522,8 +522,16 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ตั้งค่า Firebase และ App ID
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        // ตั้งค่า Firebase ด้วย Configuration ของคุณ
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHuZGyY1F3v4rCrhrpt9YB90C0Ahh-stE",
+            authDomain: "my-company-time-tracking.firebaseapp.com",
+            projectId: "my-company-time-tracking",
+            storageBucket: "my-company-time-tracking.firebasestorage.app",
+            messagingSenderId: "758524847747",
+            appId: "1:758524847747:web:2e5a49e4064334f1265db6",
+            measurementId: "G-50SYJKTRT1"
+        };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -556,7 +564,12 @@
         const initAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
+                    try {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } catch (e) {
+                        console.warn("Custom token mismatch (likely due to custom Firebase project). Falling back to anonymous.");
+                        await signInAnonymously(auth);
+                    }
                 } else {
                     await signInAnonymously(auth);
                 }
