@@ -76,332 +76,442 @@
         }
     </style>
 </head>
-<body class="h-screen w-screen overflow-hidden flex justify-center bg-gray-300">
+<body class="h-screen w-screen overflow-hidden flex justify-center items-center bg-gray-300 md:p-6 lg:p-10">
 
-    <div class="w-full max-w-md h-full bg-[#f4f4f5] relative overflow-hidden flex flex-col shadow-2xl neo-border border-y-0 sm:border-y-3">
+    <!-- Responsive Main Container: มือถือเต็มจอ, Desktop เป็นกล่องตรงกลาง -->
+    <div class="w-full h-full md:h-[95vh] md:max-w-4xl lg:max-w-6xl md:rounded-[2rem] bg-[#f4f4f5] relative overflow-hidden flex flex-col md:flex-row shadow-2xl md:border-[3px] border-[#111827]">
         
         <!-- ================= หน้าจอโหลดข้อมูล ================= -->
-        <div id="loading-overlay" class="absolute inset-0 z-[100] bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center hidden transition-opacity">
+        <div id="loading-overlay" class="absolute inset-0 z-[100] bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center hidden transition-opacity md:rounded-[2rem]">
             <i class="fa-solid fa-circle-notch fa-spin text-5xl text-[#111827] mb-4"></i>
             <h2 class="text-xl font-extrabold text-[#111827]">กำลังซิงค์ข้อมูล...</h2>
             <p class="text-xs font-bold text-gray-500 mt-2">Connecting to Cloud</p>
         </div>
 
         <!-- ================= Screen 1: เลือกบทบาท ================= -->
-        <div id="screen-role" class="absolute inset-0 z-[50] bg-[#ffde59] flex flex-col items-center justify-center p-6 transition-transform duration-300 overflow-y-auto hide-scrollbar">
+        <div id="screen-role" class="absolute inset-0 z-[50] bg-[#ffde59] flex flex-col items-center justify-center p-6 transition-transform duration-300 overflow-y-auto hide-scrollbar md:rounded-[2rem]">
             <div class="w-full max-w-xs text-center mb-8 mt-10">
                 <div class="w-28 h-28 bg-white rounded-2xl flex items-center justify-center neo-border neo-shadow-sm mx-auto mb-6 transform rotate-3">
                     <i class="fa-solid fa-clock text-6xl text-[#111827]"></i>
                 </div>
-                <h1 class="text-4xl font-extrabold text-[#111827] tracking-tight mb-2">TimeTrack</h1>
-                <span class="bg-[#111827] text-white px-3 py-1 rounded-full text-sm font-bold shadow-md">Balanced Edition</span>
+                <h1 class="text-5xl font-extrabold text-[#111827] tracking-tight mb-2">TimeTrack</h1>
+                <span class="bg-[#111827] text-white px-3 py-1 rounded-full text-sm font-bold shadow-md">Pro Edition</span>
             </div>
-            <div class="w-full max-w-xs space-y-5 mb-8">
-                <button onclick="gotoSelectEmployee()" class="w-full bg-[#38bdf8] text-[#111827] font-bold text-xl py-4 rounded-xl neo-border neo-shadow flex items-center justify-center gap-3 active:translate-y-1 transition-all">
+            <div class="w-full max-w-xs md:max-w-sm space-y-5 mb-8">
+                <button onclick="gotoSelectEmployee()" class="w-full bg-[#38bdf8] text-[#111827] font-bold text-xl md:text-2xl py-4 md:py-5 rounded-xl neo-border neo-shadow flex items-center justify-center gap-3 active:translate-y-1 hover:bg-[#7dd3fc] transition-all">
                     <i class="fa-solid fa-user-tie text-2xl"></i> ระบบพนักงาน
                 </button>
-                <button onclick="openPinPad('owner')" class="w-full bg-[#fb923c] text-[#111827] font-bold text-xl py-4 rounded-xl neo-border neo-shadow flex items-center justify-center gap-3 active:translate-y-1 transition-all">
+                <button onclick="openPinPad('owner')" class="w-full bg-[#fb923c] text-[#111827] font-bold text-xl md:text-2xl py-4 md:py-5 rounded-xl neo-border neo-shadow flex items-center justify-center gap-3 active:translate-y-1 hover:bg-[#fdba74] transition-all">
                     <i class="fa-solid fa-store text-2xl"></i> ระบบจัดการร้าน
                 </button>
             </div>
-            <p class="text-xs font-bold text-gray-700 mt-auto bg-white/50 px-3 py-2 rounded-lg neo-border text-center pb-nav">
+            <p class="text-xs font-bold text-gray-700 mt-auto bg-white/50 px-4 py-2 rounded-lg neo-border text-center pb-nav">
                 รหัสเจ้าของ: 9999 / รหัสพนักงาน: 1234
             </p>
         </div>
 
         <!-- ================= Screen 1.5: เลือกชื่อ ================= -->
-        <div id="screen-select-emp" class="absolute inset-0 z-[60] bg-[#f4f4f5] flex flex-col hidden transition-transform duration-300 transform translate-x-full">
-            <div class="bg-[#38bdf8] px-6 pb-6 pt-header rounded-b-[2rem] neo-border border-t-0 neo-shadow-sm shrink-0">
-                <div class="flex items-center gap-4">
+        <div id="screen-select-emp" class="absolute inset-0 z-[60] bg-[#f4f4f5] flex flex-col hidden transition-transform duration-300 transform translate-x-full md:rounded-[2rem]">
+            <div class="bg-[#38bdf8] px-6 pb-6 pt-header md:pt-10 rounded-b-[2rem] neo-border border-t-0 neo-shadow-sm shrink-0 flex justify-center">
+                <div class="w-full max-w-2xl flex items-center gap-4">
                     <button onclick="backToRole()" class="w-10 h-10 bg-white rounded-full flex items-center justify-center neo-border neo-shadow-sm active:translate-y-1"><i class="fa-solid fa-arrow-left text-[#111827]"></i></button>
-                    <h2 class="text-2xl font-extrabold text-[#111827]">เลือกชื่อของคุณ</h2>
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-[#111827]">เลือกชื่อของคุณ</h2>
                 </div>
             </div>
-            <div class="flex-1 overflow-y-auto hide-scrollbar p-6"><div id="emp-selection-list" class="space-y-4 pb-10"></div></div>
+            <div class="flex-1 overflow-y-auto hide-scrollbar p-6 flex justify-center"><div id="emp-selection-list" class="w-full max-w-2xl grid grid-cols-1 md:grid-cols-2 gap-4 pb-10 content-start"></div></div>
         </div>
 
         <!-- ================= Screen 1.8: PIN Pad ================= -->
-        <div id="screen-pin" class="absolute inset-0 z-[70] bg-[#111827] flex flex-col hidden transition-transform duration-300 transform translate-y-full">
-            <div class="flex items-center px-6 pt-header pb-2 shrink-0">
-                <button onclick="backFromPin()" class="w-10 h-10 bg-gray-800 text-white rounded-full flex items-center justify-center border-2 border-gray-600 active:bg-gray-700"><i class="fa-solid fa-arrow-left"></i></button>
+        <div id="screen-pin" class="absolute inset-0 z-[70] bg-[#111827] flex flex-col hidden transition-transform duration-300 transform translate-y-full md:rounded-[2rem]">
+            <div class="flex items-center px-6 pt-header md:pt-8 pb-2 shrink-0">
+                <button onclick="backFromPin()" class="w-12 h-12 bg-gray-800 text-white rounded-full flex items-center justify-center border-2 border-gray-600 hover:bg-gray-700 active:bg-gray-600 transition-colors"><i class="fa-solid fa-arrow-left text-xl"></i></button>
             </div>
             <div class="flex-1 flex flex-col items-center justify-center px-8 pb-nav">
-                <div class="mb-6 text-center">
-                    <div class="w-20 h-20 bg-white rounded-full mx-auto mb-4 border-4 border-gray-800 overflow-hidden flex items-center justify-center p-1">
+                <div class="mb-8 text-center">
+                    <div class="w-24 h-24 bg-white rounded-full mx-auto mb-4 border-4 border-gray-800 overflow-hidden flex items-center justify-center p-1 shadow-lg">
                         <img id="pin-avatar" src="" class="w-full h-full rounded-full hidden">
-                        <i id="pin-icon" class="fa-solid fa-user-shield text-4xl text-gray-800"></i>
+                        <i id="pin-icon" class="fa-solid fa-user-shield text-5xl text-gray-800"></i>
                     </div>
-                    <h2 class="text-2xl font-extrabold text-white" id="pin-title">ใส่รหัส PIN</h2>
-                    <p class="text-gray-400 font-bold mt-1 text-sm" id="pin-subtitle"></p>
+                    <h2 class="text-3xl font-extrabold text-white" id="pin-title">ใส่รหัส PIN</h2>
+                    <p class="text-gray-400 font-bold mt-2 text-base" id="pin-subtitle"></p>
                 </div>
-                <div class="flex gap-4 mb-8" id="pin-dots">
+                <div class="flex gap-4 mb-10" id="pin-dots">
                     <div class="w-5 h-5 rounded-full border-2 border-white"></div><div class="w-5 h-5 rounded-full border-2 border-white"></div><div class="w-5 h-5 rounded-full border-2 border-white"></div><div class="w-5 h-5 rounded-full border-2 border-white"></div>
                 </div>
-                <div class="grid grid-cols-3 gap-4 w-full max-w-[280px]">
-                    <button onclick="pressPin('1')" class="numpad-btn">1</button><button onclick="pressPin('2')" class="numpad-btn">2</button><button onclick="pressPin('3')" class="numpad-btn">3</button>
-                    <button onclick="pressPin('4')" class="numpad-btn">4</button><button onclick="pressPin('5')" class="numpad-btn">5</button><button onclick="pressPin('6')" class="numpad-btn">6</button>
-                    <button onclick="pressPin('7')" class="numpad-btn">7</button><button onclick="pressPin('8')" class="numpad-btn">8</button><button onclick="pressPin('9')" class="numpad-btn">9</button>
-                    <div></div><button onclick="pressPin('0')" class="numpad-btn">0</button><button onclick="deletePin()" class="numpad-btn bg-red-100 text-red-500 text-xl border-[#111827]"><i class="fa-solid fa-delete-left"></i></button>
+                <div class="grid grid-cols-3 gap-4 md:gap-6 w-full max-w-[320px]">
+                    <button onclick="pressPin('1')" class="numpad-btn hover:bg-gray-100">1</button><button onclick="pressPin('2')" class="numpad-btn hover:bg-gray-100">2</button><button onclick="pressPin('3')" class="numpad-btn hover:bg-gray-100">3</button>
+                    <button onclick="pressPin('4')" class="numpad-btn hover:bg-gray-100">4</button><button onclick="pressPin('5')" class="numpad-btn hover:bg-gray-100">5</button><button onclick="pressPin('6')" class="numpad-btn hover:bg-gray-100">6</button>
+                    <button onclick="pressPin('7')" class="numpad-btn hover:bg-gray-100">7</button><button onclick="pressPin('8')" class="numpad-btn hover:bg-gray-100">8</button><button onclick="pressPin('9')" class="numpad-btn hover:bg-gray-100">9</button>
+                    <div></div><button onclick="pressPin('0')" class="numpad-btn hover:bg-gray-100">0</button><button onclick="deletePin()" class="numpad-btn bg-red-100 text-red-500 text-2xl border-[#111827] hover:bg-red-200"><i class="fa-solid fa-delete-left"></i></button>
                 </div>
             </div>
         </div>
 
         <!-- ================= Screen 2: ฝั่งพนักงาน ================= -->
-        <div id="screen-employee" class="absolute inset-0 bg-[#f4f4f5] flex flex-col hidden">
-            <!-- ส่วนที่เลื่อนได้ (ตรงกลาง) -->
-            <div class="flex-1 overflow-y-auto hide-scrollbar relative">
+        <div id="screen-employee" class="absolute inset-0 bg-[#f4f4f5] flex flex-col md:flex-row hidden md:rounded-[2rem]">
+            
+            <!-- Navbar: Mobile = Bottom, Desktop = Left Sidebar -->
+            <div class="order-2 md:order-1 shrink-0 w-full md:w-24 lg:w-56 bg-white neo-border border-b-0 border-x-0 md:border-t-0 md:border-b-0 md:border-r-[3px] flex flex-row md:flex-col pt-2 md:pt-8 pb-nav md:pb-8 z-20">
+                <div class="hidden md:flex flex-col items-center mb-8 lg:px-4">
+                    <div class="w-12 h-12 bg-[#111827] text-white rounded-xl neo-border flex items-center justify-center mb-2"><i class="fa-solid fa-clock text-2xl"></i></div>
+                    <h1 class="font-extrabold text-[#111827] text-lg hidden lg:block tracking-tight">TimeTrack</h1>
+                </div>
+                
+                <button onclick="switchEmpTab('time')" id="nav-emp-time" class="flex-1 md:w-full md:flex-none flex flex-col lg:flex-row items-center justify-center lg:justify-start text-[#38bdf8] border-r-[3px] md:border-r-0 md:border-b-[3px] border-[#111827] py-2 md:py-4 lg:px-6 hover:bg-blue-50 transition-colors bg-blue-50"><i class="fa-solid fa-fingerprint text-xl lg:text-2xl mb-1 lg:mb-0 lg:mr-3"></i><span class="text-[10px] lg:text-sm font-bold">ลงเวลา</span></button>
+                <button onclick="switchEmpTab('leave')" id="nav-emp-leave" class="flex-1 md:w-full md:flex-none flex flex-col lg:flex-row items-center justify-center lg:justify-start text-gray-400 border-r-[3px] md:border-r-0 md:border-b-[3px] border-[#111827] py-2 md:py-4 lg:px-6 hover:bg-gray-100 transition-colors"><i class="fa-solid fa-file-signature text-xl lg:text-2xl mb-1 lg:mb-0 lg:mr-3"></i><span class="text-[10px] lg:text-sm font-bold">คำขอ</span></button>
+                <button onclick="switchEmpTab('payroll')" id="nav-emp-payroll" class="flex-1 md:w-full md:flex-none flex flex-col lg:flex-row items-center justify-center lg:justify-start text-gray-400 border-r-[3px] md:border-r-0 border-[#111827] md:border-b-[3px] py-2 md:py-4 lg:px-6 hover:bg-gray-100 transition-colors"><i class="fa-solid fa-file-invoice-dollar text-xl lg:text-2xl mb-1 lg:mb-0 lg:mr-3"></i><span class="text-[10px] lg:text-sm font-bold">เงินเดือน</span></button>
+                
+                <button onclick="logout()" class="flex-[0.5] md:w-full md:flex-none flex flex-col lg:flex-row items-center justify-center lg:justify-start text-red-500 bg-red-50 py-2 md:py-4 lg:px-6 hover:bg-red-100 transition-colors md:mt-auto md:border-t-[3px] border-[#111827]"><i class="fa-solid fa-power-off text-xl lg:text-2xl mb-1 lg:mb-0 lg:mr-3"></i><span class="text-[10px] lg:text-sm font-bold hidden lg:block">ออกจากระบบ</span></button>
+            </div>
+
+            <!-- Content Area -->
+            <div class="order-1 md:order-2 flex-1 overflow-y-auto hide-scrollbar relative bg-[#f4f4f5]">
                 
                 <!-- Tab: ลงเวลา -->
                 <div id="emp-tab-time" class="flex flex-col min-h-full">
-                    <div class="bg-[#c084fc] px-6 pt-header pb-10 rounded-b-[2.5rem] neo-border border-t-0 neo-shadow-sm shrink-0">
+                    <div class="bg-[#c084fc] px-6 md:px-10 pt-header md:pt-12 pb-10 md:pb-16 rounded-b-[2.5rem] neo-border border-t-0 md:border-t-[3px] md:border-x-0 md:rounded-t-[2rem] neo-shadow-sm shrink-0 md:mx-6 md:mt-6">
                         <div class="flex justify-between items-center mb-6">
-                            <div><p class="text-white font-bold text-sm">สวัสดี 👋,</p><h2 class="text-2xl font-bold text-[#111827]" id="emp-name">พนักงาน</h2></div>
-                            <div class="w-16 h-16 rounded-full neo-border bg-white overflow-hidden p-1 shadow-md"><img id="emp-avatar" src="" class="w-full h-full rounded-full bg-gray-100"></div>
+                            <div><p class="text-white font-bold text-sm md:text-base">สวัสดี 👋,</p><h2 class="text-2xl md:text-4xl font-bold text-[#111827]" id="emp-name">พนักงาน</h2></div>
+                            <div class="w-16 h-16 md:w-20 md:h-20 rounded-full neo-border bg-white overflow-hidden p-1 shadow-md"><img id="emp-avatar" src="" class="w-full h-full rounded-full bg-gray-100"></div>
                         </div>
-                        <div class="bg-white rounded-2xl p-5 text-center neo-border neo-shadow transform translate-y-4">
-                            <p class="text-gray-500 text-sm font-bold mb-1" id="current-date">วันที่</p><h1 class="text-5xl font-extrabold text-[#111827] tracking-wider font-mono" id="current-time">00:00:00</h1>
-                        </div>
-                    </div>
-                    <div class="flex flex-col items-center justify-center p-6 mt-8 shrink-0">
-                        <div class="relative"><button id="btn-punch" onclick="attemptPunch()" class="w-52 h-52 rounded-full bg-[#4ade80] text-[#111827] font-bold text-3xl neo-border neo-shadow flex flex-col items-center justify-center gap-3 active:scale-95 transition-all"><i id="punch-icon" class="fa-solid fa-sign-in-alt text-6xl"></i><span id="punch-text">เข้างาน</span></button></div>
-                        <div class="mt-8 bg-gray-200 px-4 py-2 rounded-full neo-border text-center">
-                            <p id="punch-status-text" class="text-[#111827] font-bold text-sm">กดปุ่มเพื่อบันทึกเวลา</p>
-                        </div>
-                        <div class="mt-4 bg-white px-4 py-2 rounded-xl neo-border shadow-[2px_2px_0px_#111827] text-center border-dashed">
-                            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide">เวลาทำงานวันนี้</p>
-                            <p id="emp-today-hours" class="text-lg font-extrabold text-[#111827] mt-0.5">0 ชม. 0 นาที</p>
+                        <div class="bg-white rounded-2xl md:rounded-3xl p-5 md:p-8 text-center neo-border neo-shadow transform translate-y-4 md:translate-y-8">
+                            <p class="text-gray-500 text-sm md:text-base font-bold mb-1" id="current-date">วันที่</p><h1 class="text-5xl md:text-7xl font-extrabold text-[#111827] tracking-wider font-mono" id="current-time">00:00:00</h1>
                         </div>
                     </div>
-                    <div class="px-6 pb-6 shrink-0"><h3 class="font-bold text-lg mb-4 text-[#111827] flex items-center gap-2"><div class="w-8 h-8 bg-white rounded-lg neo-border flex justify-center items-center"><i class="fa-solid fa-clock-rotate-left"></i></div> ประวัติวันนี้</h3><div id="emp-history-list" class="space-y-4"></div></div>
+                    <div class="flex flex-col lg:flex-row items-center justify-center p-6 md:px-10 md:mt-12 shrink-0 gap-8">
+                        <div class="relative shrink-0"><button id="btn-punch" onclick="attemptPunch()" class="w-52 h-52 md:w-64 md:h-64 rounded-full bg-[#4ade80] text-[#111827] font-bold text-3xl md:text-4xl neo-border neo-shadow hover:neo-shadow-sm flex flex-col items-center justify-center gap-3 active:scale-95 transition-all"><i id="punch-icon" class="fa-solid fa-sign-in-alt text-6xl md:text-7xl"></i><span id="punch-text">เข้างาน</span></button></div>
+                        <div class="flex flex-col gap-4 w-full max-w-sm">
+                            <div class="bg-gray-200 px-6 py-4 rounded-xl md:rounded-2xl neo-border text-center">
+                                <p id="punch-status-text" class="text-[#111827] font-bold text-sm md:text-base">กดปุ่มเพื่อบันทึกเวลา</p>
+                            </div>
+                            <div class="bg-white px-6 py-4 rounded-xl md:rounded-2xl neo-border shadow-[2px_2px_0px_#111827] text-center border-dashed">
+                                <p class="text-xs md:text-sm font-bold text-gray-500 uppercase tracking-wide">เวลาทำงานวันนี้</p>
+                                <p id="emp-today-hours" class="text-xl md:text-2xl font-extrabold text-[#111827] mt-1">0 ชม. 0 นาที</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-6 md:px-10 pb-6 md:pb-10 shrink-0 mt-4 md:mt-8">
+                        <h3 class="font-bold text-lg md:text-xl mb-4 text-[#111827] flex items-center gap-2"><div class="w-8 h-8 md:w-10 md:h-10 bg-white rounded-lg neo-border flex justify-center items-center"><i class="fa-solid fa-clock-rotate-left"></i></div> ประวัติวันนี้</h3>
+                        <div id="emp-history-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                    </div>
                 </div>
                 
                 <!-- Tab: คำขอ -->
                 <div id="emp-tab-leave" class="flex flex-col min-h-full hidden">
-                    <div class="px-6 pt-header pb-4 shrink-0"><h2 class="text-3xl font-extrabold text-[#111827]">วันหยุด/การลา</h2></div>
-                    <div class="px-6 flex gap-3 mb-6 shrink-0">
-                        <button onclick="openLeaveModal()" class="flex-1 bg-[#38bdf8] text-[#111827] py-3 rounded-xl font-bold neo-border neo-shadow-sm flex flex-col items-center justify-center gap-1 active:translate-y-1"><i class="fa-solid fa-calendar-minus text-xl"></i><span class="text-xs">ขอลา</span></button>
-                        <button onclick="openSwapModal()" class="flex-1 bg-[#ffde59] text-[#111827] py-3 rounded-xl font-bold neo-border neo-shadow-sm flex flex-col items-center justify-center gap-1 active:translate-y-1"><i class="fa-solid fa-rotate text-xl"></i><span class="text-xs">สลับวัน</span></button>
+                    <div class="px-6 md:px-10 pt-header md:pt-10 pb-4 shrink-0"><h2 class="text-3xl md:text-4xl font-extrabold text-[#111827]">วันหยุด/การลา</h2></div>
+                    <div class="px-6 md:px-10 flex flex-col sm:flex-row gap-4 mb-6 shrink-0">
+                        <button onclick="openLeaveModal()" class="flex-1 bg-[#38bdf8] text-[#111827] py-4 md:py-6 rounded-xl md:rounded-2xl font-bold neo-border neo-shadow-sm hover:neo-shadow flex flex-col items-center justify-center gap-2 active:translate-y-1 transition-all"><i class="fa-solid fa-calendar-minus text-2xl md:text-3xl"></i><span class="text-sm md:text-base">ขอลาหยุด</span></button>
+                        <button onclick="openSwapModal()" class="flex-1 bg-[#ffde59] text-[#111827] py-4 md:py-6 rounded-xl md:rounded-2xl font-bold neo-border neo-shadow-sm hover:neo-shadow flex flex-col items-center justify-center gap-2 active:translate-y-1 transition-all"><i class="fa-solid fa-rotate text-2xl md:text-3xl"></i><span class="text-sm md:text-base">สลับวัน / แลกกะ</span></button>
                     </div>
-                    <div class="px-6 pb-6"><h3 class="font-bold text-lg mb-3 text-[#111827]">ประวัติคำขอ</h3><div id="emp-leave-history" class="space-y-3"></div></div>
+                    <div class="px-6 md:px-10 pb-6 md:pb-10"><h3 class="font-bold text-lg md:text-xl mb-4 text-[#111827]">ประวัติคำขอ</h3><div id="emp-leave-history" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div></div>
                 </div>
 
                 <!-- Tab: เงินเดือน -->
                 <div id="emp-tab-payroll" class="flex flex-col min-h-full hidden">
-                    <div class="px-6 pt-header pb-4 shrink-0"><h2 class="text-3xl font-extrabold text-[#111827] mb-1">สลิปเงินเดือน</h2><p class="text-gray-500 font-bold text-sm">ประวัติรายรับของคุณ</p></div>
-                    <div class="px-6 pb-6"><div id="emp-payslip-list" class="space-y-4"></div></div>
+                    <div class="px-6 md:px-10 pt-header md:pt-10 pb-6 shrink-0"><h2 class="text-3xl md:text-4xl font-extrabold text-[#111827] mb-1">สลิปเงินเดือน</h2><p class="text-gray-500 font-bold text-sm md:text-base">ประวัติรายรับของคุณ</p></div>
+                    <div class="px-6 md:px-10 pb-6 md:pb-10"><div id="emp-payslip-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"></div></div>
                 </div>
-            </div>
-            
-            <!-- ส่วนที่ติดขอบล่างเสมอ (Bottom Nav) -->
-            <div class="shrink-0 w-full bg-white neo-border border-b-0 border-x-0 flex pt-2 pb-nav z-20">
-                <button onclick="switchEmpTab('time')" id="nav-emp-time" class="flex-1 flex flex-col items-center justify-center text-[#38bdf8] border-r-3 border-[#111827] py-2"><i class="fa-solid fa-fingerprint text-xl mb-1"></i><span class="text-[10px] font-bold">ลงเวลา</span></button>
-                <button onclick="switchEmpTab('leave')" id="nav-emp-leave" class="flex-1 flex flex-col items-center justify-center text-gray-400 border-r-3 border-[#111827] py-2"><i class="fa-solid fa-file-signature text-xl mb-1"></i><span class="text-[10px] font-bold">คำขอ</span></button>
-                <button onclick="switchEmpTab('payroll')" id="nav-emp-payroll" class="flex-1 flex flex-col items-center justify-center text-gray-400 border-r-3 border-[#111827] py-2"><i class="fa-solid fa-file-invoice-dollar text-xl mb-1"></i><span class="text-[10px] font-bold">เงินเดือน</span></button>
-                <button onclick="logout()" class="flex-[0.5] flex flex-col items-center justify-center text-red-500 bg-red-50 py-2 active:bg-red-200 transition-colors"><i class="fa-solid fa-power-off text-xl mb-1"></i></button>
             </div>
         </div>
 
         <!-- ================= Screen 3: ฝั่งเจ้าของร้าน ================= -->
-        <div id="screen-owner" class="absolute inset-0 bg-[#f4f4f5] flex flex-col hidden">
-            <div class="flex-1 overflow-y-auto hide-scrollbar relative">
+        <div id="screen-owner" class="absolute inset-0 bg-[#f4f4f5] flex flex-col md:flex-row hidden md:rounded-[2rem]">
+            
+            <!-- Navbar: Mobile = Bottom, Desktop = Left Sidebar -->
+            <div class="order-2 md:order-1 shrink-0 w-full md:w-24 lg:w-56 bg-white neo-border border-b-0 border-x-0 md:border-t-0 md:border-b-0 md:border-r-[3px] flex flex-row md:flex-col pt-2 md:pt-8 pb-nav md:pb-8 z-20">
+                <div class="hidden md:flex flex-col items-center mb-8 lg:px-4">
+                    <div class="w-12 h-12 bg-[#fb923c] text-[#111827] rounded-xl neo-border flex items-center justify-center mb-2"><i class="fa-solid fa-store text-2xl"></i></div>
+                    <h1 class="font-extrabold text-[#111827] text-lg hidden lg:block tracking-tight text-center">ระบบจัดการ<br>ร้านค้า</h1>
+                </div>
+
+                <button onclick="switchOwnerTab('dashboard')" id="nav-owner-dashboard" class="flex-[1.2] md:w-full md:flex-none flex flex-col lg:flex-row items-center justify-center lg:justify-start text-[#fb923c] bg-orange-50 border-r-[3px] md:border-r-0 md:border-b-[3px] border-[#111827] py-2 md:py-4 lg:px-6 hover:bg-orange-50 transition-colors"><i class="fa-solid fa-chart-pie text-xl lg:text-2xl mb-1 lg:mb-0 lg:mr-3"></i><span class="text-[9px] lg:text-sm font-bold">สถานะ</span></button>
+                <button onclick="switchOwnerTab('employees')" id="nav-owner-employees" class="flex-[1.2] md:w-full md:flex-none flex flex-col lg:flex-row items-center justify-center lg:justify-start text-gray-400 border-r-[3px] md:border-r-0 md:border-b-[3px] border-[#111827] py-2 md:py-4 lg:px-6 hover:bg-gray-100 transition-colors"><i class="fa-solid fa-users text-xl lg:text-2xl mb-1 lg:mb-0 lg:mr-3"></i><span class="text-[9px] lg:text-sm font-bold">พนักงาน</span></button>
+                <button onclick="switchOwnerTab('leave')" id="nav-owner-leave" class="flex-[1.2] md:w-full md:flex-none flex flex-col lg:flex-row items-center justify-center lg:justify-start text-gray-400 border-r-[3px] md:border-r-0 md:border-b-[3px] border-[#111827] relative py-2 md:py-4 lg:px-6 hover:bg-gray-100 transition-colors"><i class="fa-solid fa-inbox text-xl lg:text-2xl mb-1 lg:mb-0 lg:mr-3"></i><span class="text-[9px] lg:text-sm font-bold">คำขอ</span><span id="dot-pending-leave" class="absolute top-2 right-2 md:top-3 lg:right-4 w-3 h-3 bg-red-500 rounded-full border-2 border-white hidden"></span></button>
+                <button onclick="switchOwnerTab('payroll')" id="nav-owner-payroll" class="flex-[1.2] md:w-full md:flex-none flex flex-col lg:flex-row items-center justify-center lg:justify-start text-gray-400 border-r-[3px] md:border-r-0 border-[#111827] md:border-b-[3px] py-2 md:py-4 lg:px-6 hover:bg-gray-100 transition-colors"><i class="fa-solid fa-file-invoice-dollar text-xl lg:text-2xl mb-1 lg:mb-0 lg:mr-3"></i><span class="text-[9px] lg:text-sm font-bold">เงินเดือน</span></button>
+                
+                <button onclick="logout()" class="flex-[0.6] md:w-full md:flex-none flex flex-col lg:flex-row items-center justify-center lg:justify-start text-red-500 bg-red-50 py-2 md:py-4 lg:px-6 hover:bg-red-100 transition-colors md:mt-auto md:border-t-[3px] border-[#111827]"><i class="fa-solid fa-power-off text-xl lg:text-2xl mb-1 lg:mb-0 lg:mr-3"></i><span class="text-[9px] lg:text-sm font-bold hidden lg:block">ออก</span></button>
+            </div>
+
+            <!-- Content Area -->
+            <div class="order-1 md:order-2 flex-1 overflow-y-auto hide-scrollbar relative bg-[#f4f4f5]">
                 
                 <!-- Tab: แดชบอร์ด -->
                 <div id="owner-tab-dashboard" class="flex flex-col min-h-full">
-                    <div class="bg-[#fb923c] px-6 pt-header pb-8 rounded-b-[2.5rem] neo-border border-t-0 neo-shadow-sm shrink-0">
-                        <div class="flex justify-between items-center mb-6">
+                    <div class="bg-[#fb923c] px-6 md:px-10 pt-header md:pt-10 pb-8 md:pb-12 rounded-b-[2.5rem] neo-border border-t-0 md:border-t-[3px] md:border-x-0 md:rounded-t-[2rem] neo-shadow-sm shrink-0 md:mx-6 md:mt-6">
+                        <div class="flex justify-between items-center mb-6 md:mb-8">
                             <div>
-                                <h2 class="text-3xl font-extrabold text-[#111827]">แดชบอร์ด</h2>
-                                <p class="text-[#111827] font-bold mt-1 bg-white/80 backdrop-blur-sm inline-block px-3 py-1 rounded-lg neo-border text-xs" id="owner-date">18 เม.ย.</p>
+                                <h2 class="text-3xl md:text-4xl font-extrabold text-[#111827]">แดชบอร์ด</h2>
+                                <p class="text-[#111827] font-bold mt-2 bg-white/80 backdrop-blur-sm inline-block px-3 py-1 rounded-lg neo-border text-xs md:text-sm" id="owner-date">18 เม.ย.</p>
                             </div>
-                            <div class="w-12 h-12 bg-white rounded-xl neo-border flex items-center justify-center shadow-[4px_4px_0px_#111827]">
-                                <i class="fa-solid fa-store text-2xl text-[#111827]"></i>
+                            <div class="w-12 h-12 md:w-16 md:h-16 bg-white rounded-xl md:rounded-2xl neo-border flex items-center justify-center shadow-[4px_4px_0px_#111827] md:shadow-[6px_6px_0px_#111827]">
+                                <i class="fa-solid fa-store text-2xl md:text-3xl text-[#111827]"></i>
                             </div>
                         </div>
                         
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="bg-white rounded-2xl p-4 neo-border shadow-[4px_4px_0px_#111827] flex flex-col justify-center">
-                                <p class="text-[10px] font-extrabold text-gray-500 uppercase tracking-wide">พนักงานทั้งหมด</p>
-                                <div class="flex items-end gap-2 mt-1"><p class="text-4xl font-extrabold text-[#111827] leading-none" id="stat-total">0</p><span class="text-xs font-bold text-gray-500 mb-1">คน</span></div>
+                        <!-- Grid Cards Responsive -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
+                            <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 neo-border shadow-[4px_4px_0px_#111827] flex flex-col justify-center transform hover:-translate-y-1 transition-transform">
+                                <p class="text-[10px] md:text-xs font-extrabold text-gray-500 uppercase tracking-wide">พนักงานทั้งหมด</p>
+                                <div class="flex items-end gap-2 mt-1 md:mt-2"><p class="text-4xl md:text-5xl font-extrabold text-[#111827] leading-none" id="stat-total">0</p><span class="text-xs md:text-sm font-bold text-gray-500 mb-1">คน</span></div>
                             </div>
-                            <div class="bg-[#4ade80] rounded-2xl p-4 neo-border shadow-[4px_4px_0px_#111827] flex flex-col justify-center">
-                                <p class="text-[10px] font-extrabold text-[#111827] uppercase tracking-wide">เข้างานวันนี้</p>
-                                <div class="flex items-end gap-2 mt-1"><p class="text-4xl font-extrabold text-[#111827] leading-none" id="stat-working">0</p><span class="text-xs font-bold text-[#111827] mb-1">คน</span></div>
+                            <div class="bg-[#4ade80] rounded-2xl md:rounded-3xl p-4 md:p-6 neo-border shadow-[4px_4px_0px_#111827] flex flex-col justify-center transform hover:-translate-y-1 transition-transform">
+                                <p class="text-[10px] md:text-xs font-extrabold text-[#111827] uppercase tracking-wide">เข้างานวันนี้</p>
+                                <div class="flex items-end gap-2 mt-1 md:mt-2"><p class="text-4xl md:text-5xl font-extrabold text-[#111827] leading-none" id="stat-working">0</p><span class="text-xs md:text-sm font-bold text-[#111827] mb-1">คน</span></div>
                             </div>
-                            <div class="bg-[#c084fc] rounded-2xl p-4 neo-border shadow-[4px_4px_0px_#111827] flex flex-col justify-center">
-                                <p class="text-[10px] font-extrabold text-[#111827] uppercase tracking-wide">ลาหยุดพัก</p>
-                                <div class="flex items-end gap-2 mt-1"><p class="text-4xl font-extrabold text-white leading-none" id="stat-leave">0</p><span class="text-xs font-bold text-white mb-1">คน</span></div>
+                            <div class="bg-[#c084fc] rounded-2xl md:rounded-3xl p-4 md:p-6 neo-border shadow-[4px_4px_0px_#111827] flex flex-col justify-center transform hover:-translate-y-1 transition-transform">
+                                <p class="text-[10px] md:text-xs font-extrabold text-[#111827] uppercase tracking-wide">ลาหยุดพัก</p>
+                                <div class="flex items-end gap-2 mt-1 md:mt-2"><p class="text-4xl md:text-5xl font-extrabold text-white leading-none" id="stat-leave">0</p><span class="text-xs md:text-sm font-bold text-white mb-1">คน</span></div>
                             </div>
-                            <div class="bg-[#f87171] rounded-2xl p-4 neo-border shadow-[4px_4px_0px_#111827] flex flex-col justify-center">
-                                <p class="text-[10px] font-extrabold text-[#111827] uppercase tracking-wide">ยังไม่เข้า / ขาด</p>
-                                <div class="flex items-end gap-2 mt-1"><p class="text-4xl font-extrabold text-white leading-none" id="stat-absent">0</p><span class="text-xs font-bold text-white mb-1">คน</span></div>
+                            <div class="bg-[#f87171] rounded-2xl md:rounded-3xl p-4 md:p-6 neo-border shadow-[4px_4px_0px_#111827] flex flex-col justify-center transform hover:-translate-y-1 transition-transform">
+                                <p class="text-[10px] md:text-xs font-extrabold text-[#111827] uppercase tracking-wide">ยังไม่เข้า / ขาด</p>
+                                <div class="flex items-end gap-2 mt-1 md:mt-2"><p class="text-4xl md:text-5xl font-extrabold text-white leading-none" id="stat-absent">0</p><span class="text-xs md:text-sm font-bold text-white mb-1">คน</span></div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="p-6 pb-6 space-y-6">
+                    <div class="p-6 md:px-10 pb-6 md:pb-10 space-y-6 md:space-y-8 mt-2 md:mt-4">
                         <div id="dashboard-alerts"></div>
 
-                        <div>
-                            <h3 class="font-bold text-lg mb-3 text-[#111827] flex items-center gap-2"><div class="w-8 h-8 bg-white rounded-lg neo-border flex justify-center items-center"><i class="fa-solid fa-bolt text-yellow-500"></i></div> ความเคลื่อนไหวล่าสุด</h3>
-                            <div id="owner-recent-activity" class="space-y-3"></div>
-                        </div>
+                        <!-- 2 Columns on Desktop -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
+                            <div>
+                                <h3 class="font-bold text-lg md:text-xl mb-4 text-[#111827] flex items-center gap-2"><div class="w-8 h-8 md:w-10 md:h-10 bg-white rounded-lg neo-border flex justify-center items-center"><i class="fa-solid fa-bolt text-yellow-500"></i></div> ความเคลื่อนไหวล่าสุด</h3>
+                                <div id="owner-recent-activity" class="space-y-3"></div>
+                            </div>
 
-                        <div>
-                            <h3 class="font-bold text-lg mb-3 text-[#111827] flex items-center gap-2"><div class="w-8 h-8 bg-white rounded-lg neo-border flex justify-center items-center"><i class="fa-solid fa-users-viewfinder"></i></div> สถานะพนักงานวันนี้</h3>
-                            <div id="owner-employee-status-list" class="space-y-3"></div>
+                            <div>
+                                <h3 class="font-bold text-lg md:text-xl mb-4 text-[#111827] flex items-center gap-2"><div class="w-8 h-8 md:w-10 md:h-10 bg-white rounded-lg neo-border flex justify-center items-center"><i class="fa-solid fa-users-viewfinder text-blue-500"></i></div> สถานะพนักงานวันนี้</h3>
+                                <div id="owner-employee-status-list" class="space-y-3 md:grid md:grid-cols-2 lg:grid-cols-1 md:gap-3 md:space-y-0 lg:space-y-3"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Tab: พนักงาน -->
                 <div id="owner-tab-employees" class="flex flex-col min-h-full hidden">
-                    <div class="px-6 pt-header pb-4 flex justify-between items-center shrink-0"><h2 class="text-3xl font-extrabold text-[#111827]">พนักงาน</h2><button onclick="openEmployeeModal()" class="bg-[#4ade80] text-[#111827] px-4 py-2 rounded-xl font-bold neo-border neo-shadow-sm flex items-center gap-2 active:translate-y-1"><i class="fa-solid fa-user-plus"></i> เพิ่ม</button></div>
+                    <div class="px-6 md:px-10 pt-header md:pt-10 pb-4 shrink-0 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                        <h2 class="text-3xl md:text-4xl font-extrabold text-[#111827]">พนักงาน</h2>
+                        <button onclick="openEmployeeModal()" class="bg-[#4ade80] text-[#111827] px-6 py-3 rounded-xl font-bold neo-border neo-shadow-sm hover:neo-shadow flex items-center justify-center gap-2 active:translate-y-1 transition-all"><i class="fa-solid fa-user-plus"></i> เพิ่มพนักงานใหม่</button>
+                    </div>
                     
-                    <!-- Search Bar -->
-                    <div class="px-6 pb-2 shrink-0">
-                        <div class="relative">
-                            <i class="fa-solid fa-search absolute left-3 top-3.5 text-gray-400"></i>
-                            <input type="text" id="search-emp" placeholder="ค้นหาชื่อ หรือ ตำแหน่ง..." class="neo-input pl-10 py-2.5 text-sm bg-white w-full border-2" onkeyup="renderOwnerEmployeeList()">
+                    <div class="px-6 md:px-10 pb-4 shrink-0">
+                        <div class="relative w-full md:max-w-md">
+                            <i class="fa-solid fa-search absolute left-4 top-4 text-gray-400"></i>
+                            <input type="text" id="search-emp" placeholder="ค้นหาชื่อ หรือ ตำแหน่ง..." class="neo-input pl-12 py-3 text-sm md:text-base bg-white w-full border-[3px]" onkeyup="renderOwnerEmployeeList()">
                         </div>
                     </div>
 
-                    <div class="px-6 pb-6"><div id="owner-employee-management-list" class="space-y-4 mt-2"></div></div>
+                    <!-- Responsive Grid for Employees -->
+                    <div class="px-6 md:px-10 pb-6 md:pb-10"><div id="owner-employee-management-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 mt-2"></div></div>
                 </div>
 
                 <!-- Tab: คำขอ -->
                 <div id="owner-tab-leave" class="flex flex-col min-h-full hidden">
-                    <div class="px-6 pt-header pb-4 shrink-0"><h2 class="text-3xl font-extrabold text-[#111827] mb-2">กล่องข้อความ</h2><span class="bg-yellow-300 text-[#111827] px-3 py-1 rounded-full text-xs font-bold neo-border shadow-[2px_2px_0px_#111827]">รอตรวจสอบ <span id="badge-pending" class="ml-1 bg-white px-1.5 rounded-full">0</span></span></div>
-                    <div class="px-6 pb-6"><div id="owner-leave-list" class="space-y-4"></div></div>
+                    <div class="px-6 md:px-10 pt-header md:pt-10 pb-6 shrink-0 flex items-center gap-4">
+                        <h2 class="text-3xl md:text-4xl font-extrabold text-[#111827]">กล่องข้อความ</h2>
+                        <span class="bg-yellow-300 text-[#111827] px-3 py-1 rounded-full text-xs md:text-sm font-bold neo-border shadow-[2px_2px_0px_#111827]">รอตรวจสอบ <span id="badge-pending" class="ml-1 bg-white px-1.5 rounded-full">0</span></span>
+                    </div>
+                    <!-- Responsive Grid for Inbox -->
+                    <div class="px-6 md:px-10 pb-6 md:pb-10"><div id="owner-leave-list" class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5"></div></div>
                 </div>
 
                 <!-- Tab: เงินเดือน -->
                 <div id="owner-tab-payroll" class="flex flex-col min-h-full hidden">
-                    <div class="px-6 pt-header pb-4 shrink-0"><h2 class="text-3xl font-extrabold text-[#111827] mb-2">ระบบเงินเดือน</h2><div class="flex gap-2 items-center"><input type="month" id="payroll-month" class="neo-input bg-white py-1.5 text-sm" onchange="renderOwnerPayroll()"></div></div>
-                    <div class="px-6 pb-6"><div id="owner-payroll-list" class="space-y-4"></div></div>
+                    <div class="px-6 md:px-10 pt-header md:pt-10 pb-6 shrink-0 flex justify-between items-end">
+                        <h2 class="text-3xl md:text-4xl font-extrabold text-[#111827]">ระบบเงินเดือน</h2>
+                        <div class="flex flex-col"><label class="text-[10px] font-bold mb-1 text-gray-500">เลือกเดือน</label><input type="month" id="payroll-month" class="neo-input bg-white py-2 text-sm md:text-base border-[3px]" onchange="renderOwnerPayroll()"></div>
+                    </div>
+                    <div class="px-6 md:px-10 pb-6 md:pb-10" id="owner-payroll-container">
+                        <!-- Content rendered by JS -->
+                    </div>
                 </div>
-            </div>
-
-            <!-- Bottom Nav -->
-            <div class="shrink-0 w-full bg-white neo-border border-b-0 border-x-0 flex pt-2 pb-nav z-20">
-                <button onclick="switchOwnerTab('dashboard')" id="nav-owner-dashboard" class="flex-[1.2] flex flex-col items-center justify-center text-[#fb923c] border-r-3 border-[#111827] bg-orange-50 py-2"><i class="fa-solid fa-chart-pie text-xl mb-1"></i><span class="text-[9px] font-bold">สถานะ</span></button>
-                <button onclick="switchOwnerTab('employees')" id="nav-owner-employees" class="flex-[1.2] flex flex-col items-center justify-center text-gray-400 border-r-3 border-[#111827] py-2"><i class="fa-solid fa-users text-xl mb-1"></i><span class="text-[9px] font-bold">พนักงาน</span></button>
-                <button onclick="switchOwnerTab('leave')" id="nav-owner-leave" class="flex-[1.2] flex flex-col items-center justify-center text-gray-400 border-r-3 border-[#111827] relative py-2"><i class="fa-solid fa-inbox text-xl mb-1"></i><span class="text-[9px] font-bold">คำขอ</span><span id="dot-pending-leave" class="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full border-2 border-white hidden"></span></button>
-                <button onclick="switchOwnerTab('payroll')" id="nav-owner-payroll" class="flex-[1.2] flex flex-col items-center justify-center text-gray-400 border-r-3 border-[#111827] py-2"><i class="fa-solid fa-file-invoice-dollar text-xl mb-1"></i><span class="text-[9px] font-bold">เงินเดือน</span></button>
-                <button onclick="logout()" class="flex-[0.6] flex flex-col items-center justify-center text-red-500 bg-red-50 py-2 active:bg-red-200 transition-colors"><i class="fa-solid fa-power-off text-xl mb-1"></i></button>
             </div>
         </div>
 
-        <!-- ================= MODALS (Balanced Layouts) ================= -->
+        <!-- ================= MODALS (Responsive) ================= -->
         
         <!-- Modal: เพิ่ม/แก้ไขพนักงาน -->
-        <div id="modal-employee" class="absolute inset-0 z-[60] modal-backdrop flex items-end justify-center hidden pt-modal">
-            <div class="bg-white w-full rounded-t-[2rem] neo-border border-b-0 border-x-0 transform transition-transform duration-300 translate-y-full flex flex-col max-h-[85vh]" id="modal-employee-content">
+        <div id="modal-employee" class="absolute inset-0 z-[60] modal-backdrop flex items-end md:items-center justify-center hidden pt-modal md:p-6 transition-opacity">
+            <div class="bg-white w-full md:max-w-3xl lg:max-w-4xl rounded-t-[2rem] md:rounded-[2rem] neo-border border-b-0 border-x-0 md:border-[3px] transform transition-transform duration-300 translate-y-full flex flex-col max-h-[85vh] md:max-h-[90vh]" id="modal-employee-content">
                 <div class="flex justify-between items-center p-6 pb-4 border-b-2 border-dashed border-gray-300 shrink-0">
-                    <div><h3 id="emp-form-title" class="text-2xl font-extrabold text-[#111827]">ตั้งค่าพนักงาน</h3></div><button type="button" onclick="closeEmployeeModal()" class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center font-bold">X</button>
+                    <div><h3 id="emp-form-title" class="text-2xl md:text-3xl font-extrabold text-[#111827]">ตั้งค่าพนักงาน</h3></div><button type="button" onclick="closeEmployeeModal()" class="w-10 h-10 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center font-bold text-xl transition-colors">X</button>
                 </div>
-                <div class="overflow-y-auto hide-scrollbar p-6 flex-1">
+                <div class="overflow-y-auto hide-scrollbar p-6 flex-1 bg-gray-50/50">
                     <form id="form-employee" class="space-y-5">
                         <input type="hidden" id="emp-id-input">
-                        <div class="bg-gray-50 p-4 rounded-xl border-2 border-gray-200 space-y-4"><h4 class="font-extrabold text-[#111827] text-sm"><i class="fa-solid fa-user text-blue-500"></i> ข้อมูลพื้นฐาน</h4><div><label class="text-xs font-bold mb-1 block">ชื่อ-นามสกุล</label><input type="text" id="emp-name-input" class="neo-input bg-white text-sm" required></div><div class="flex gap-3"><div class="flex-[2]"><label class="text-xs font-bold mb-1 block">ตำแหน่ง</label><input type="text" id="emp-position-input" class="neo-input bg-white text-sm" required></div><div class="flex-1"><label class="text-xs font-bold mb-1 block">PIN</label><input type="text" id="emp-pin-input" class="neo-input bg-white text-center font-mono text-sm" maxlength="4" minlength="4" pattern="[0-9]{4}" required></div></div></div>
-                        <div class="bg-[#ffde59]/20 p-4 rounded-xl border-2 border-[#111827] space-y-4"><h4 class="font-extrabold text-[#111827] text-sm"><i class="fa-solid fa-clock text-[#fb923c]"></i> เวลาทำงาน</h4><div><label class="text-xs font-bold mb-2 block">วันทำงาน</label><div class="flex justify-between" id="day-picker"><button type="button" class="day-btn" data-day="1">จ</button><button type="button" class="day-btn" data-day="2">อ</button><button type="button" class="day-btn" data-day="3">พ</button><button type="button" class="day-btn" data-day="4">พฤ</button><button type="button" class="day-btn" data-day="5">ศ</button><button type="button" class="day-btn text-blue-600 border-blue-200" data-day="6">ส</button><button type="button" class="day-btn text-red-500 border-red-200" data-day="0">อา</button></div></div><div class="flex gap-4"><div class="flex-1"><label class="text-xs font-bold mb-1 block">เวลาเข้า</label><input type="time" id="emp-start-time" class="neo-input bg-white text-sm" required></div><div class="flex-1"><label class="text-xs font-bold mb-1 block">เวลาออก</label><input type="time" id="emp-end-time" class="neo-input bg-white text-sm" required></div></div></div>
-                        <div class="bg-green-50 p-4 rounded-xl border-2 border-green-300 space-y-4"><h4 class="font-extrabold text-green-800 text-sm"><i class="fa-solid fa-money-bill-wave"></i> ค่าจ้าง & เงินเดือน</h4><div><label class="text-xs font-bold mb-1 block text-green-900">ประเภท</label><select id="emp-salary-type" class="neo-input bg-white text-sm border-green-500" onchange="updateSalaryUnit()"><option value="monthly">รายเดือน</option><option value="weekly">รายสัปดาห์</option><option value="daily">รายวัน</option><option value="hourly">รายชั่วโมง</option></select></div><div class="flex gap-3"><div class="flex-[1.2]"><label class="text-xs font-bold mb-1 block text-green-900">ค่าจ้างพื้นฐาน <span id="salary-unit-text" class="text-blue-700 bg-blue-100 px-1 rounded">(฿)</span></label><input type="number" id="emp-base-rate" class="neo-input bg-white text-sm border-green-500" required></div><div class="flex-[0.8]"><label class="text-xs font-bold mb-1 block text-green-900">เรท OT (฿/ชม.)</label><input type="number" id="emp-ot-rate" class="neo-input bg-white text-sm border-green-500" value="0"></div></div></div>
+                        <!-- Desktop Split Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
+                            <!-- Col 1 -->
+                            <div class="space-y-5">
+                                <div class="bg-white p-5 rounded-2xl border-[3px] border-gray-200 shadow-sm space-y-4">
+                                    <h4 class="font-extrabold text-[#111827] text-sm md:text-base border-b-2 border-gray-100 pb-2"><i class="fa-solid fa-user text-blue-500 mr-1"></i> ข้อมูลพื้นฐาน</h4>
+                                    <div><label class="text-xs md:text-sm font-bold mb-1 block">ชื่อ-นามสกุล</label><input type="text" id="emp-name-input" class="neo-input bg-gray-50 focus:bg-white text-sm" required></div>
+                                    <div class="flex gap-4"><div class="flex-[2]"><label class="text-xs md:text-sm font-bold mb-1 block">ตำแหน่ง</label><input type="text" id="emp-position-input" class="neo-input bg-gray-50 focus:bg-white text-sm" required></div><div class="flex-1"><label class="text-xs md:text-sm font-bold mb-1 block text-red-600">PIN (4 หลัก)</label><input type="text" id="emp-pin-input" class="neo-input bg-red-50 focus:bg-white text-center font-mono text-sm border-red-300 focus:border-[#111827]" maxlength="4" minlength="4" pattern="[0-9]{4}" required></div></div>
+                                </div>
+                                <div class="bg-white p-5 rounded-2xl border-[3px] border-[#111827] shadow-[4px_4px_0px_#ffde59] space-y-4 relative overflow-hidden">
+                                    <div class="absolute top-0 right-0 w-16 h-16 bg-[#ffde59] opacity-20 rounded-bl-full"></div>
+                                    <h4 class="font-extrabold text-[#111827] text-sm md:text-base border-b-2 border-gray-100 pb-2"><i class="fa-solid fa-clock text-[#fb923c] mr-1"></i> เวลาทำงาน</h4>
+                                    <div><label class="text-xs md:text-sm font-bold mb-2 block">วันทำงานปกติ</label><div class="flex justify-between max-w-sm" id="day-picker"><button type="button" class="day-btn" data-day="1">จ</button><button type="button" class="day-btn" data-day="2">อ</button><button type="button" class="day-btn" data-day="3">พ</button><button type="button" class="day-btn" data-day="4">พฤ</button><button type="button" class="day-btn" data-day="5">ศ</button><button type="button" class="day-btn text-blue-600 border-blue-200" data-day="6">ส</button><button type="button" class="day-btn text-red-500 border-red-200" data-day="0">อา</button></div></div>
+                                    <div class="flex gap-4"><div class="flex-1"><label class="text-xs md:text-sm font-bold mb-1 block text-gray-600">เวลาเข้า</label><input type="time" id="emp-start-time" class="neo-input bg-gray-50 focus:bg-white text-sm" required></div><div class="flex-1"><label class="text-xs md:text-sm font-bold mb-1 block text-gray-600">เวลาออก</label><input type="time" id="emp-end-time" class="neo-input bg-gray-50 focus:bg-white text-sm" required></div></div>
+                                </div>
+                            </div>
+                            <!-- Col 2 -->
+                            <div class="space-y-5">
+                                <div class="bg-white p-5 rounded-2xl border-[3px] border-green-400 shadow-[4px_4px_0px_#4ade80] space-y-4">
+                                    <h4 class="font-extrabold text-green-800 text-sm md:text-base border-b-2 border-green-100 pb-2"><i class="fa-solid fa-money-bill-wave text-green-500 mr-1"></i> ค่าจ้าง & เงินเดือน</h4>
+                                    <div><label class="text-xs md:text-sm font-bold mb-1 block text-green-900">ประเภทการจ้าง</label><select id="emp-salary-type" class="neo-input bg-green-50 text-sm border-green-400 focus:border-[#111827]" onchange="updateSalaryUnit()"><option value="monthly">รายเดือน (Monthly)</option><option value="weekly">รายสัปดาห์ (Weekly)</option><option value="daily">รายวัน (Daily)</option><option value="hourly">รายชั่วโมง (Hourly)</option></select></div>
+                                    <div class="flex flex-col sm:flex-row md:flex-col lg:flex-row gap-4">
+                                        <div class="flex-[1.2]">
+                                            <label class="text-xs md:text-sm font-bold mb-1 block text-green-900">เรทค่าจ้าง <span id="salary-unit-text" class="text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded">(฿)</span></label>
+                                            <input type="number" id="emp-base-rate" class="neo-input bg-white text-sm border-green-400 font-mono text-lg" required>
+                                        </div>
+                                        <div class="flex-[0.8]">
+                                            <label class="text-xs md:text-sm font-bold mb-1 block text-green-900">เรท OT (฿/ชม.)</label>
+                                            <input type="number" id="emp-ot-rate" class="neo-input bg-white text-sm border-green-400 font-mono" value="0">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-blue-50 p-4 rounded-xl border-2 border-blue-200 border-dashed text-blue-800 text-xs md:text-sm font-medium">
+                                    <i class="fa-solid fa-circle-info mr-1"></i> ระบบจะคำนวณ OT ให้อัตโนมัติเมื่อพนักงานลงเวลาออกงานช้ากว่าเวลาออกปกติที่ตั้งไว้
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
-                <!-- Sticky Footer Buttons -->
-                <div class="p-6 pt-2 pb-nav shrink-0 bg-white border-t border-gray-100 flex gap-3">
-                    <button type="button" id="btn-delete-emp" class="hidden w-[60px] bg-red-100 text-red-500 font-bold text-xl py-3.5 rounded-xl neo-border neo-shadow-sm active:translate-y-1 flex items-center justify-center"><i class="fa-solid fa-trash"></i></button>
-                    <button type="button" onclick="submitEmployeeForm()" class="flex-1 bg-[#111827] text-white font-bold text-xl py-3.5 rounded-xl neo-border neo-shadow-sm active:translate-y-1">บันทึกข้อมูล</button>
+                <div class="p-6 md:px-8 pt-4 pb-nav shrink-0 bg-white border-t-[3px] border-gray-100 flex gap-4 rounded-b-[2rem]">
+                    <button type="button" id="btn-delete-emp" class="hidden w-16 md:w-20 bg-red-100 hover:bg-red-200 text-red-600 font-bold text-xl py-3.5 rounded-xl neo-border neo-shadow-sm active:translate-y-1 flex items-center justify-center transition-colors"><i class="fa-solid fa-trash"></i></button>
+                    <button type="button" onclick="submitEmployeeForm()" class="flex-1 bg-[#111827] text-white font-bold text-xl py-3.5 rounded-xl neo-border neo-shadow hover:neo-shadow-sm active:translate-y-1 transition-all">บันทึกข้อมูลพนักงาน</button>
                 </div>
             </div>
         </div>
 
         <!-- Modal: แบบฟอร์มขอลา -->
-        <div id="modal-leave" class="absolute inset-0 z-[60] modal-backdrop flex items-end justify-center hidden pt-modal">
-            <div class="bg-white w-full rounded-t-[2rem] p-0 neo-border border-b-0 border-x-0 transform transition-transform duration-300 translate-y-full flex flex-col max-h-[85vh]" id="modal-leave-content">
-                <div class="flex justify-between items-center p-6 pb-4 border-b-2 border-dashed border-gray-200 shrink-0"><h3 class="text-2xl font-extrabold text-[#111827]">แบบฟอร์มขอลา</h3><button onclick="closeLeaveModal()" class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center font-bold">X</button></div>
+        <div id="modal-leave" class="absolute inset-0 z-[60] modal-backdrop flex items-end md:items-center justify-center hidden pt-modal md:p-6 transition-opacity">
+            <div class="bg-white w-full md:max-w-lg rounded-t-[2rem] md:rounded-[2rem] p-0 neo-border border-b-0 border-x-0 md:border-[3px] transform transition-transform duration-300 translate-y-full flex flex-col max-h-[85vh]" id="modal-leave-content">
+                <div class="flex justify-between items-center p-6 pb-4 border-b-2 border-dashed border-gray-200 shrink-0"><h3 class="text-2xl font-extrabold text-[#111827]">แบบฟอร์มขอลาหยุด</h3><button onclick="closeLeaveModal()" class="w-10 h-10 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center font-bold text-xl transition-colors">X</button></div>
                 <div class="p-6 overflow-y-auto hide-scrollbar flex-1">
-                    <form id="form-leave" class="space-y-4">
-                        <select id="leave-type" class="neo-input bg-[#38bdf8] text-[#111827]"><option value="ลากิจ">ลากิจ</option><option value="ลาป่วย">ลาป่วย</option><option value="พักร้อน">พักร้อน</option></select>
-                        <div class="flex gap-4"><div class="flex-1"><label class="text-sm font-bold text-[#111827]">จาก</label><input type="date" id="leave-start" class="neo-input bg-white" required onchange="validateLeaveDates()"></div><div class="flex-1"><label class="text-sm font-bold text-[#111827]">ถึง</label><input type="date" id="leave-end" class="neo-input bg-white" required onchange="validateLeaveDates()"></div></div>
-                        <textarea id="leave-reason" rows="3" class="neo-input bg-white" placeholder="ระบุเหตุผล (บังคับ)" required></textarea>
+                    <form id="form-leave" class="space-y-5">
+                        <div>
+                            <label class="text-sm font-bold text-gray-600 mb-1 block">ประเภทการลา</label>
+                            <select id="leave-type" class="neo-input bg-[#38bdf8] text-[#111827] text-lg font-extrabold border-[3px] shadow-[4px_4px_0px_#111827]"><option value="ลากิจ">ลากิจ (Personal)</option><option value="ลาป่วย">ลาป่วย (Sick)</option><option value="พักร้อน">พักร้อน (Vacation)</option></select>
+                        </div>
+                        <div class="flex gap-4 bg-gray-50 p-4 rounded-xl border-2 border-gray-200"><div class="flex-1"><label class="text-sm font-bold text-[#111827] mb-1 block">วันที่เริ่มต้น</label><input type="date" id="leave-start" class="neo-input bg-white" required onchange="validateLeaveDates()"></div><div class="flex-1"><label class="text-sm font-bold text-[#111827] mb-1 block">วันสิ้นสุด</label><input type="date" id="leave-end" class="neo-input bg-white" required onchange="validateLeaveDates()"></div></div>
+                        <div>
+                            <label class="text-sm font-bold text-gray-600 mb-1 block">เหตุผลประกอบการลา</label>
+                            <textarea id="leave-reason" rows="3" class="neo-input bg-white resize-none" placeholder="โปรดระบุรายละเอียดสั้นๆ..." required></textarea>
+                        </div>
                     </form>
                 </div>
-                <div class="p-6 pt-2 pb-nav shrink-0"><button type="button" onclick="submitLeaveForm()" class="w-full bg-[#111827] text-white font-bold text-xl py-3.5 rounded-xl neo-border neo-shadow-sm active:translate-y-1">ส่งคำขอลา</button></div>
+                <div class="p-6 pt-2 pb-nav shrink-0"><button type="button" onclick="submitLeaveForm()" class="w-full bg-[#111827] text-white font-bold text-xl py-4 rounded-xl neo-border neo-shadow hover:neo-shadow-sm active:translate-y-1 transition-all"><i class="fa-solid fa-paper-plane mr-2"></i> ส่งคำขออนุมัติ</button></div>
             </div>
         </div>
 
         <!-- Modal: สลับวันหยุด -->
-        <div id="modal-swap" class="absolute inset-0 z-[60] modal-backdrop flex items-end justify-center hidden pt-modal">
-            <div class="bg-white w-full rounded-t-[2rem] p-0 neo-border border-b-0 border-x-0 transform transition-transform duration-300 translate-y-full flex flex-col max-h-[85vh]" id="modal-swap-content">
-                <div class="flex justify-between items-center p-6 pb-4 border-b-2 border-dashed border-gray-200 shrink-0"><div><h3 class="text-2xl font-extrabold text-[#111827]">สลับวันหยุด</h3></div><button type="button" onclick="closeSwapModal()" class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center font-bold">X</button></div>
+        <div id="modal-swap" class="absolute inset-0 z-[60] modal-backdrop flex items-end md:items-center justify-center hidden pt-modal md:p-6 transition-opacity">
+            <div class="bg-white w-full md:max-w-lg rounded-t-[2rem] md:rounded-[2rem] p-0 neo-border border-b-0 border-x-0 md:border-[3px] transform transition-transform duration-300 translate-y-full flex flex-col max-h-[85vh]" id="modal-swap-content">
+                <div class="flex justify-between items-center p-6 pb-4 border-b-2 border-dashed border-gray-200 shrink-0"><div><h3 class="text-2xl font-extrabold text-[#111827]">แบบฟอร์มสลับกะ</h3></div><button type="button" onclick="closeSwapModal()" class="w-10 h-10 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center font-bold text-xl transition-colors">X</button></div>
                 <div class="p-6 overflow-y-auto hide-scrollbar flex-1">
-                    <form id="form-swap" class="space-y-4">
-                        <div><label class="text-sm font-bold text-[#111827] mb-1 block">รูปแบบการสลับ</label><select id="swap-type-select" class="neo-input bg-[#ffde59] border-[#111827]" onchange="toggleSwapMode()"><option value="self">สลับวันหยุดตัวเอง</option><option value="coworker">แลกเวรกับเพื่อน</option></select></div>
-                        <div id="swap-mode-self" class="space-y-4"><div class="bg-red-50 p-3 rounded-xl border-2 border-red-200"><label class="text-sm font-bold text-red-700 block mb-1">วันหยุดเดิม (จะมาทำงาน)</label><input type="date" id="swap-original" class="neo-input bg-white border-red-500"></div><div class="flex justify-center -my-3 relative z-10"><div class="bg-[#111827] text-white w-8 h-8 rounded-full flex items-center justify-center neo-border"><i class="fa-solid fa-arrow-down"></i></div></div><div class="bg-blue-50 p-3 rounded-xl border-2 border-blue-200"><label class="text-sm font-bold text-blue-700 block mb-1">วันที่ขอหยุดแทน</label><input type="date" id="swap-new" class="neo-input bg-white border-blue-500"></div></div>
-                        <div id="swap-mode-coworker" class="space-y-4 hidden"><div class="bg-purple-50 p-4 rounded-xl border-2 border-purple-200"><label class="text-sm font-bold block mb-1">เลือกเพื่อน</label><select id="swap-target-emp" class="neo-input bg-white border-purple-300"></select><label class="text-sm font-bold block mt-3 mb-1">วันที่คุณขอหยุด</label><input type="date" id="swap-co-date1" class="neo-input bg-white border-blue-400"><label class="text-sm font-bold block mt-3 mb-1">วันที่เพื่อนขอหยุด</label><input type="date" id="swap-co-date2" class="neo-input bg-white border-red-400"></div></div>
-                        <div><label class="text-sm font-bold">เหตุผล</label><textarea id="swap-reason" rows="2" class="neo-input bg-white" required></textarea></div>
+                    <form id="form-swap" class="space-y-6">
+                        <div class="bg-[#ffde59] p-4 rounded-xl border-[3px] border-[#111827] shadow-[4px_4px_0px_#111827]"><label class="text-sm font-extrabold text-[#111827] mb-2 block"><i class="fa-solid fa-sliders mr-1"></i> รูปแบบการสลับ</label><select id="swap-type-select" class="neo-input bg-white border-[#111827]" onchange="toggleSwapMode()"><option value="self">สลับวันหยุดของตัวเอง (ไม่กระทบคนอื่น)</option><option value="coworker">แลกเวรกับเพื่อนร่วมงาน (2 คน)</option></select></div>
+                        
+                        <!-- โหมดสลับตัวเอง -->
+                        <div id="swap-mode-self" class="space-y-4 bg-gray-50 p-5 rounded-2xl border-2 border-gray-200">
+                            <div class="bg-red-50 p-4 rounded-xl border-[3px] border-red-300"><label class="text-sm font-bold text-red-700 block mb-2"><i class="fa-solid fa-calendar-xmark mr-1"></i> วันหยุดเดิม (จะมาทำแทน)</label><input type="date" id="swap-original" class="neo-input bg-white border-red-400"></div>
+                            <div class="flex justify-center -my-5 relative z-10"><div class="bg-[#111827] text-white w-10 h-10 rounded-full flex items-center justify-center neo-border shadow-md"><i class="fa-solid fa-arrow-down text-lg"></i></div></div>
+                            <div class="bg-blue-50 p-4 rounded-xl border-[3px] border-blue-300"><label class="text-sm font-bold text-blue-700 block mb-2"><i class="fa-solid fa-calendar-check mr-1"></i> วันที่ขอหยุดชดเชย</label><input type="date" id="swap-new" class="neo-input bg-white border-blue-400"></div>
+                        </div>
+
+                        <!-- โหมดแลกเวร -->
+                        <div id="swap-mode-coworker" class="space-y-4 hidden bg-gray-50 p-5 rounded-2xl border-2 border-gray-200">
+                            <div class="bg-purple-50 p-4 rounded-xl border-[3px] border-purple-300">
+                                <label class="text-sm font-bold text-purple-800 block mb-2"><i class="fa-solid fa-user-group mr-1"></i> เลือกเพื่อนที่จะแลกด้วย</label>
+                                <select id="swap-target-emp" class="neo-input bg-white border-purple-400 mb-4"></select>
+                                
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div><label class="text-xs font-bold text-blue-700 block mb-1">วันที่คุณขอหยุด</label><input type="date" id="swap-co-date1" class="neo-input bg-white border-blue-400 text-sm px-2"></div>
+                                    <div><label class="text-xs font-bold text-red-700 block mb-1">วันที่เพื่อนขอหยุด</label><input type="date" id="swap-co-date2" class="neo-input bg-white border-red-400 text-sm px-2"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div><label class="text-sm font-bold text-gray-600 block mb-1">เหตุผลความจำเป็น</label><textarea id="swap-reason" rows="2" class="neo-input bg-white resize-none" required></textarea></div>
                     </form>
                 </div>
-                <div class="p-6 pt-2 pb-nav shrink-0"><button type="button" onclick="submitSwapForm()" class="w-full bg-[#111827] text-white font-bold text-xl py-3.5 rounded-xl neo-border neo-shadow-sm active:translate-y-1">ส่งคำขอ</button></div>
+                <div class="p-6 pt-2 pb-nav shrink-0"><button type="button" onclick="submitSwapForm()" class="w-full bg-[#111827] text-white font-bold text-xl py-4 rounded-xl neo-border neo-shadow hover:neo-shadow-sm active:translate-y-1 transition-all"><i class="fa-solid fa-paper-plane mr-2"></i> ส่งคำขออนุมัติ</button></div>
             </div>
         </div>
 
         <!-- Modal: รีวิวคำขอ (Owner) -->
-        <div id="modal-review" class="absolute inset-0 z-[60] modal-backdrop flex items-center justify-center hidden p-4">
-            <div class="bg-white w-full max-w-sm rounded-2xl p-0 neo-border neo-shadow transform transition-transform duration-300 scale-95 opacity-0 flex flex-col max-h-[85vh]" id="modal-review-content">
-                <div class="flex items-center gap-3 p-6 pb-4 border-b-2 border-dashed border-gray-200 shrink-0"><div id="rev-icon-bg" class="w-10 h-10 rounded-lg flex items-center justify-center neo-border text-xl"><i id="rev-icon"></i></div><h3 class="text-2xl font-extrabold text-[#111827]" id="rev-modal-title">รายละเอียด</h3></div>
-                <div class="p-6 overflow-y-auto hide-scrollbar flex-1 space-y-3"><p class="text-sm"><span class="font-bold text-gray-500">พนักงาน:</span> <span id="rev-name" class="font-extrabold text-lg text-[#111827] ml-2"></span></p><p class="text-sm"><span class="font-bold text-gray-500">ประเภท:</span> <span id="rev-type"></span></p><div id="rev-dynamic-content" class="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-2"></div><div><span class="font-bold text-gray-500 text-sm">เหตุผล:</span><p id="rev-reason" class="text-gray-700 mt-1 text-sm font-medium break-words"></p></div></div>
-                <div class="p-6 pt-2 shrink-0"><div class="flex gap-3 mb-3"><button onclick="approveRequest()" class="flex-1 bg-[#4ade80] text-[#111827] font-bold py-3 rounded-xl neo-border neo-shadow-sm active:scale-95">อนุมัติ</button><button onclick="rejectRequest()" class="flex-1 bg-[#f87171] text-white font-bold py-3 rounded-xl neo-border neo-shadow-sm active:scale-95">ไม่อนุมัติ</button></div><button onclick="closeReviewModal()" class="w-full bg-gray-200 text-gray-600 font-bold py-2 rounded-xl border-2 border-gray-300 active:scale-95">ปิด</button></div>
+        <div id="modal-review" class="absolute inset-0 z-[60] modal-backdrop flex items-center justify-center hidden p-4 md:p-6 transition-opacity">
+            <div class="bg-white w-full max-w-sm md:max-w-md rounded-2xl p-0 neo-border neo-shadow transform transition-transform duration-300 scale-95 opacity-0 flex flex-col max-h-[85vh]" id="modal-review-content">
+                <div class="flex items-center gap-4 p-6 pb-4 border-b-2 border-dashed border-gray-200 shrink-0"><div id="rev-icon-bg" class="w-12 h-12 rounded-xl flex items-center justify-center neo-border text-2xl"><i id="rev-icon"></i></div><h3 class="text-2xl font-extrabold text-[#111827]" id="rev-modal-title">รายละเอียด</h3></div>
+                <div class="p-6 overflow-y-auto hide-scrollbar flex-1 space-y-4">
+                    <p class="text-base"><span class="font-bold text-gray-500">พนักงาน:</span> <span id="rev-name" class="font-extrabold text-xl text-[#111827] ml-2"></span></p>
+                    <p class="text-base flex items-center"><span class="font-bold text-gray-500 mr-2">ประเภท:</span> <span id="rev-type"></span></p>
+                    <div id="rev-dynamic-content" class="bg-gray-50 p-4 rounded-xl border-[3px] border-gray-200 space-y-2"></div>
+                    <div><span class="font-bold text-gray-500 text-sm">เหตุผลประกอบ:</span><p id="rev-reason" class="text-[#111827] bg-white p-3 rounded-lg border border-gray-200 mt-2 text-sm font-medium break-words"></p></div>
+                </div>
+                <div class="p-6 pt-4 shrink-0 bg-gray-50 rounded-b-2xl border-t border-gray-200">
+                    <div class="flex gap-3 mb-3">
+                        <button onclick="approveRequest()" class="flex-1 bg-[#4ade80] text-[#111827] font-bold text-lg py-3 rounded-xl neo-border shadow-[4px_4px_0px_#111827] active:translate-y-1 active:shadow-none transition-all"><i class="fa-solid fa-check mr-1"></i> อนุมัติ</button>
+                        <button onclick="rejectRequest()" class="flex-1 bg-[#f87171] text-white font-bold text-lg py-3 rounded-xl neo-border shadow-[4px_4px_0px_#111827] active:translate-y-1 active:shadow-none transition-all"><i class="fa-solid fa-xmark mr-1"></i> ปฏิเสธ</button>
+                    </div>
+                    <button onclick="closeReviewModal()" class="w-full bg-white text-gray-600 font-bold py-3 rounded-xl border-[3px] border-gray-300 hover:bg-gray-100 transition-colors">ปิดหน้าต่าง</button>
+                </div>
             </div>
         </div>
 
-        <!-- Modal: ยืนยัน (Updated) -->
-        <div id="modal-confirm" class="absolute inset-0 z-[80] modal-backdrop flex items-center justify-center hidden p-4">
-            <div class="bg-white w-full max-w-sm rounded-2xl p-6 neo-border neo-shadow text-center flex flex-col max-h-[85vh]">
-                <div class="overflow-y-auto hide-scrollbar flex-1 mb-6">
-                    <div id="confirm-icon-bg" class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-yellow-500">
-                        <i id="confirm-icon" class="fa-solid fa-triangle-exclamation text-3xl text-yellow-500"></i>
+        <!-- Modal: ยืนยัน (Confirm) -->
+        <div id="modal-confirm" class="absolute inset-0 z-[80] modal-backdrop flex items-center justify-center hidden p-4 md:p-6 transition-opacity">
+            <div class="bg-white w-full max-w-sm md:max-w-md rounded-2xl md:rounded-[2rem] p-6 md:p-8 neo-border neo-shadow text-center flex flex-col max-h-[85vh]">
+                <div class="overflow-y-auto hide-scrollbar flex-1 mb-6 md:mb-8">
+                    <div id="confirm-icon-bg" class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-5 border-[3px] border-yellow-400 shadow-sm">
+                        <i id="confirm-icon" class="fa-solid fa-triangle-exclamation text-4xl text-yellow-500"></i>
                     </div>
-                    <h3 class="text-2xl font-extrabold text-[#111827] mb-2" id="confirm-title">แจ้งเตือน</h3>
-                    <p class="text-gray-600 font-medium text-sm break-words" id="confirm-msg"></p>
+                    <h3 class="text-3xl font-extrabold text-[#111827] mb-3" id="confirm-title">แจ้งเตือน</h3>
+                    <p class="text-gray-600 font-medium text-base break-words px-2" id="confirm-msg"></p>
                 </div>
-                <div class="flex gap-3 shrink-0">
-                    <button onclick="closeConfirmModal()" class="flex-1 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl border-2 border-gray-300 active:scale-95">ยกเลิก</button>
-                    <button id="confirm-btn-action" class="flex-1 bg-[#ffde59] text-[#111827] font-bold py-3 rounded-xl neo-border neo-shadow-sm active:scale-95">ยืนยัน</button>
+                <div class="flex gap-4 shrink-0">
+                    <button onclick="closeConfirmModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-lg py-3.5 rounded-xl border-[3px] border-gray-300 transition-colors">ยกเลิก</button>
+                    <button id="confirm-btn-action" class="flex-1 bg-[#ffde59] text-[#111827] font-bold text-lg py-3.5 rounded-xl neo-border shadow-[4px_4px_0px_#111827] active:translate-y-1 active:shadow-none transition-all">ยืนยัน</button>
                 </div>
             </div>
         </div>
 
         <!-- Modal: สลิปเงินเดือน -->
-        <div id="modal-payslip" class="absolute inset-0 z-[80] modal-backdrop flex items-center justify-center hidden p-4">
-            <div class="bg-white w-full max-w-sm rounded-xl p-0 neo-border neo-shadow transform transition-transform duration-300 scale-95 opacity-0 flex flex-col max-h-[90vh]" id="modal-payslip-content">
-                <div class="bg-[#111827] text-white p-5 rounded-t-lg text-center relative shrink-0 no-print">
-                    <button onclick="closePaySlipModal()" class="absolute top-3 right-3 text-white opacity-70 hover:opacity-100 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
-                    <h2 class="text-2xl font-extrabold tracking-widest uppercase">PAY SLIP</h2>
-                    <p class="text-sm text-gray-300 mt-1" id="slip-month-year"></p>
+        <div id="modal-payslip" class="absolute inset-0 z-[80] modal-backdrop flex items-center justify-center hidden p-4 md:p-6 transition-opacity">
+            <div class="bg-white w-full max-w-sm md:max-w-md rounded-xl md:rounded-2xl p-0 neo-border neo-shadow transform transition-transform duration-300 scale-95 opacity-0 flex flex-col max-h-[90vh]" id="modal-payslip-content">
+                <div class="bg-[#111827] text-white p-5 md:p-6 rounded-t-lg md:rounded-t-xl text-center relative shrink-0 no-print">
+                    <button onclick="closePaySlipModal()" class="absolute top-4 right-4 text-white opacity-70 hover:opacity-100 p-2 transition-opacity"><i class="fa-solid fa-xmark text-2xl"></i></button>
+                    <h2 class="text-2xl md:text-3xl font-extrabold tracking-widest uppercase">PAY SLIP</h2>
+                    <p class="text-sm md:text-base text-gray-300 mt-1" id="slip-month-year"></p>
                 </div>
-                <div class="p-6 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] overflow-y-auto hide-scrollbar flex-1">
-                    <div class="mb-5 border-b-2 border-dashed border-gray-300 pb-4"><p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">ข้อมูลพนักงาน</p><h3 class="text-xl font-extrabold text-[#111827] break-words" id="slip-emp-name"></h3><p class="text-sm font-bold text-gray-600 break-words" id="slip-emp-pos"></p></div>
-                    <div class="space-y-3 mb-6">
-                        <div class="flex justify-between items-center text-sm font-medium"><span class="text-gray-600 shrink-0" id="slip-base-label"></span><span class="font-extrabold text-[#111827] text-right ml-2" id="slip-base-amount"></span></div>
-                        <div class="flex justify-between items-center text-sm font-medium"><span class="text-gray-600 shrink-0">ค่าล่วงเวลา (OT) <span id="slip-ot-hrs" class="text-xs"></span></span><span class="font-extrabold text-green-600 text-right ml-2" id="slip-ot-amount"></span></div>
-                        <div class="flex justify-between items-center text-sm font-medium"><span class="text-gray-600 text-xs shrink-0" id="slip-work-summary"></span><span></span></div>
+                <div class="p-6 md:p-8 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] overflow-y-auto hide-scrollbar flex-1 relative">
+                    <div class="absolute top-0 right-6 w-16 h-24 bg-gray-100 opacity-50 -z-10"></div>
+                    <div class="mb-6 border-b-2 border-dashed border-gray-300 pb-5">
+                        <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">ข้อมูลพนักงาน (Employee Info)</p>
+                        <h3 class="text-2xl md:text-3xl font-extrabold text-[#111827] break-words leading-tight" id="slip-emp-name"></h3>
+                        <p class="text-sm font-bold text-gray-600 break-words mt-1" id="slip-emp-pos"></p>
                     </div>
-                    <div class="bg-[#ffde59] p-4 rounded-xl border-2 border-[#111827] shadow-[2px_2px_0px_#111827] flex justify-between items-center mb-4">
-                        <span class="font-extrabold text-[#111827]">รับสุทธิ</span><span class="text-2xl font-extrabold text-[#111827] tracking-tighter" id="slip-net-total"></span>
+                    <div class="space-y-4 mb-8">
+                        <div class="flex justify-between items-center text-sm md:text-base font-medium"><span class="text-gray-600 shrink-0" id="slip-base-label"></span><span class="font-extrabold text-[#111827] text-right ml-2 text-lg" id="slip-base-amount"></span></div>
+                        <div class="flex justify-between items-center text-sm md:text-base font-medium"><span class="text-gray-600 shrink-0">ค่าล่วงเวลา (Overtime) <span id="slip-ot-hrs" class="text-xs font-bold bg-green-100 text-green-700 px-1 rounded ml-1"></span></span><span class="font-extrabold text-green-600 text-right ml-2 text-lg" id="slip-ot-amount"></span></div>
+                        <div class="flex justify-between items-center text-sm md:text-base font-medium"><span class="text-gray-600 text-xs shrink-0" id="slip-work-summary"></span><span></span></div>
+                    </div>
+                    <div class="bg-[#ffde59] p-5 rounded-xl border-[3px] border-[#111827] shadow-[4px_4px_0px_#111827] flex justify-between items-center mb-6">
+                        <span class="font-extrabold text-[#111827] text-lg">รับสุทธิ (Net Pay)</span><span class="text-3xl font-extrabold text-[#111827] tracking-tighter" id="slip-net-total"></span>
                     </div>
                     
-                    <!-- Print Button Mockup -->
-                    <button onclick="mockPrintPayslip()" class="no-print w-full bg-[#38bdf8] text-[#111827] font-bold py-3 rounded-xl neo-border shadow-[2px_2px_0px_#111827] active:translate-y-1 transition-all"><i class="fa-solid fa-download"></i> บันทึกรูปสลิป / พิมพ์</button>
+                    <button onclick="mockPrintPayslip()" class="no-print w-full bg-[#38bdf8] hover:bg-[#7dd3fc] text-[#111827] font-bold text-lg py-4 rounded-xl neo-border shadow-[4px_4px_0px_#111827] active:translate-y-1 active:shadow-[2px_2px_0px_#111827] transition-all"><i class="fa-solid fa-print mr-2"></i> บันทึกรูป / พิมพ์สลิป</button>
                 </div>
-                <div class="p-4 bg-gray-50 rounded-b-lg border-t border-gray-200 shrink-0 text-center"><p class="text-[10px] text-gray-400 font-medium">TimeTrack System</p></div>
+                <div class="p-3 bg-gray-100 rounded-b-xl md:rounded-b-2xl border-t border-gray-200 shrink-0 text-center"><p class="text-xs text-gray-400 font-bold tracking-widest uppercase">TimeTrack System</p></div>
             </div>
         </div>
 
         <!-- Toast Notification -->
         <div id="toast" class="absolute top-[env(safe-area-inset-top,20px)] left-1/2 transform -translate-x-1/2 px-6 py-4 rounded-xl font-bold shadow-2xl neo-border z-[100] hidden flex items-center gap-3 w-auto max-w-[90%] transition-all">
-            <i id="toast-icon" class="mt-0.5 shrink-0"></i>
-            <span id="toast-msg" class="break-words text-sm leading-snug"></span>
+            <i id="toast-icon" class="mt-0.5 shrink-0 text-2xl"></i>
+            <span id="toast-msg" class="break-words text-sm md:text-base leading-snug"></span>
         </div>
 
     </div>
@@ -497,7 +607,6 @@
             };
 
             try {
-                // อัปเดตข้อมูลขึ้น Google Sheets โดยใช้ mode: 'no-cors' ป้องกันการโดนบล็อก
                 fetch(GAS_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -540,20 +649,20 @@
             const icon = document.getElementById('toast-icon');
             
             msg.innerText = message; 
-            toast.className = `absolute top-[env(safe-area-inset-top,20px)] left-1/2 transform -translate-x-1/2 px-5 py-3.5 rounded-xl font-bold shadow-2xl neo-border z-[100] flex items-center gap-3 w-auto max-w-[90%] toast-enter`;
+            toast.className = `absolute top-[env(safe-area-inset-top,20px)] left-1/2 transform -translate-x-1/2 px-6 py-4 rounded-xl font-bold shadow-2xl neo-border z-[100] flex items-center gap-4 w-auto max-w-[90%] md:max-w-md toast-enter`;
             
             if(type === 'error') {
-                toast.classList.add('bg-red-50', 'text-red-600', 'border-red-600');
-                icon.className = "fa-solid fa-circle-xmark text-red-500 text-xl";
+                toast.classList.add('bg-red-50', 'text-red-600', 'border-[3px]', 'border-red-600');
+                icon.className = "fa-solid fa-circle-xmark text-red-500 text-3xl";
             } else if (type === 'warning') {
-                toast.classList.add('bg-yellow-50', 'text-yellow-700', 'border-yellow-500');
-                icon.className = "fa-solid fa-triangle-exclamation text-yellow-500 text-xl";
+                toast.classList.add('bg-yellow-50', 'text-yellow-700', 'border-[3px]', 'border-yellow-500');
+                icon.className = "fa-solid fa-triangle-exclamation text-yellow-500 text-3xl";
             } else if (type === 'info') {
-                toast.classList.add('bg-blue-50', 'text-blue-700', 'border-blue-500');
-                icon.className = "fa-solid fa-circle-info text-blue-500 text-xl";
+                toast.classList.add('bg-blue-50', 'text-blue-700', 'border-[3px]', 'border-blue-500');
+                icon.className = "fa-solid fa-circle-info text-blue-500 text-3xl";
             } else {
-                toast.classList.add('bg-[#111827]', 'text-white');
-                icon.className = "fa-solid fa-circle-check text-[#4ade80] text-xl";
+                toast.classList.add('bg-[#111827]', 'text-white', 'border-[3px]', 'border-white');
+                icon.className = "fa-solid fa-circle-check text-[#4ade80] text-3xl";
             }
 
             toast.classList.remove('hidden'); 
@@ -569,13 +678,13 @@
             const btnAction = document.getElementById('confirm-btn-action');
 
             if (type === 'danger') {
-                iconBg.className = "w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-red-500";
-                icon.className = "fa-solid fa-trash text-3xl text-red-500";
-                btnAction.className = "flex-1 bg-[#f87171] text-white font-bold py-3 rounded-xl neo-border neo-shadow-sm active:scale-95";
+                iconBg.className = "w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-5 border-[3px] border-red-400 shadow-sm";
+                icon.className = "fa-solid fa-trash text-4xl text-red-500";
+                btnAction.className = "flex-1 bg-[#f87171] text-white font-bold text-lg py-3.5 rounded-xl neo-border shadow-[4px_4px_0px_#111827] active:translate-y-1 active:shadow-none transition-all";
             } else {
-                iconBg.className = "w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-yellow-500";
-                icon.className = "fa-solid fa-triangle-exclamation text-3xl text-yellow-500";
-                btnAction.className = "flex-1 bg-[#ffde59] text-[#111827] font-bold py-3 rounded-xl neo-border neo-shadow-sm active:scale-95";
+                iconBg.className = "w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-5 border-[3px] border-yellow-400 shadow-sm";
+                icon.className = "fa-solid fa-triangle-exclamation text-4xl text-yellow-500";
+                btnAction.className = "flex-1 bg-[#ffde59] text-[#111827] font-bold text-lg py-3.5 rounded-xl neo-border shadow-[4px_4px_0px_#111827] active:translate-y-1 active:shadow-none transition-all";
             }
 
             btnAction.innerText = confirmBtnText;
@@ -612,13 +721,13 @@
             return isWork;
         }
 
-        function gotoSelectEmployee() { if(employees.length===0) return showToast('ไม่พบข้อมูลพนักงานในระบบ', 'warning'); document.getElementById('emp-selection-list').innerHTML = employees.map(emp => `<button onclick="openPinPad('employee', ${emp.id})" class="w-full bg-white p-4 rounded-xl neo-border neo-shadow-sm flex items-center gap-4 text-left active:scale-[0.98] transition-transform"><img src="${emp.avatar}" class="w-14 h-14 rounded-full bg-gray-100 shrink-0"><div class="flex-1 min-w-0"><h4 class="font-extrabold text-[#111827] text-xl truncate">${emp.name}</h4><p class="text-sm text-gray-500 truncate">${emp.position}</p></div><i class="fa-solid fa-chevron-right shrink-0 text-gray-400"></i></button>`).join(''); showScreen('screen-select-emp'); }
+        function gotoSelectEmployee() { if(employees.length===0) return showToast('ไม่พบข้อมูลพนักงานในระบบ', 'warning'); document.getElementById('emp-selection-list').innerHTML = employees.map(emp => `<button onclick="openPinPad('employee', ${emp.id})" class="w-full bg-white p-5 rounded-2xl neo-border shadow-[4px_4px_0px_#111827] flex items-center gap-4 text-left active:translate-y-1 active:shadow-none hover:bg-gray-50 transition-all"><img src="${emp.avatar}" class="w-16 h-16 rounded-full neo-border bg-gray-100 shrink-0"><div class="flex-1 min-w-0"><h4 class="font-extrabold text-[#111827] text-xl truncate">${emp.name}</h4><p class="text-sm font-bold text-gray-500 truncate">${emp.position}</p></div><div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0 border-2 border-gray-300"><i class="fa-solid fa-chevron-right text-gray-500"></i></div></button>`).join(''); showScreen('screen-select-emp'); }
         function backToRole() { showScreen('screen-role'); }
         function openPinPad(role, empId = null) { pinTargetRole=role; pinTargetEmpId=empId; enteredPin=""; updatePinDots(); if (role === 'owner') { document.getElementById('pin-title').innerText="รหัสเจ้าของ"; document.getElementById('pin-subtitle').innerText="เข้าสู่ระบบจัดการ"; document.getElementById('pin-icon').classList.remove('hidden'); document.getElementById('pin-avatar').classList.add('hidden'); } else { const emp=employees.find(e=>e.id===empId); document.getElementById('pin-title').innerText="รหัสพนักงาน"; document.getElementById('pin-subtitle').innerText=emp.name; document.getElementById('pin-avatar').src=emp.avatar; document.getElementById('pin-avatar').classList.remove('hidden'); document.getElementById('pin-icon').classList.add('hidden'); } showScreen('screen-pin'); }
         function backFromPin() { if(pinTargetRole==='owner') showScreen('screen-role'); else showScreen('screen-select-emp'); }
         function pressPin(num) { if(enteredPin.length<4){ enteredPin+=num; updatePinDots(); if(enteredPin.length===4) setTimeout(verifyPin, 100); } }
         function deletePin() { if(enteredPin.length>0){ enteredPin=enteredPin.slice(0,-1); updatePinDots(); } }
-        function updatePinDots() { const dots=document.getElementById('pin-dots').children; for(let i=0;i<4;i++) dots[i].className=i<enteredPin.length?"w-5 h-5 rounded-full border-2 border-white bg-white":"w-5 h-5 rounded-full border-2 border-white"; }
+        function updatePinDots() { const dots=document.getElementById('pin-dots').children; for(let i=0;i<4;i++) dots[i].className=i<enteredPin.length?"w-5 h-5 rounded-full border-[3px] border-white bg-white shadow-sm":"w-5 h-5 rounded-full border-[3px] border-gray-600 bg-gray-800"; }
         function verifyPin() { 
             let success = pinTargetRole==='owner' ? enteredPin===MASTER_OWNER_PIN : enteredPin===employees.find(e=>e.id===pinTargetEmpId).pin; 
             if(success){ 
@@ -640,10 +749,12 @@
 
         function switchEmpTab(tab) {
             ['emp-tab-time', 'emp-tab-leave', 'emp-tab-payroll'].forEach(id=>document.getElementById(id).classList.add('hidden'));
-            ['nav-emp-time', 'nav-emp-leave', 'nav-emp-payroll'].forEach(id=>document.getElementById(id).className="flex-1 flex flex-col items-center justify-center text-gray-400 border-r-3 border-[#111827] py-2");
+            ['nav-emp-time', 'nav-emp-leave', 'nav-emp-payroll'].forEach(id=>document.getElementById(id).className="flex-1 md:w-full md:flex-none flex flex-col lg:flex-row items-center justify-center lg:justify-start text-gray-400 border-r-[3px] md:border-r-0 md:border-b-[3px] border-[#111827] py-2 md:py-4 lg:px-6 hover:bg-gray-100 transition-colors");
+            
             document.getElementById(`emp-tab-${tab}`).classList.remove('hidden');
             let color = tab==='time'?'text-[#38bdf8] bg-blue-50':tab==='leave'?'text-[#c084fc] bg-purple-50':'text-[#fb923c] bg-orange-50';
-            document.getElementById(`nav-emp-${tab}`).className=`flex-1 flex flex-col items-center justify-center border-r-3 border-[#111827] py-2 ${color}`;
+            document.getElementById(`nav-emp-${tab}`).className=`flex-1 md:w-full md:flex-none flex flex-col lg:flex-row items-center justify-center lg:justify-start border-r-[3px] md:border-r-0 md:border-b-[3px] border-[#111827] py-2 md:py-4 lg:px-6 transition-colors ${color}`;
+            
             if(tab==='leave') renderEmployeeRequestHistory(); if(tab==='payroll') renderEmployeePaySlips();
         }
         function initEmployeeScreen() { const user=employees.find(e=>e.id===currentUserId); document.getElementById('emp-name').innerText=user.name; document.getElementById('emp-avatar').src=user.avatar; updateDate(); updateClock(); updatePunchButtonState(); renderEmployeeTimeHistory(); }
@@ -674,7 +785,7 @@
         }
         
         function analyzePunchStatus() { const logs = timeLogs.filter(l => l.empId === currentUserId).sort((a,b) => b.timestamp - a.timestamp); if (logs.length === 0) return { action: 'in', warning: null }; const lastLog = logs[0], todayStr = new Date().toDateString(), logDateStr = new Date(lastLog.timestamp).toDateString(); if (lastLog.type === 'in') { if (logDateStr === todayStr) return { action: 'out', warning: null }; else return { action: 'in', warning: 'ระบบขึ้นรอบใหม่ (คุณลืมกดออกงานรอบที่แล้ว)' }; } else return { action: 'in', warning: null }; }
-        function updatePunchButtonState() { const s = analyzePunchStatus(), btn=document.getElementById('btn-punch'), icon=document.getElementById('punch-icon'), text=document.getElementById('punch-text'), st=document.getElementById('punch-status-text'); if(s.action === 'in') { btn.className="w-52 h-52 rounded-full bg-[#4ade80] text-[#111827] font-bold text-3xl neo-border neo-shadow flex flex-col items-center justify-center gap-3 transition-all active:scale-95"; icon.className="fa-solid fa-sign-in-alt text-6xl"; text.innerText="เข้างาน"; st.innerHTML='พร้อมบันทึกเวลาเข้างาน'; } else { btn.className="w-52 h-52 rounded-full bg-[#f87171] text-white font-bold text-3xl neo-border neo-shadow flex flex-col items-center justify-center gap-3 transition-all active:scale-95"; icon.className="fa-solid fa-sign-out-alt text-6xl"; text.innerText="ออกงาน"; st.innerHTML='<span class="text-red-500"><i class="fa-solid fa-circle-dot animate-pulse"></i> กำลังปฏิบัติงาน...</span>'; } }
+        function updatePunchButtonState() { const s = analyzePunchStatus(), btn=document.getElementById('btn-punch'), icon=document.getElementById('punch-icon'), text=document.getElementById('punch-text'), st=document.getElementById('punch-status-text'); if(s.action === 'in') { btn.className="w-52 h-52 md:w-64 md:h-64 rounded-full bg-[#4ade80] text-[#111827] font-bold text-3xl md:text-4xl neo-border shadow-[6px_6px_0px_#111827] md:shadow-[8px_8px_0px_#111827] active:shadow-none flex flex-col items-center justify-center gap-3 active:translate-y-2 transition-all"; icon.className="fa-solid fa-sign-in-alt text-6xl md:text-7xl"; text.innerText="เข้างาน"; st.innerHTML='<span class="text-green-600"><i class="fa-solid fa-check-circle"></i> พร้อมบันทึกเวลาเข้างาน</span>'; } else { btn.className="w-52 h-52 md:w-64 md:h-64 rounded-full bg-[#f87171] text-white font-bold text-3xl md:text-4xl neo-border shadow-[6px_6px_0px_#111827] md:shadow-[8px_8px_0px_#111827] active:shadow-none flex flex-col items-center justify-center gap-3 active:translate-y-2 transition-all"; icon.className="fa-solid fa-sign-out-alt text-6xl md:text-7xl"; text.innerText="ออกงาน"; st.innerHTML='<span class="text-red-500"><i class="fa-solid fa-circle-dot animate-pulse"></i> กำลังปฏิบัติงาน...</span>'; } }
 
         let isPunchCooldown = false;
         function attemptPunch() { 
@@ -702,7 +813,22 @@
             setTimeout(() => { isPunchCooldown = false; document.getElementById('btn-punch').classList.remove('btn-cooldown'); }, 3000); 
         }
 
-        function renderEmployeeTimeHistory() { const c=document.getElementById('emp-history-list'), logs=timeLogs.filter(l=>l.empId===currentUserId).sort((a,b)=>b.timestamp-a.timestamp); if(logs.length===0){ c.innerHTML='<div class="text-center bg-white p-4 rounded-xl border-dashed border-2 text-gray-400">ไม่มีประวัติ</div>'; return; } c.innerHTML=logs.map(l=>{ const isCheckIn=l.type==='in'; const dateMark = new Date(l.timestamp).toLocaleDateString('th-TH', {day:'numeric', month:'short'}); return `<div class="bg-white p-4 rounded-xl neo-border flex justify-between items-center"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-lg flex justify-center items-center neo-border shrink-0 ${isCheckIn?'bg-green-100 text-green-500':'bg-red-100 text-red-500'}"><i class="fa-solid ${isCheckIn?'fa-arrow-right-to-bracket':'fa-arrow-right-from-bracket'}"></i></div><div><p class="font-extrabold text-[#111827]">${isCheckIn?'เข้างาน':'ออกงาน'}</p><p class="text-[10px] text-gray-500">${dateMark}</p></div></div><p class="font-bold text-xl text-[#111827]">${l.time}</p></div>`; }).join(''); }
+        function renderEmployeeTimeHistory() { 
+            const c=document.getElementById('emp-history-list'), logs=timeLogs.filter(l=>l.empId===currentUserId).sort((a,b)=>b.timestamp-a.timestamp); 
+            if(logs.length===0){ c.innerHTML='<div class="col-span-full text-center bg-white p-6 md:p-8 rounded-2xl border-dashed border-[3px] border-gray-300 text-gray-400 font-bold">ยังไม่มีประวัติในระบบ</div>'; return; } 
+            
+            c.innerHTML=logs.map(l=>{ 
+                const isCheckIn=l.type==='in'; 
+                const dateMark = new Date(l.timestamp).toLocaleDateString('th-TH', {day:'numeric', month:'short'}); 
+                return `<div class="bg-white p-4 md:p-5 rounded-2xl border-[3px] border-[#111827] shadow-[4px_4px_0px_#111827] flex justify-between items-center hover:-translate-y-1 transition-transform">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-xl flex justify-center items-center border-[3px] border-[#111827] shrink-0 ${isCheckIn?'bg-green-100 text-green-600 shadow-[2px_2px_0px_#16a34a]':'bg-red-100 text-red-600 shadow-[2px_2px_0px_#dc2626]'}"><i class="fa-solid ${isCheckIn?'fa-arrow-right-to-bracket':'fa-arrow-right-from-bracket'} text-xl"></i></div>
+                        <div><p class="font-extrabold text-[#111827] text-base">${isCheckIn?'เข้างาน':'ออกงาน'}</p><p class="text-xs font-bold text-gray-500">${dateMark}</p></div>
+                    </div>
+                    <p class="font-extrabold text-2xl text-[#111827]">${l.time}</p>
+                </div>`; 
+            }).join(''); 
+        }
 
         function submitLeaveForm() {
             const type = document.getElementById('leave-type').value;
@@ -741,12 +867,12 @@
             showToast('ส่งคำขอสลับกะเรียบร้อย รอเจ้าของร้านตรวจสอบ', 'success');
         }
 
-        function openLeaveModal() { const d=getLocalISODate(); document.getElementById('form-leave').reset(); document.getElementById('leave-start').value=d; document.getElementById('leave-start').min=d; document.getElementById('leave-end').value=d; document.getElementById('leave-end').min=d; document.getElementById('modal-leave').classList.remove('hidden'); setTimeout(()=>document.getElementById('modal-leave-content').classList.remove('translate-y-full'),10); }
-        function closeLeaveModal() { document.getElementById('modal-leave-content').classList.add('translate-y-full'); setTimeout(()=>{document.getElementById('modal-leave').classList.add('hidden');},300); }
+        function openLeaveModal() { const d=getLocalISODate(); document.getElementById('form-leave').reset(); document.getElementById('leave-start').value=d; document.getElementById('leave-start').min=d; document.getElementById('leave-end').value=d; document.getElementById('leave-end').min=d; document.getElementById('modal-leave').classList.remove('hidden'); setTimeout(()=>document.getElementById('modal-leave-content').classList.remove('translate-y-full', 'opacity-0'),10); }
+        function closeLeaveModal() { document.getElementById('modal-leave-content').classList.add('translate-y-full', 'opacity-0'); setTimeout(()=>{document.getElementById('modal-leave').classList.add('hidden');},300); }
         function validateLeaveDates() { const s=document.getElementById('leave-start').value, e=document.getElementById('leave-end'); e.min=s; if(e.value<s) e.value=s; }
         
-        function openSwapModal() { const d=getLocalISODate(); document.getElementById('form-swap').reset(); document.getElementById('swap-original').value=d; document.getElementById('swap-original').min=d; document.getElementById('swap-new').value=d; document.getElementById('swap-new').min=d; document.getElementById('swap-co-date1').value=d; document.getElementById('swap-co-date1').min=d; document.getElementById('swap-co-date2').value=d; document.getElementById('swap-co-date2').min=d; document.getElementById('swap-target-emp').innerHTML = '<option value="">-- เลือกเพื่อนร่วมงาน --</option>' + employees.filter(e => e.id !== currentUserId).map(e => `<option value="${e.id}">${e.name}</option>`).join(''); toggleSwapMode(); document.getElementById('modal-swap').classList.remove('hidden'); setTimeout(()=>document.getElementById('modal-swap-content').classList.remove('translate-y-full'),10); }
-        function closeSwapModal() { document.getElementById('modal-swap-content').classList.add('translate-y-full'); setTimeout(()=>{document.getElementById('modal-swap').classList.add('hidden');},300); }
+        function openSwapModal() { const d=getLocalISODate(); document.getElementById('form-swap').reset(); document.getElementById('swap-original').value=d; document.getElementById('swap-original').min=d; document.getElementById('swap-new').value=d; document.getElementById('swap-new').min=d; document.getElementById('swap-co-date1').value=d; document.getElementById('swap-co-date1').min=d; document.getElementById('swap-co-date2').value=d; document.getElementById('swap-co-date2').min=d; document.getElementById('swap-target-emp').innerHTML = '<option value="">-- เลือกเพื่อน --</option>' + employees.filter(e => e.id !== currentUserId).map(e => `<option value="${e.id}">${e.name}</option>`).join(''); toggleSwapMode(); document.getElementById('modal-swap').classList.remove('hidden'); setTimeout(()=>document.getElementById('modal-swap-content').classList.remove('translate-y-full', 'opacity-0'),10); }
+        function closeSwapModal() { document.getElementById('modal-swap-content').classList.add('translate-y-full', 'opacity-0'); setTimeout(()=>{document.getElementById('modal-swap').classList.add('hidden');},300); }
         function toggleSwapMode() { const t=document.getElementById('swap-type-select').value; if(t==='self'){document.getElementById('swap-mode-self').classList.remove('hidden'); document.getElementById('swap-mode-coworker').classList.add('hidden');}else{document.getElementById('swap-mode-self').classList.add('hidden'); document.getElementById('swap-mode-coworker').classList.remove('hidden');} }
         
         function renderEmployeeRequestHistory() { 
@@ -754,12 +880,12 @@
             const myReqs = requests.filter(l => l.empId === currentUserId || l.targetEmpId === currentUserId).sort((a,b) => b.timestamp - a.timestamp); 
             
             if(myReqs.length === 0) { 
-                c.innerHTML = '<div class="text-center p-4 border-2 border-dashed bg-white rounded-xl text-gray-400">ไม่มีประวัติ</div>'; 
+                c.innerHTML = '<div class="col-span-full text-center p-6 md:p-8 border-[3px] border-dashed border-gray-300 bg-white rounded-2xl text-gray-400 font-bold">ไม่มีประวัติคำขอ</div>'; 
                 return; 
             } 
             
             c.innerHTML = myReqs.map(req => { 
-                let ui = req.status === 'pending' ? '<span class="bg-yellow-300 text-[10px] px-2 py-0.5 rounded font-bold neo-border shrink-0">รออนุมัติ</span>' : req.status === 'approved' ? '<span class="bg-[#4ade80] text-[10px] px-2 py-0.5 rounded font-bold neo-border shrink-0">อนุมัติ</span>' : '<span class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded font-bold neo-border shrink-0">ไม่อนุมัติ</span>'; 
+                let ui = req.status === 'pending' ? '<span class="bg-yellow-300 text-[#111827] text-[10px] md:text-xs px-2 py-1 rounded font-bold border-2 border-[#111827] shrink-0">รออนุมัติ</span>' : req.status === 'approved' ? '<span class="bg-[#4ade80] text-[#111827] text-[10px] md:text-xs px-2 py-1 rounded font-bold border-2 border-[#111827] shrink-0">อนุมัติ</span>' : '<span class="bg-red-500 text-white text-[10px] md:text-xs px-2 py-1 rounded font-bold border-2 border-[#111827] shrink-0">ไม่อนุมัติ</span>'; 
                 let icon = '', title = '', desc = ''; 
                 
                 if(req.reqType === 'leave') { 
@@ -768,22 +894,22 @@
                     desc = `${formatDate(req.startDate)}`; 
                 } else { 
                     icon = '<i class="fa-solid fa-rotate"></i>'; 
-                    title = 'สลับวัน'; 
-                    desc = 'แลกเปลี่ยนกะ'; 
+                    title = 'สลับวัน / แลกกะ'; 
+                    desc = 'ขอเปลี่ยนตารางงาน'; 
                 } 
                 
                 let cancelBtn = (req.status === 'pending' && req.empId === currentUserId) 
-                    ? `<button onclick="confirmCancelRequest(${req.id})" class="ml-2 w-8 h-8 rounded-lg bg-red-100 text-red-500 flex justify-center items-center shrink-0 border-2 border-[#111827] active:scale-95 transition-transform"><i class="fa-solid fa-trash"></i></button>` 
+                    ? `<button onclick="confirmCancelRequest(${req.id})" class="ml-2 w-10 h-10 rounded-xl bg-red-100 hover:bg-red-200 text-red-600 flex justify-center items-center shrink-0 border-[3px] border-[#111827] shadow-[2px_2px_0px_#111827] active:shadow-none active:translate-y-1 transition-all"><i class="fa-solid fa-trash text-sm"></i></button>` 
                     : '';
 
-                return `<div class="bg-white p-3 rounded-xl neo-border flex gap-3 items-center">
-                    <div class="w-8 h-8 rounded bg-gray-100 flex justify-center items-center shrink-0 border border-gray-300 text-[#111827]">${icon}</div>
+                return `<div class="bg-white p-4 md:p-5 rounded-2xl border-[3px] border-[#111827] shadow-[4px_4px_0px_#111827] flex gap-4 items-center">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gray-100 flex justify-center items-center shrink-0 border-[3px] border-[#111827] text-xl text-[#111827]">${icon}</div>
                     <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-start">
-                            <h4 class="font-extrabold text-[#111827] text-sm">${title}</h4>
+                        <div class="flex justify-between items-start mb-1">
+                            <h4 class="font-extrabold text-[#111827] text-base">${title}</h4>
                             ${ui}
                         </div>
-                        <p class="text-xs text-gray-600 font-medium truncate">${desc}</p>
+                        <p class="text-xs md:text-sm text-gray-500 font-bold truncate">${desc}</p>
                     </div>
                     ${cancelBtn}
                 </div>`; 
@@ -793,7 +919,7 @@
         let reqIdToCancel = null;
         function confirmCancelRequest(reqId) { 
             reqIdToCancel = reqId; 
-            showConfirm("ยกเลิกคำขอ", "คุณแน่ใจหรือไม่ว่าต้องการยกเลิกหรือลบคำขอนี้?", "danger", "ยืนยันยกเลิก", executeCancelRequest);
+            showConfirm("ยกเลิกคำขอ", "คุณแน่ใจหรือไม่ว่าต้องการยกเลิกคำขอนี้?", "danger", "ยืนยันยกเลิก", executeCancelRequest);
         }
 
         function executeCancelRequest() { 
@@ -811,20 +937,37 @@
             showToast('ยกเลิกคำขอเรียบร้อยแล้ว', 'info'); 
         }
 
-        function renderEmployeePaySlips() { const c = document.getElementById('emp-payslip-list'); const mySlips = paySlips.filter(p => p.empId === currentUserId).sort((a,b) => b.timestamp - a.timestamp); if(mySlips.length === 0) { c.innerHTML='<div class="text-center p-6 border-2 border-dashed bg-white rounded-xl text-gray-400 font-bold">ยังไม่มีสลิปเงินเดือน</div>'; return; } c.innerHTML = mySlips.map(s => `<div class="bg-white p-4 rounded-xl neo-border neo-shadow-sm flex justify-between items-center"><div class="flex items-center gap-3"><div class="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center neo-border shrink-0"><i class="fa-solid fa-file-invoice-dollar text-xl"></i></div><div class="min-w-0"><h4 class="font-extrabold text-[#111827] truncate">สลิปเดือน ${s.monthLabel}</h4><p class="text-xs font-bold text-gray-500">สุทธิ: <span class="text-green-600">${formatMoney(s.netPay)} ฿</span></p></div></div><button onclick="viewSlip(${s.id})" class="w-10 h-10 bg-[#111827] text-white rounded-lg flex items-center justify-center active:scale-95 shrink-0"><i class="fa-solid fa-eye"></i></button></div>`).join(''); }
+        function renderEmployeePaySlips() { 
+            const c = document.getElementById('emp-payslip-list'); 
+            const mySlips = paySlips.filter(p => p.empId === currentUserId).sort((a,b) => b.timestamp - a.timestamp); 
+            if(mySlips.length === 0) { c.innerHTML='<div class="col-span-full text-center p-8 border-[3px] border-dashed border-gray-300 bg-white rounded-2xl text-gray-400 font-bold">ยังไม่มีสลิปเงินเดือนในระบบ</div>'; return; } 
+            
+            c.innerHTML = mySlips.map(s => `<div class="bg-white p-5 rounded-2xl border-[3px] border-[#111827] shadow-[4px_4px_0px_#111827] flex justify-between items-center hover:-translate-y-1 transition-transform">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-[#4ade80] text-[#111827] rounded-xl flex items-center justify-center border-[3px] border-[#111827] shrink-0"><i class="fa-solid fa-file-invoice-dollar text-2xl"></i></div>
+                    <div class="min-w-0">
+                        <h4 class="font-extrabold text-[#111827] truncate text-base">สลิปเดือน ${s.monthLabel}</h4>
+                        <p class="text-xs font-bold text-gray-500 mt-1">รับสุทธิ: <span class="text-green-600">${formatMoney(s.netPay)} ฿</span></p>
+                    </div>
+                </div>
+                <button onclick="viewSlip(${s.id})" class="w-10 h-10 md:w-12 md:h-12 bg-[#111827] text-white rounded-xl flex items-center justify-center active:scale-95 shrink-0 transition-transform"><i class="fa-solid fa-eye text-lg"></i></button>
+            </div>`).join(''); 
+        }
 
         function switchOwnerTab(tab) {
             ['owner-tab-dashboard', 'owner-tab-employees', 'owner-tab-leave', 'owner-tab-payroll'].forEach(id=>document.getElementById(id).classList.add('hidden'));
-            ['nav-owner-dashboard', 'nav-owner-employees', 'nav-owner-leave', 'nav-owner-payroll'].forEach(id=>document.getElementById(id).className="flex-[1.2] flex flex-col items-center justify-center text-gray-400 border-r-3 border-[#111827] py-2"+(id==='nav-owner-leave'?' relative':''));
+            ['nav-owner-dashboard', 'nav-owner-employees', 'nav-owner-leave', 'nav-owner-payroll'].forEach(id=>document.getElementById(id).className="flex-[1.2] md:w-full md:flex-none flex flex-col lg:flex-row items-center justify-center lg:justify-start text-gray-400 border-r-[3px] md:border-r-0 md:border-b-[3px] border-[#111827] py-2 md:py-4 lg:px-6 hover:bg-gray-100 transition-colors"+(id==='nav-owner-leave'?' relative':''));
+            
             document.getElementById(`owner-tab-${tab}`).classList.remove('hidden');
             let color = tab==='dashboard'?'text-[#fb923c] bg-orange-50':tab==='employees'?'text-[#c084fc] bg-purple-50':tab==='leave'?'text-[#38bdf8] bg-blue-50':'text-green-600 bg-green-50';
-            document.getElementById(`nav-owner-${tab}`).className=`flex-[1.2] flex flex-col items-center justify-center border-r-3 border-[#111827] py-2 ${color}`+(tab==='leave'?' relative':'');
+            document.getElementById(`nav-owner-${tab}`).className=`flex-[1.2] md:w-full md:flex-none flex flex-col lg:flex-row items-center justify-center lg:justify-start border-r-[3px] md:border-r-0 md:border-b-[3px] border-[#111827] py-2 md:py-4 lg:px-6 transition-colors ${color}`+(tab==='leave'?' relative':'');
             
             if(tab==='dashboard') renderOwnerDashboard(); 
             if(tab==='employees') { document.getElementById('search-emp').value = ''; renderOwnerEmployeeList(); }
             if(tab==='leave') renderOwnerInboxList(); 
             if(tab==='payroll') { const now = new Date(); document.getElementById('payroll-month').value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`; renderOwnerPayroll(); }
         }
+        
         function initOwnerScreen() { renderOwnerDashboard(); updateOwnerBadge(); }
         function renderOwnerDashboard() {
             const container = document.getElementById('owner-employee-status-list'); 
@@ -838,20 +981,20 @@
             const pendingReqs = requests.filter(r => r.status === 'pending').length;
             if (pendingReqs > 0) {
                 alertContainer.innerHTML = `
-                    <div onclick="switchOwnerTab('leave')" class="bg-[#ffde59] p-4 rounded-xl neo-border shadow-[4px_4px_0px_#111827] flex items-center justify-between cursor-pointer active:translate-y-1 transition-all">
+                    <div onclick="switchOwnerTab('leave')" class="bg-[#ffde59] p-5 rounded-2xl border-[3px] border-[#111827] shadow-[6px_6px_0px_#111827] flex items-center justify-between cursor-pointer active:translate-y-1 active:shadow-[2px_2px_0px_#111827] transition-all">
                         <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center neo-border text-yellow-500 relative">
-                                <i class="fa-solid fa-bell text-lg"></i>
-                                <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
+                            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center border-[3px] border-[#111827] text-yellow-500 relative">
+                                <i class="fa-solid fa-bell text-xl"></i>
+                                <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-[3px] border-[#111827] animate-pulse"></span>
                             </div>
-                            <div><p class="font-extrabold text-[#111827] text-sm">มีคำขอรอตรวจสอบ</p><p class="text-[11px] font-bold text-gray-700 mt-0.5">กดเพื่อดู ${pendingReqs} รายการ</p></div>
+                            <div><p class="font-extrabold text-[#111827] text-base md:text-lg">มีคำขอรอตรวจสอบ</p><p class="text-xs md:text-sm font-bold text-gray-700 mt-1">กดเพื่อดู ${pendingReqs} รายการ</p></div>
                         </div>
-                        <i class="fa-solid fa-chevron-right text-[#111827]"></i>
+                        <i class="fa-solid fa-chevron-right text-[#111827] text-xl"></i>
                     </div>`;
             } else { alertContainer.innerHTML = ''; }
 
             if(employees.length === 0){ 
-                container.innerHTML='<div class="bg-white p-6 rounded-xl border-2 border-dashed border-gray-300 text-center"><p class="font-bold text-gray-400">ยังไม่มีข้อมูลพนักงาน</p></div>'; 
+                container.innerHTML='<div class="bg-white p-6 rounded-2xl border-[3px] border-dashed border-gray-300 text-center col-span-full"><p class="font-bold text-gray-400">ยังไม่มีข้อมูลพนักงาน</p></div>'; 
             } else {
                 container.innerHTML = employees.map(emp => {
                     const isWorkDay = checkIsWorkDay(emp.id, todayStr);
@@ -859,7 +1002,7 @@
                     const lastLog = logs.length > 0 ? logs[0] : null;
                     
                     let badge = isWorkDay ? 'ยังไม่เข้า' : 'วันหยุด';
-                    let col = isWorkDay ? 'bg-red-100 text-red-600 border-red-300' : 'bg-gray-100 text-gray-500 border-gray-300';
+                    let col = isWorkDay ? 'bg-red-100 text-red-600 border-red-400' : 'bg-gray-100 text-gray-500 border-gray-300';
                     let time = isWorkDay ? 'รอดำเนินการ' : '-';
 
                     const isOnLeave = requests.find(l => l.empId === emp.id && l.reqType === 'leave' && l.status === 'approved' && l.startDate <= todayStr && l.endDate >= todayStr);
@@ -870,11 +1013,18 @@
                         const todayLogs = logs.filter(l => new Date(l.timestamp).toDateString() === todayDateStr);
                         if (todayLogs.length > 0) {
                             wCount++; 
-                            if (lastLog.type === 'in') { badge = 'กำลังทำงาน'; col = 'bg-[#4ade80] text-[#111827] border-[#111827] shadow-[2px_2px_0px_#111827]'; time = `เข้า: ${lastLog.time}`; } 
+                            if (lastLog.type === 'in') { badge = 'ทำงานอยู่'; col = 'bg-[#4ade80] text-[#111827] border-[#111827] shadow-[2px_2px_0px_#111827]'; time = `เข้า: ${lastLog.time}`; } 
                             else { badge = 'เลิกงานแล้ว'; col = 'bg-gray-800 text-white border-[#111827] shadow-[2px_2px_0px_#111827]'; time = `ออก: ${lastLog.time}`; }
                         } else if (isWorkDay) { absentCount++; }
                     }
-                    return `<div class="bg-white p-3.5 rounded-xl neo-border flex items-center gap-3"><img src="${emp.avatar}" class="w-10 h-10 rounded-full border border-gray-300 shrink-0"><div class="flex-1 min-w-0"><h4 class="font-extrabold text-[#111827] text-sm truncate">${emp.name}</h4><p class="text-[10px] font-bold text-gray-500 mt-0.5"><i class="fa-regular fa-clock"></i> ${time}</p></div><div class="px-2 py-1 rounded-md text-[10px] font-bold border-2 ${col} shrink-0 text-center min-w-[70px]">${badge}</div></div>`;
+                    return `<div class="bg-white p-4 rounded-xl border-[3px] border-[#111827] shadow-sm flex items-center gap-3">
+                        <img src="${emp.avatar}" class="w-12 h-12 rounded-full border-2 border-[#111827] shrink-0 bg-gray-100">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-extrabold text-[#111827] text-sm md:text-base truncate">${emp.name}</h4>
+                            <p class="text-[10px] md:text-xs font-bold text-gray-500 mt-1"><i class="fa-regular fa-clock"></i> ${time}</p>
+                        </div>
+                        <div class="px-2 md:px-3 py-1 md:py-1.5 rounded-lg text-[10px] md:text-xs font-bold border-2 ${col} shrink-0 text-center min-w-[70px] md:min-w-[80px]">${badge}</div>
+                    </div>`;
                 }).join('');
             }
 
@@ -883,32 +1033,28 @@
             document.getElementById('stat-leave').innerText = leaveCount;
             document.getElementById('stat-absent').innerText = absentCount;
 
-            const todayAllLogs = timeLogs.filter(l => new Date(l.timestamp).toDateString() === todayDateStr).sort((a,b) => b.timestamp - a.timestamp).slice(0, 3);
+            const todayAllLogs = timeLogs.filter(l => new Date(l.timestamp).toDateString() === todayDateStr).sort((a,b) => b.timestamp - a.timestamp).slice(0, 4); // Show 4 on desktop
             
             if(todayAllLogs.length === 0) {
-                activityContainer.innerHTML = '<div class="bg-white p-4 rounded-xl border-2 border-dashed border-gray-300 text-center"><p class="text-xs font-bold text-gray-400">ยังไม่มีการเคลื่อนไหวในวันนี้</p></div>';
+                activityContainer.innerHTML = '<div class="bg-white p-6 rounded-2xl border-[3px] border-dashed border-gray-300 text-center"><p class="text-sm font-bold text-gray-400">ยังไม่มีการเคลื่อนไหวในวันนี้</p></div>';
             } else {
                 activityContainer.innerHTML = todayAllLogs.map(l => {
                     const emp = employees.find(e => e.id === l.empId) || {name: 'ไม่ทราบชื่อ', avatar: ''};
                     const isCheckIn = l.type === 'in';
-                    return `<div class="flex items-center gap-3 bg-white p-3 rounded-xl border-2 ${isCheckIn?'border-green-200':'border-red-200'}">
-                        <div class="w-8 h-8 rounded-lg flex justify-center items-center shrink-0 border-2 ${isCheckIn?'bg-green-50 text-green-500 border-green-300':'bg-red-50 text-red-500 border-red-300'}">
-                            <i class="fa-solid ${isCheckIn?'fa-arrow-right-to-bracket':'fa-arrow-right-from-bracket'} text-xs"></i>
+                    return `<div class="flex items-center gap-4 bg-white p-4 rounded-xl border-[3px] ${isCheckIn?'border-[#4ade80]':'border-[#f87171]'} shadow-sm">
+                        <div class="w-10 h-10 rounded-xl flex justify-center items-center shrink-0 border-[3px] border-[#111827] ${isCheckIn?'bg-[#4ade80] text-[#111827]':'bg-[#f87171] text-white'}">
+                            <i class="fa-solid ${isCheckIn?'fa-arrow-right-to-bracket':'fa-arrow-right-from-bracket'} text-sm md:text-base"></i>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="font-extrabold text-[#111827] text-xs truncate">${emp.name}</p>
-                            <p class="text-[10px] text-gray-500 font-medium">${isCheckIn ? 'เข้างาน' : 'ออกงาน'}</p>
+                            <p class="font-extrabold text-[#111827] text-sm md:text-base truncate">${emp.name}</p>
+                            <p class="text-[10px] md:text-xs text-gray-500 font-bold mt-1">${isCheckIn ? 'ลงเวลาเข้างาน' : 'ลงเวลาออกงาน'}</p>
                         </div>
-                        <p class="font-extrabold text-[#111827] text-sm shrink-0 bg-gray-100 px-2 py-1 rounded-md border border-gray-200">${l.time}</p>
+                        <p class="font-extrabold text-[#111827] text-base md:text-lg shrink-0 bg-gray-100 px-3 py-1.5 rounded-lg border-2 border-gray-300">${l.time}</p>
                     </div>`;
                 }).join('');
             }
         }
 
-        let editingWorkDays = []; 
-        let empIdToDelete = null;
-        let empNameToDelete = null;
-        
         function updateSalaryUnit() { const type = document.getElementById('emp-salary-type').value; const label = document.getElementById('salary-unit-text'); const input = document.getElementById('emp-base-rate'); if(type === 'monthly') { label.innerText = '(฿/เดือน)'; input.placeholder = 'เช่น 15000'; } else if(type === 'weekly') { label.innerText = '(฿/สัปดาห์)'; input.placeholder = 'เช่น 3500'; } else if(type === 'daily') { label.innerText = '(฿/วัน)'; input.placeholder = 'เช่น 500'; } else if(type === 'hourly') { label.innerText = '(฿/ชม.)'; input.placeholder = 'เช่น 60'; } }
 
         function renderOwnerEmployeeList() { 
@@ -918,22 +1064,23 @@
             const filteredEmps = employees.filter(e => e.name.toLowerCase().includes(searchTerm) || e.position.toLowerCase().includes(searchTerm));
             
             if(filteredEmps.length === 0){ 
-                container.innerHTML='<div class="text-center font-bold text-gray-400 py-6 bg-white rounded-xl border-dashed border-2 neo-border">ไม่พบพนักงานที่ค้นหา</div>'; 
+                container.innerHTML='<div class="col-span-full text-center font-bold text-gray-400 py-8 bg-white rounded-2xl border-dashed border-[3px] border-gray-300">ไม่พบพนักงานที่ค้นหา</div>'; 
                 return; 
             } 
             
             container.innerHTML = filteredEmps.map(emp => { 
                 const sType = emp.payrollConfig.salaryType === 'monthly' ? 'รายเดือน' : emp.payrollConfig.salaryType === 'weekly' ? 'รายสัปดาห์' : emp.payrollConfig.salaryType === 'daily' ? 'รายวัน' : 'รายชม.'; 
-                return `<div class="bg-white p-4 rounded-xl neo-border neo-shadow-sm flex items-center gap-4"> 
-                    <img src="${emp.avatar}" class="w-14 h-14 rounded-full neo-border bg-gray-100 shrink-0"> 
+                return `<div class="bg-white p-5 rounded-2xl border-[3px] border-[#111827] shadow-[4px_4px_0px_#111827] flex items-center gap-4 hover:-translate-y-1 transition-transform"> 
+                    <img src="${emp.avatar}" class="w-16 h-16 rounded-full border-2 border-[#111827] bg-gray-100 shrink-0"> 
                     <div class="flex-1 min-w-0">
-                        <h4 class="font-extrabold text-[#111827] text-lg truncate">${emp.name}</h4>
-                        <div class="flex flex-wrap gap-1 items-center mt-1">
-                            <span class="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[9px] font-bold border border-blue-300"><i class="fa-regular fa-clock"></i> ${emp.workConfig.startTime}-${emp.workConfig.endTime}</span>
-                            <span class="bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-[9px] font-bold border border-green-300"><i class="fa-solid fa-coins"></i> ${sType}</span>
+                        <h4 class="font-extrabold text-[#111827] text-lg md:text-xl truncate">${emp.name}</h4>
+                        <p class="text-xs text-gray-500 font-bold truncate mb-2">${emp.position}</p>
+                        <div class="flex flex-wrap gap-1.5 items-center">
+                            <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-md text-[10px] md:text-xs font-bold border border-blue-300"><i class="fa-regular fa-clock mr-1"></i> ${emp.workConfig.startTime}-${emp.workConfig.endTime}</span>
+                            <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-md text-[10px] md:text-xs font-bold border border-green-300"><i class="fa-solid fa-coins mr-1"></i> ${sType}</span>
                         </div>
                     </div> 
-                    <button onclick="openEmployeeModal(${emp.id})" class="w-10 h-10 bg-[#ffde59] rounded-xl neo-border shadow-[2px_2px_0px_#111827] active:shadow-none active:translate-y-1 flex justify-center items-center text-[#111827] shrink-0 transition-all"><i class="fa-solid fa-gear"></i></button> 
+                    <button onclick="openEmployeeModal(${emp.id})" class="w-12 h-12 bg-[#ffde59] hover:bg-[#fde047] rounded-xl border-[3px] border-[#111827] shadow-[2px_2px_0px_#111827] active:shadow-none active:translate-y-1 flex justify-center items-center text-[#111827] shrink-0 transition-all"><i class="fa-solid fa-pen"></i></button> 
                 </div>`
             }).join(''); 
         }
@@ -959,13 +1106,13 @@
             if (id) { const idx = employees.findIndex(e => e.id == id); if(idx > -1) { employees[idx] = { ...employees[idx], ...baseData, avatar: generateAvatar(baseData.name) }; showToast('อัปเดตข้อมูลพนักงานสำเร็จ', 'success'); } } 
             else { employees.push({ id: Date.now(), ...baseData, avatar: generateAvatar(baseData.name) }); showToast('เพิ่มพนักงานสำเร็จ', 'success'); }
             
-            saveData(); closeEmployeeModal(); renderOwnerEmployeeList();
+            saveData(); closeEmployeeModal(); renderOwnerEmployeeList(); renderOwnerDashboard();
         }
 
         function openEmployeeModal(empId = null) {
             document.getElementById('form-employee').reset(); document.getElementById('emp-id-input').value = ''; setupDayPicker();
             if (empId) { const emp = employees.find(e => e.id === empId); document.getElementById('emp-form-title').innerText = "แก้ไขข้อมูล"; document.getElementById('emp-id-input').value = emp.id; document.getElementById('emp-name-input').value = emp.name; document.getElementById('emp-position-input').value = emp.position; document.getElementById('emp-pin-input').value = emp.pin; editingWorkDays = [...emp.workConfig.workDays]; document.getElementById('emp-start-time').value = emp.workConfig.startTime; document.getElementById('emp-end-time').value = emp.workConfig.endTime; document.getElementById('emp-salary-type').value = emp.payrollConfig.salaryType; document.getElementById('emp-base-rate').value = emp.payrollConfig.baseRate; document.getElementById('emp-ot-rate').value = emp.payrollConfig.otRate; document.getElementById('btn-delete-emp').classList.remove('hidden'); document.getElementById('btn-delete-emp').onclick = () => confirmDeleteEmployee(emp.id, emp.name); } 
-            else { document.getElementById('emp-form-title').innerText = "เพิ่มพนักงาน"; editingWorkDays = [1, 2, 3, 4, 5, 6]; document.getElementById('emp-start-time').value = "09:00"; document.getElementById('emp-end-time').value = "18:00"; document.getElementById('emp-salary-type').value = "monthly"; document.getElementById('emp-base-rate').value = ""; document.getElementById('emp-ot-rate').value = "0"; document.getElementById('btn-delete-emp').classList.add('hidden'); }
+            else { document.getElementById('emp-form-title').innerText = "เพิ่มพนักงานใหม่"; editingWorkDays = [1, 2, 3, 4, 5, 6]; document.getElementById('emp-start-time').value = "09:00"; document.getElementById('emp-end-time').value = "18:00"; document.getElementById('emp-salary-type').value = "monthly"; document.getElementById('emp-base-rate').value = ""; document.getElementById('emp-ot-rate').value = "0"; document.getElementById('btn-delete-emp').classList.add('hidden'); }
             updateDayPickerUI(); updateSalaryUnit(); document.getElementById('modal-employee').classList.remove('hidden'); setTimeout(() => document.getElementById('modal-employee-content').classList.remove('translate-y-full'), 10);
         }
         function closeEmployeeModal() { document.getElementById('modal-employee-content').classList.add('translate-y-full'); setTimeout(() => document.getElementById('modal-employee').classList.add('hidden'), 300); }
@@ -973,7 +1120,7 @@
         function confirmDeleteEmployee(empId, empName) { 
             empIdToDelete = empId; 
             empNameToDelete = empName;
-            showConfirm("ลบพนักงาน", `ลบ <span class="font-bold text-red-600">${empName}</span> ออกจากระบบหรือไม่?<br><span class="text-[10px] text-gray-500">ข้อมูลที่เกี่ยวข้องจะถูกลบทิ้งทั้งหมด</span>`, "danger", "ยืนยันลบ", executeDeleteEmployee);
+            showConfirm("ลบพนักงาน", `ลบ <span class="font-bold text-red-600">${empName}</span> ออกจากระบบหรือไม่?<br><span class="text-[10px] md:text-sm text-gray-500 mt-2 block">ข้อมูลที่เกี่ยวข้องจะถูกลบทิ้งทั้งหมด</span>`, "danger", "ยืนยันลบ", executeDeleteEmployee);
         }
         function executeDeleteEmployee() { 
             if(!empIdToDelete) return; 
@@ -996,36 +1143,38 @@
                 return b.timestamp - a.timestamp;
             }); 
 
-            if(s.length === 0){ c.innerHTML = '<div class="text-center font-bold text-gray-400 py-4">ไม่มีคำขอในระบบ</div>'; return; } 
+            if(s.length === 0){ c.innerHTML = '<div class="col-span-full text-center font-bold text-gray-400 py-8 bg-white rounded-2xl border-[3px] border-dashed border-gray-300">ไม่มีคำขอในระบบ</div>'; return; } 
 
             c.innerHTML = s.map(req => { 
                 const emp = employees.find(e => e.id === req.empId) || {name: 'ไม่ทราบชื่อ', avatar: ''}; 
-                let ui = req.status === 'pending' ? '<span class="bg-yellow-300 text-[10px] px-2 py-0.5 rounded font-bold neo-border shadow-[2px_2px_0px_#111827] shrink-0">รอตรวจสอบ</span>' : req.status === 'approved' ? '<span class="text-green-500 font-bold text-xs shrink-0"><i class="fa-solid fa-check"></i> อนุมัติแล้ว</span>' : '<span class="text-red-500 font-bold text-xs shrink-0"><i class="fa-solid fa-xmark"></i> ไม่อนุมัติ</span>'; 
-                let btn = req.status === 'pending' ? `<button onclick="openReviewModal(${req.id})" class="mt-3 w-full bg-[#111827] text-white py-2 rounded-lg font-bold text-sm active:scale-95 transition-all">ตรวจสอบ</button>` : ''; 
-                let iconClass = req.reqType === 'leave' ? 'fa-calendar-minus text-blue-600 bg-blue-100 border-blue-200' : req.reqType === 'swap' ? 'fa-rotate text-yellow-600 bg-yellow-100 border-yellow-200' : 'fa-people-arrows text-purple-600 bg-purple-100 border-purple-200'; 
+                let ui = req.status === 'pending' ? '<span class="bg-yellow-300 text-[#111827] text-[10px] md:text-xs px-2 py-1 rounded font-bold border-2 border-[#111827] shrink-0">รอตรวจสอบ</span>' : req.status === 'approved' ? '<span class="text-green-500 font-bold text-xs md:text-sm shrink-0"><i class="fa-solid fa-check"></i> อนุมัติแล้ว</span>' : '<span class="text-red-500 font-bold text-xs md:text-sm shrink-0"><i class="fa-solid fa-xmark"></i> ไม่อนุมัติ</span>'; 
+                let btn = req.status === 'pending' ? `<button onclick="openReviewModal(${req.id})" class="mt-4 w-full bg-[#111827] text-white py-3 rounded-xl font-bold text-sm md:text-base hover:bg-gray-800 active:scale-95 transition-all">ตรวจสอบคำขอ</button>` : ''; 
+                let iconClass = req.reqType === 'leave' ? 'fa-calendar-minus text-blue-600 bg-blue-100 border-blue-300' : req.reqType === 'swap' ? 'fa-rotate text-yellow-600 bg-yellow-100 border-yellow-400' : 'fa-people-arrows text-purple-600 bg-purple-100 border-purple-300'; 
                 let typeText = req.reqType === 'leave' ? req.type : req.reqType === 'swap' ? 'สลับวัน(ตัวเอง)' : 'สลับกะ(แลกเวร)'; 
-                let deleteBtn = `<button onclick="confirmCancelRequest(${req.id})" class="ml-2 w-7 h-7 rounded-md bg-red-100 text-red-500 flex justify-center items-center shrink-0 border border-[#111827] active:scale-95"><i class="fa-solid fa-trash text-xs"></i></button>`;
+                let deleteBtn = `<button onclick="confirmCancelRequest(${req.id})" class="ml-2 w-8 h-8 rounded-lg bg-red-100 hover:bg-red-200 text-red-600 flex justify-center items-center shrink-0 border-2 border-[#111827] active:scale-95 transition-all"><i class="fa-solid fa-trash text-xs"></i></button>`;
 
-                return `<div class="bg-white p-4 rounded-xl neo-border neo-shadow-sm ${req.status === 'pending' ? 'border-blue-500' : ''}">
-                    <div class="flex justify-between items-start mb-2">
-                        <div class="flex items-center gap-3">
-                            <img src="${emp.avatar}" class="w-8 h-8 rounded-full neo-border bg-gray-100 shrink-0">
-                            <div class="min-w-0">
-                                <h4 class="font-extrabold text-[#111827] text-sm leading-tight truncate">${emp.name}</h4>
-                                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded border ${iconClass}"><i class="fa-solid ${iconClass.split(' ')[0]}"></i> ${typeText}</span>
+                return `<div class="bg-white p-5 rounded-2xl border-[3px] border-[#111827] shadow-[4px_4px_0px_#111827] flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-center gap-3">
+                                <img src="${emp.avatar}" class="w-12 h-12 rounded-full border-2 border-[#111827] bg-gray-100 shrink-0">
+                                <div class="min-w-0">
+                                    <h4 class="font-extrabold text-[#111827] text-base md:text-lg leading-tight truncate">${emp.name}</h4>
+                                    <span class="inline-block mt-1 text-[9px] md:text-[10px] font-bold px-2 py-0.5 rounded border-2 ${iconClass}"><i class="fa-solid ${iconClass.split(' ')[0]} mr-1"></i> ${typeText}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                ${ui}
+                                ${deleteBtn}
                             </div>
                         </div>
-                        <div class="flex items-center">
-                            ${ui}
-                            ${deleteBtn}
-                        </div>
+                        <p class="text-sm text-gray-600 font-medium break-words bg-gray-50 p-3 rounded-xl border border-gray-200 mt-2">${req.reason}</p>
                     </div>
-                    <p class="text-xs text-gray-600 break-words bg-gray-50 p-2 rounded border border-gray-200">${req.reason}</p>
                     ${btn}
                 </div>`; 
             }).join(''); 
         }
-        function openReviewModal(id) { selectedReqIdForReview=id; const req=requests.find(x=>x.id===id), emp=employees.find(e=>e.id===req.empId)||{name:'?'}; document.getElementById('rev-name').innerText=emp.name; document.getElementById('rev-reason').innerText=req.reason; document.getElementById('rev-icon').className = req.reqType === 'leave' ? "fa-solid fa-calendar-minus" : "fa-solid fa-rotate"; document.getElementById('rev-icon-bg').className = req.reqType === 'leave' ? "w-10 h-10 rounded-lg flex items-center justify-center neo-border text-xl bg-blue-100 text-blue-600" : "w-10 h-10 rounded-lg flex items-center justify-center neo-border text-xl bg-yellow-100 text-yellow-600"; document.getElementById('rev-modal-title').innerText = req.reqType === 'leave' ? "คำขอลา" : "คำขอสลับกะ"; document.getElementById('rev-type').innerText = req.reqType === 'leave' ? req.type : "สลับวันทำงาน"; document.getElementById('rev-type').className = req.reqType === 'leave' ? "bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-bold ml-2 text-xs border border-blue-200" : "bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded font-bold ml-2 text-xs border border-yellow-300"; document.getElementById('rev-dynamic-content').innerHTML = `<p class="text-xs font-bold text-blue-600">วันที่: ${formatDate(req.startDate || req.originalDate || req.dateAOff)}</p>`; document.getElementById('modal-review').classList.remove('hidden'); setTimeout(()=>document.getElementById('modal-review-content').classList.remove('scale-95','opacity-0'),10); }
+        function openReviewModal(id) { selectedReqIdForReview=id; const req=requests.find(x=>x.id===id), emp=employees.find(e=>e.id===req.empId)||{name:'?'}; document.getElementById('rev-name').innerText=emp.name; document.getElementById('rev-reason').innerText=req.reason; document.getElementById('rev-icon').className = req.reqType === 'leave' ? "fa-solid fa-calendar-minus" : "fa-solid fa-rotate"; document.getElementById('rev-icon-bg').className = req.reqType === 'leave' ? "w-12 h-12 rounded-xl flex items-center justify-center border-[3px] border-[#111827] text-2xl bg-[#38bdf8] text-[#111827]" : "w-12 h-12 rounded-xl flex items-center justify-center border-[3px] border-[#111827] text-2xl bg-[#ffde59] text-[#111827]"; document.getElementById('rev-modal-title').innerText = req.reqType === 'leave' ? "พิจารณาคำขอลา" : "พิจารณาคำขอสลับกะ"; document.getElementById('rev-type').innerText = req.reqType === 'leave' ? req.type : "สลับวันทำงาน"; document.getElementById('rev-type').className = req.reqType === 'leave' ? "bg-blue-100 text-blue-800 px-2 py-1 rounded font-bold ml-2 text-xs border border-blue-300" : "bg-yellow-100 text-yellow-800 px-2 py-1 rounded font-bold ml-2 text-xs border border-yellow-400"; document.getElementById('rev-dynamic-content').innerHTML = `<p class="text-sm font-bold text-[#111827] bg-white px-3 py-2 rounded-lg border border-gray-200"><i class="fa-solid fa-calendar-day mr-2 text-gray-400"></i>วันที่: ${formatDate(req.startDate || req.originalDate || req.dateAOff)}</p>`; document.getElementById('modal-review').classList.remove('hidden'); setTimeout(()=>document.getElementById('modal-review-content').classList.remove('scale-95','opacity-0'),10); }
         function closeReviewModal() { document.getElementById('modal-review-content').classList.add('scale-95','opacity-0'); setTimeout(()=>{document.getElementById('modal-review').classList.add('hidden'); selectedReqIdForReview=null;},300); }
         function approveRequest() { 
             const idx=requests.findIndex(l=>l.id===selectedReqIdForReview); 
@@ -1069,20 +1218,53 @@
             return { empId: emp.id, name: emp.name, avatar: emp.avatar, position: emp.position, monthLabel: `${mStr}/${yStr}`, monthStr: monthStr, salaryType: emp.payrollConfig.salaryType, basePay: basePay, otHours: otHoursFloat, otPay: otPay, netPay: netPay, daysWorked: daysWorked };
         }
         function renderOwnerPayroll() {
-            const monthStr = document.getElementById('payroll-month').value, container = document.getElementById('owner-payroll-list');
+            const monthStr = document.getElementById('payroll-month').value, container = document.getElementById('owner-payroll-container');
             if(!monthStr) return; let html = '', totalCompanyPay = 0;
             employees.forEach(emp => {
                 const p = calculateEmployeePayroll(emp.id, monthStr);
                 if(p) {
                     totalCompanyPay += p.netPay; const isSaved = paySlips.find(s => s.empId === emp.id && s.monthStr === monthStr);
                     let sTypeStr = p.salaryType === 'monthly'?'รายเดือน':p.salaryType === 'weekly'?'รายสัปดาห์':p.salaryType==='daily'?'รายวัน':'รายชั่วโมง';
-                    let btnHTML = isSaved ? `<button onclick="viewSlip(${isSaved.id})" class="w-full mt-3 bg-gray-200 text-gray-700 font-bold py-2 rounded-lg border-2 border-gray-300 text-sm active:scale-95"><i class="fa-solid fa-eye"></i> ดูสลิปที่บันทึกแล้ว</button>` : `<button onclick="savePaySlip(${emp.id}, '${monthStr}')" class="w-full mt-3 bg-[#111827] text-white font-bold py-2 rounded-lg text-sm active:scale-95 transition-transform"><i class="fa-solid fa-file-invoice"></i> ออกสลิปและบันทึก</button>`;
-                    html += `<div class="bg-white p-4 rounded-xl neo-border neo-shadow-sm"><div class="flex justify-between items-start mb-3"><div class="flex items-center gap-3"><img src="${p.avatar}" class="w-10 h-10 rounded-full border border-gray-300 shrink-0"><div class="min-w-0"><h4 class="font-extrabold text-[#111827] leading-tight truncate">${p.name}</h4><p class="text-[10px] font-bold text-gray-500">${sTypeStr}</p></div></div><div class="text-right shrink-0"><p class="font-extrabold text-lg text-green-600">${formatMoney(p.netPay)} ฿</p></div></div><div class="flex justify-between text-xs text-gray-600 bg-gray-50 p-2 rounded-lg border border-gray-200"><span>ทำงาน: <span class="font-bold text-[#111827]">${p.daysWorked} วัน</span></span><span>OT: <span class="font-bold text-[#111827]">${p.otHours.toFixed(1)} ชม.</span></span></div>${btnHTML}</div>`;
+                    let btnHTML = isSaved ? `<button onclick="viewSlip(${isSaved.id})" class="w-full mt-4 bg-gray-100 hover:bg-gray-200 text-[#111827] font-bold py-3 rounded-xl border-[3px] border-[#111827] text-sm md:text-base active:scale-95 transition-all"><i class="fa-solid fa-eye mr-2"></i> ดูสลิป</button>` : `<button onclick="savePaySlip(${emp.id}, '${monthStr}')" class="w-full mt-4 bg-[#111827] text-white font-bold py-3 rounded-xl border-[3px] border-[#111827] shadow-[2px_2px_0px_#111827] text-sm md:text-base active:scale-95 active:shadow-none transition-all"><i class="fa-solid fa-file-invoice mr-2"></i> ออกสลิปและบันทึก</button>`;
+                    html += `<div class="bg-white p-5 rounded-2xl border-[3px] border-[#111827] shadow-[4px_4px_0px_#111827] flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="flex items-center gap-3">
+                                    <img src="${p.avatar}" class="w-12 h-12 rounded-full border-2 border-[#111827] bg-gray-100 shrink-0">
+                                    <div class="min-w-0">
+                                        <h4 class="font-extrabold text-[#111827] text-base md:text-lg leading-tight truncate">${p.name}</h4>
+                                        <p class="text-[10px] md:text-xs font-bold text-gray-500 mt-1 bg-gray-100 px-2 py-0.5 rounded inline-block">${sTypeStr}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right shrink-0">
+                                    <p class="font-extrabold text-xl md:text-2xl text-[#111827]">${formatMoney(p.netPay)} <span class="text-sm">฿</span></p>
+                                </div>
+                            </div>
+                            <div class="flex justify-between text-xs md:text-sm text-gray-600 bg-gray-50 p-3 rounded-xl border border-gray-200">
+                                <span>วันทำงาน: <span class="font-bold text-[#111827]">${p.daysWorked} วัน</span></span>
+                                <span>เวลา OT: <span class="font-bold text-[#111827]">${p.otHours.toFixed(1)} ชม.</span></span>
+                            </div>
+                        </div>
+                        ${btnHTML}
+                    </div>`;
                 }
             });
-            if(html === '') html = '<div class="text-center font-bold text-gray-400 py-10 bg-white rounded-xl border-dashed border-2 neo-border">ไม่มีข้อมูลพนักงาน</div>';
-            else html = `<div class="bg-green-100 p-4 rounded-xl border-2 border-green-600 mb-4 flex justify-between items-center shadow-[2px_2px_0px_#16a34a]"><span class="font-extrabold text-green-900">ยอดรวมเดือนนี้</span><span class="text-2xl font-extrabold text-green-700">${formatMoney(totalCompanyPay)} ฿</span></div>` + html;
-            container.innerHTML = html;
+
+            if(html === '') {
+                container.innerHTML = '<div class="text-center font-bold text-gray-400 py-10 bg-white rounded-2xl border-dashed border-[3px] border-gray-300">ไม่มีข้อมูลการทำงานในเดือนนี้</div>';
+            } else {
+                container.innerHTML = `
+                    <div class="bg-[#4ade80] p-5 rounded-2xl border-[3px] border-[#111827] mb-6 flex justify-between items-center shadow-[6px_6px_0px_#111827]">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center border-2 border-[#111827]"><i class="fa-solid fa-sack-dollar text-[#111827]"></i></div>
+                            <span class="font-extrabold text-[#111827] text-lg md:text-xl">ยอดจ่ายรวมเดือนนี้</span>
+                        </div>
+                        <span class="text-2xl md:text-4xl font-extrabold text-[#111827]">${formatMoney(totalCompanyPay)} ฿</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        ${html}
+                    </div>`;
+            }
         }
         function savePaySlip(empId, monthStr) { 
             const p = calculateEmployeePayroll(empId, monthStr); 
@@ -1096,7 +1278,7 @@
         }
         function viewSlip(slipId) {
             const s = paySlips.find(x => x.id === slipId); if(!s) return;
-            document.getElementById('slip-month-year').innerText = "ประจำเดือน " + s.monthLabel; document.getElementById('slip-emp-name').innerText = s.name; document.getElementById('slip-emp-pos').innerText = s.position; document.getElementById('slip-base-label').innerText = s.salaryType === 'monthly' ? 'เงินเดือนพื้นฐาน' : s.salaryType === 'weekly' ? 'ค่าจ้างรายสัปดาห์' : s.salaryType === 'daily' ? 'ค่าจ้างรายวัน' : 'ค่าจ้างรายชั่วโมง'; document.getElementById('slip-base-amount').innerText = formatMoney(s.basePay) + " ฿"; document.getElementById('slip-ot-hrs').innerText = `(${s.otHours.toFixed(1)} ชม.)`; document.getElementById('slip-ot-amount').innerText = formatMoney(s.otPay) + " ฿"; document.getElementById('slip-work-summary').innerText = `ทำ ${s.daysWorked} วัน`; document.getElementById('slip-net-total').innerText = formatMoney(s.netPay) + " ฿";
+            document.getElementById('slip-month-year').innerText = "ประจำเดือน " + s.monthLabel; document.getElementById('slip-emp-name').innerText = s.name; document.getElementById('slip-emp-pos').innerText = s.position; document.getElementById('slip-base-label').innerText = s.salaryType === 'monthly' ? 'เงินเดือนพื้นฐาน' : s.salaryType === 'weekly' ? 'ค่าจ้างรายสัปดาห์' : s.salaryType === 'daily' ? 'ค่าจ้างรายวัน' : 'ค่าจ้างรายชั่วโมง'; document.getElementById('slip-base-amount').innerText = formatMoney(s.basePay) + " ฿"; document.getElementById('slip-ot-hrs').innerText = `(${s.otHours.toFixed(1)} ชม.)`; document.getElementById('slip-ot-amount').innerText = formatMoney(s.otPay) + " ฿"; document.getElementById('slip-work-summary').innerText = `สรุปวันทำจริง: ${s.daysWorked} วัน`; document.getElementById('slip-net-total').innerText = formatMoney(s.netPay) + " ฿";
             document.getElementById('modal-payslip').classList.remove('hidden'); setTimeout(() => document.getElementById('modal-payslip-content').classList.remove('scale-95', 'opacity-0'), 10);
         }
         function closePaySlipModal() { document.getElementById('modal-payslip-content').classList.add('scale-95', 'opacity-0'); setTimeout(() => document.getElementById('modal-payslip').classList.add('hidden'), 300); }
