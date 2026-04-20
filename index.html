@@ -80,6 +80,13 @@
 
     <div class="w-full max-w-md h-full bg-[#f4f4f5] relative overflow-hidden flex flex-col shadow-2xl neo-border border-y-0 sm:border-y-3">
         
+        <!-- ================= หน้าจอโหลดข้อมูล (เพิ่มใหม่) ================= -->
+        <div id="loading-overlay" class="absolute inset-0 z-[100] bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center hidden transition-opacity">
+            <i class="fa-solid fa-circle-notch fa-spin text-5xl text-[#111827] mb-4"></i>
+            <h2 class="text-xl font-extrabold text-[#111827]">กำลังซิงค์ข้อมูล...</h2>
+            <p class="text-xs font-bold text-gray-500 mt-2">Connecting to Cloud</p>
+        </div>
+
         <!-- ================= Screen 1: เลือกบทบาท ================= -->
         <div id="screen-role" class="absolute inset-0 z-[50] bg-[#ffde59] flex flex-col items-center justify-center p-6 transition-transform duration-300 overflow-y-auto hide-scrollbar">
             <div class="w-full max-w-xs text-center mb-8 mt-10">
@@ -407,22 +414,105 @@
         document.getElementById('manifest-link').href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/json' }));
 
         const MASTER_OWNER_PIN = "9999";
+        
+        // --- ตั้งค่า Google Sheets API ---
+        // นำ Web App URL ที่ได้จาก Google Apps Script มาใส่ที่นี่
+        const GAS_URL = "YOUR_WEB_APP_URL_HERE"; 
+        
         let employees = [], timeLogs = [], requests = [], paySlips = []; 
 
-        function loadData() {
-            const e = localStorage.getItem('tt_emps_v10'), l = localStorage.getItem('tt_logs_v10'), r = localStorage.getItem('tt_reqs_v10'), p = localStorage.getItem('tt_slips_v10');
-            if (e) employees = JSON.parse(e);
-            else {
-                employees = [
-                    { id: 1, name: 'สมชาย ใจดี', position: 'ผู้จัดการสาขา', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Somchai&backgroundColor=b6e3f4', pin: '1234', workConfig: { workDays: [1,2,3,4,5,6], startTime: '09:00', endTime: '18:00', allowOT: true }, payrollConfig: { salaryType: 'monthly', baseRate: 15000, otRate: 60 } },
-                    { id: 2, name: 'สมหญิง รักดี', position: 'พนักงานขาย', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Somying&backgroundColor=ffdfbf', pin: '1234', workConfig: { workDays: [1,2,3,4,5,6], startTime: '08:30', endTime: '17:30', allowOT: true }, payrollConfig: { salaryType: 'weekly', baseRate: 2500, otRate: 50 } },
-                    { id: 3, name: 'มานะ อดทน', position: 'พาร์ทไทม์', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mana&backgroundColor=c0aede', pin: '1234', workConfig: { workDays: [1,3,5], startTime: '10:00', endTime: '15:00', allowOT: false }, payrollConfig: { salaryType: 'hourly', baseRate: 50, otRate: 0 } }
-                ];
-                createMockLogsForPayroll(); saveData();
-            }
-            if (l) timeLogs = JSON.parse(l); if (r) requests = JSON.parse(r); if (p) paySlips = JSON.parse(p);
+        function showLoading(show) {
+            const el = document.getElementById('loading-overlay');
+            if(show) el.classList.remove('hidden');
+            else el.classList.add('hidden');
         }
-        function saveData() { localStorage.setItem('tt_emps_v10', JSON.stringify(employees)); localStorage.setItem('tt_logs_v10', JSON.stringify(timeLogs)); localStorage.setItem('tt_reqs_v10', JSON.stringify(requests)); localStorage.setItem('tt_slips_v10', JSON.stringify(paySlips)); }
+
+        async function loadData() {
+            showLoading(true);
+            try {
+                // ถ้ายังไม่ได้ใส่ URL หรือใช้ค่าเริ่มต้น ให้โหลดจากเครื่องตามปกติ
+                if (!GAS_URL || !GAS_URL.startsWith("http")) {
+                    loadLocalData();
+                    return;
+                }
+
+                // ดึงข้อมูลจาก Google Sheets
+                const response = await fetch(GAS_URL);
+                const data = await response.json();
+                
+                if (data.tt_emps_v10) {
+                    employees = JSON.parse(data.tt_emps_v10);
+                    timeLogs = data.tt_logs_v10 ? JSON.parse(data.tt_logs_v10) : [];
+                    requests = data.tt_reqs_v10 ? JSON.parse(data.tt_reqs_v10) : [];
+                    paySlips = data.tt_slips_v10 ? JSON.parse(data.tt_slips_v10) : [];
+                    saveLocalData(); // Backup ไว้ในเครื่องด้วยเพื่อให้โหลดไวในครั้งถัดไป
+                } else {
+                    // ถ้ายังไม่มีข้อมูลใน Sheet (รันครั้งแรก)
+                    initDefaultData();
+                }
+            } catch (error) {
+                console.error("Cloud load error:", error);
+                showToast("เชื่อมต่อฐานข้อมูลล้มเหลว ใช้ข้อมูลสำรองในเครื่อง", "warning");
+                loadLocalData();
+            } finally {
+                showLoading(false);
+                showScreen('screen-role'); // แสดงหน้าจอหลังจากโหลดเสร็จแล้ว
+            }
+        }
+
+        function loadLocalData() {
+            const e = localStorage.getItem('tt_emps_v10'), l = localStorage.getItem('tt_logs_v10'), r = localStorage.getItem('tt_reqs_v10'), p = localStorage.getItem('tt_slips_v10');
+            if (e) {
+                employees = JSON.parse(e);
+                if (l) timeLogs = JSON.parse(l); if (r) requests = JSON.parse(r); if (p) paySlips = JSON.parse(p);
+            } else {
+                initDefaultData();
+            }
+        }
+
+        function initDefaultData() {
+            employees = [
+                { id: 1, name: 'สมชาย ใจดี', position: 'ผู้จัดการสาขา', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Somchai&backgroundColor=b6e3f4', pin: '1234', workConfig: { workDays: [1,2,3,4,5,6], startTime: '09:00', endTime: '18:00', allowOT: true }, payrollConfig: { salaryType: 'monthly', baseRate: 15000, otRate: 60 } },
+                { id: 2, name: 'สมหญิง รักดี', position: 'พนักงานขาย', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Somying&backgroundColor=ffdfbf', pin: '1234', workConfig: { workDays: [1,2,3,4,5,6], startTime: '08:30', endTime: '17:30', allowOT: true }, payrollConfig: { salaryType: 'weekly', baseRate: 2500, otRate: 50 } },
+                { id: 3, name: 'มานะ อดทน', position: 'พาร์ทไทม์', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mana&backgroundColor=c0aede', pin: '1234', workConfig: { workDays: [1,3,5], startTime: '10:00', endTime: '15:00', allowOT: false }, payrollConfig: { salaryType: 'hourly', baseRate: 50, otRate: 0 } }
+            ];
+            createMockLogsForPayroll(); 
+            saveData();
+        }
+
+        function saveLocalData() {
+            localStorage.setItem('tt_emps_v10', JSON.stringify(employees)); 
+            localStorage.setItem('tt_logs_v10', JSON.stringify(timeLogs)); 
+            localStorage.setItem('tt_reqs_v10', JSON.stringify(requests)); 
+            localStorage.setItem('tt_slips_v10', JSON.stringify(paySlips));
+        }
+
+        async function saveData() { 
+            saveLocalData(); // บันทึกลงเครื่องทันทีเพื่อให้แอปทำงานไวและออฟไลน์ได้ระดับนึง
+
+            if (!GAS_URL || !GAS_URL.startsWith("http")) return;
+
+            const payload = {
+                tt_emps_v10: JSON.stringify(employees),
+                tt_logs_v10: JSON.stringify(timeLogs),
+                tt_reqs_v10: JSON.stringify(requests),
+                tt_slips_v10: JSON.stringify(paySlips)
+            };
+
+            try {
+                // อัปเดตข้อมูลขึ้น Google Sheets แบบ Background (ไม่ต้องรอก็ได้)
+                fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                    // ใช้ text/plain เลี่ยงปัญหา CORS Preflight ใน Apps Script
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' } 
+                }).then(res => res.json()).then(res => {
+                    if(res.status !== "success") console.error("Cloud Save Warning:", res);
+                });
+            } catch (error) {
+                console.error("Cloud Save Failed:", error);
+            }
+        }
         
         // Smart Mock Data Creation based on current date
         function createMockLogsForPayroll() { 
@@ -1029,7 +1119,8 @@
             showToast('ระบบได้บันทึกรูปสลิปเงินเดือนเรียบร้อยแล้ว', 'success');
         }
 
-        loadData(); showScreen('screen-role');
+        // โหลดข้อมูล (ย้าย showScreen('screen-role') เข้าไปในฟังก์ชันโหลด เพื่อให้รอหน้าโหลดทำงานเสร็จก่อน)
+        loadData(); 
     </script>
 </body>
 </html>
