@@ -78,17 +78,14 @@
 </head>
 <body class="h-screen w-screen overflow-hidden flex justify-center items-center bg-gray-300 md:p-6 lg:p-10">
 
-    <!-- Responsive Main Container -->
     <div class="w-full h-full md:h-[95vh] md:max-w-4xl lg:max-w-6xl md:rounded-[2rem] bg-[#f4f4f5] relative overflow-hidden flex flex-col md:flex-row shadow-2xl md:border-[3px] border-[#111827]">
         
-        <!-- ================= หน้าจอโหลดข้อมูล ================= -->
         <div id="loading-overlay" class="absolute inset-0 z-[100] bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center hidden transition-opacity md:rounded-[2rem]">
             <i class="fa-solid fa-circle-notch fa-spin text-5xl text-[#111827] mb-4"></i>
             <h2 class="text-xl font-extrabold text-[#111827]">กำลังซิงค์ข้อมูล (Firebase)...</h2>
             <p class="text-xs font-bold text-gray-500 mt-2">Connecting to Realtime Cloud</p>
         </div>
 
-        <!-- ================= Screen 1: เลือกบทบาท ================= -->
         <div id="screen-role" class="absolute inset-0 z-[50] bg-[#ffde59] flex flex-col items-center justify-center p-6 transition-transform duration-300 overflow-y-auto hide-scrollbar md:rounded-[2rem]">
             <div class="w-full max-w-xs text-center mb-8 mt-10">
                 <div class="w-28 h-28 bg-white rounded-2xl flex items-center justify-center neo-border neo-shadow-sm mx-auto mb-6 transform rotate-3">
@@ -110,7 +107,6 @@
             </p>
         </div>
 
-        <!-- ================= Screen 1.5: เลือกชื่อ ================= -->
         <div id="screen-select-emp" class="absolute inset-0 z-[60] bg-[#f4f4f5] flex flex-col hidden transition-transform duration-300 transform translate-x-full md:rounded-[2rem]">
             <div class="bg-[#38bdf8] px-6 pb-6 pt-header md:pt-10 rounded-b-[2rem] neo-border border-t-0 neo-shadow-sm shrink-0 flex justify-center">
                 <div class="w-full max-w-2xl flex items-center gap-4">
@@ -121,7 +117,6 @@
             <div class="flex-1 overflow-y-auto hide-scrollbar p-6 flex justify-center"><div id="emp-selection-list" class="w-full max-w-2xl grid grid-cols-1 md:grid-cols-2 gap-4 pb-10 content-start"></div></div>
         </div>
 
-        <!-- ================= Screen 1.8: PIN Pad ================= -->
         <div id="screen-pin" class="absolute inset-0 z-[70] bg-[#111827] flex flex-col hidden transition-transform duration-300 transform translate-y-full md:rounded-[2rem]">
             <div class="flex items-center px-6 pt-header md:pt-8 pb-2 shrink-0">
                 <button onclick="backFromPin()" class="w-12 h-12 bg-gray-800 text-white rounded-full flex items-center justify-center border-2 border-gray-600 hover:bg-gray-700 active:bg-gray-600 transition-colors"><i class="fa-solid fa-arrow-left text-xl"></i></button>
@@ -147,10 +142,8 @@
             </div>
         </div>
 
-        <!-- ================= Screen 2: ฝั่งพนักงาน ================= -->
         <div id="screen-employee" class="absolute inset-0 bg-[#f4f4f5] flex flex-col md:flex-row hidden md:rounded-[2rem]">
             
-            <!-- Navbar: Mobile = Bottom, Desktop = Left Sidebar -->
             <div class="order-2 md:order-1 shrink-0 w-full md:w-24 lg:w-56 bg-white neo-border border-b-0 border-x-0 md:border-t-0 md:border-b-0 md:border-r-[3px] flex flex-row md:flex-col pt-2 md:pt-8 pb-nav md:pb-8 z-20">
                 <div class="hidden md:flex flex-col items-center mb-8 lg:px-4">
                     <div class="w-12 h-12 bg-[#111827] text-white rounded-xl neo-border flex items-center justify-center mb-2"><i class="fa-solid fa-clock text-2xl"></i></div>
@@ -164,10 +157,8 @@
                 <button onclick="logout()" class="flex-[0.5] md:w-full md:flex-none flex flex-col lg:flex-row items-center justify-center lg:justify-start text-red-500 bg-red-50 py-2 md:py-4 lg:px-6 hover:bg-red-100 transition-colors md:mt-auto md:border-t-[3px] border-[#111827]"><i class="fa-solid fa-power-off text-xl lg:text-2xl mb-1 lg:mb-0 lg:mr-3"></i><span class="text-[10px] lg:text-sm font-bold hidden lg:block">ออกจากระบบ</span></button>
             </div>
 
-            <!-- Content Area -->
             <div class="order-1 md:order-2 flex-1 overflow-y-auto hide-scrollbar relative bg-[#f4f4f5]">
                 
-                <!-- Tab: ลงเวลา -->
                 <div id="emp-tab-time" class="flex flex-col min-h-full">
                     <div class="bg-[#c084fc] px-6 md:px-10 pt-header md:pt-12 pb-10 md:pb-16 rounded-b-[2.5rem] neo-border border-t-0 md:border-t-[3px] md:border-x-0 md:rounded-t-[2rem] neo-shadow-sm shrink-0 md:mx-6 md:mt-6">
                         <div class="flex justify-between items-center mb-6">
@@ -196,7 +187,6 @@
                     </div>
                 </div>
                 
-                <!-- Tab: คำขอ -->
                 <div id="emp-tab-leave" class="flex flex-col min-h-full hidden">
                     <div class="px-6 md:px-10 pt-header md:pt-10 pb-4 shrink-0"><h2 class="text-3xl md:text-4xl font-extrabold text-[#111827]">วันหยุด/การลา</h2></div>
                     <div class="px-6 md:px-10 flex flex-col sm:flex-row gap-4 mb-6 shrink-0">
@@ -206,7 +196,6 @@
                     <div class="px-6 md:px-10 pb-6 md:pb-10"><h3 class="font-bold text-lg md:text-xl mb-4 text-[#111827]">ประวัติคำขอ</h3><div id="emp-leave-history" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div></div>
                 </div>
 
-                <!-- Tab: เงินเดือน -->
                 <div id="emp-tab-payroll" class="flex flex-col min-h-full hidden">
                     <div class="px-6 md:px-10 pt-header md:pt-10 pb-6 shrink-0"><h2 class="text-3xl md:text-4xl font-extrabold text-[#111827] mb-1">สลิปเงินเดือน</h2><p class="text-gray-500 font-bold text-sm md:text-base">ประวัติรายรับของคุณ</p></div>
                     <div class="px-6 md:px-10 pb-6 md:pb-10"><div id="emp-payslip-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"></div></div>
@@ -214,10 +203,8 @@
             </div>
         </div>
 
-        <!-- ================= Screen 3: ฝั่งเจ้าของร้าน ================= -->
         <div id="screen-owner" class="absolute inset-0 bg-[#f4f4f5] flex flex-col md:flex-row hidden md:rounded-[2rem]">
             
-            <!-- Navbar: Mobile = Bottom, Desktop = Left Sidebar -->
             <div class="order-2 md:order-1 shrink-0 w-full md:w-24 lg:w-56 bg-white neo-border border-b-0 border-x-0 md:border-t-0 md:border-b-0 md:border-r-[3px] flex flex-row md:flex-col pt-2 md:pt-8 pb-nav md:pb-8 z-20">
                 <div class="hidden md:flex flex-col items-center mb-8 lg:px-4">
                     <div class="w-12 h-12 bg-[#fb923c] text-[#111827] rounded-xl neo-border flex items-center justify-center mb-2"><i class="fa-solid fa-store text-2xl"></i></div>
@@ -232,10 +219,8 @@
                 <button onclick="logout()" class="flex-[0.6] md:w-full md:flex-none flex flex-col lg:flex-row items-center justify-center lg:justify-start text-red-500 bg-red-50 py-2 md:py-4 lg:px-6 hover:bg-red-100 transition-colors md:mt-auto md:border-t-[3px] border-[#111827]"><i class="fa-solid fa-power-off text-xl lg:text-2xl mb-1 lg:mb-0 lg:mr-3"></i><span class="text-[9px] lg:text-sm font-bold hidden lg:block">ออก</span></button>
             </div>
 
-            <!-- Content Area -->
             <div class="order-1 md:order-2 flex-1 overflow-y-auto hide-scrollbar relative bg-[#f4f4f5]">
                 
-                <!-- Tab: แดชบอร์ด -->
                 <div id="owner-tab-dashboard" class="flex flex-col min-h-full">
                     <div class="bg-[#fb923c] px-6 md:px-10 pt-header md:pt-10 pb-8 md:pb-12 rounded-b-[2.5rem] neo-border border-t-0 md:border-t-[3px] md:border-x-0 md:rounded-t-[2rem] neo-shadow-sm shrink-0 md:mx-6 md:mt-6">
                         <div class="flex justify-between items-center mb-6 md:mb-8">
@@ -248,7 +233,6 @@
                             </div>
                         </div>
                         
-                        <!-- Grid Cards Responsive -->
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
                             <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 neo-border shadow-[4px_4px_0px_#111827] flex flex-col justify-center transform hover:-translate-y-1 transition-transform">
                                 <p class="text-[10px] md:text-xs font-extrabold text-gray-500 uppercase tracking-wide">พนักงานทั้งหมด</p>
@@ -272,7 +256,6 @@
                     <div class="p-6 md:px-10 pb-6 md:pb-10 space-y-6 md:space-y-8 mt-2 md:mt-4">
                         <div id="dashboard-alerts"></div>
 
-                        <!-- 2 Columns on Desktop -->
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
                             <div>
                                 <h3 class="font-bold text-lg md:text-xl mb-4 text-[#111827] flex items-center gap-2"><div class="w-8 h-8 md:w-10 md:h-10 bg-white rounded-lg neo-border flex justify-center items-center"><i class="fa-solid fa-bolt text-yellow-500"></i></div> ความเคลื่อนไหวล่าสุด</h3>
@@ -287,7 +270,6 @@
                     </div>
                 </div>
 
-                <!-- Tab: พนักงาน -->
                 <div id="owner-tab-employees" class="flex flex-col min-h-full hidden">
                     <div class="px-6 md:px-10 pt-header md:pt-10 pb-4 shrink-0 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                         <h2 class="text-3xl md:text-4xl font-extrabold text-[#111827]">พนักงาน</h2>
@@ -301,36 +283,28 @@
                         </div>
                     </div>
 
-                    <!-- Responsive Grid for Employees -->
                     <div class="px-6 md:px-10 pb-6 md:pb-10"><div id="owner-employee-management-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 mt-2"></div></div>
                 </div>
 
-                <!-- Tab: คำขอ -->
                 <div id="owner-tab-leave" class="flex flex-col min-h-full hidden">
                     <div class="px-6 md:px-10 pt-header md:pt-10 pb-6 shrink-0 flex items-center gap-4">
                         <h2 class="text-3xl md:text-4xl font-extrabold text-[#111827]">กล่องข้อความ</h2>
                         <span class="bg-yellow-300 text-[#111827] px-3 py-1 rounded-full text-xs md:text-sm font-bold neo-border shadow-[2px_2px_0px_#111827]">รอตรวจสอบ <span id="badge-pending" class="ml-1 bg-white px-1.5 rounded-full">0</span></span>
                     </div>
-                    <!-- Responsive Grid for Inbox -->
                     <div class="px-6 md:px-10 pb-6 md:pb-10"><div id="owner-leave-list" class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5"></div></div>
                 </div>
 
-                <!-- Tab: เงินเดือน -->
                 <div id="owner-tab-payroll" class="flex flex-col min-h-full hidden">
                     <div class="px-6 md:px-10 pt-header md:pt-10 pb-6 shrink-0 flex justify-between items-end">
                         <h2 class="text-3xl md:text-4xl font-extrabold text-[#111827]">ระบบเงินเดือน</h2>
                         <div class="flex flex-col"><label class="text-[10px] font-bold mb-1 text-gray-500">เลือกเดือน</label><input type="month" id="payroll-month" class="neo-input bg-white py-2 text-sm md:text-base border-[3px]" onchange="renderOwnerPayroll()"></div>
                     </div>
                     <div class="px-6 md:px-10 pb-6 md:pb-10" id="owner-payroll-container">
-                        <!-- Content rendered by JS -->
-                    </div>
+                        </div>
                 </div>
             </div>
         </div>
 
-        <!-- ================= MODALS (Responsive) ================= -->
-        
-        <!-- Modal: เพิ่ม/แก้ไขพนักงาน -->
         <div id="modal-employee" class="absolute inset-0 z-[60] modal-backdrop flex items-end md:items-center justify-center hidden pt-modal md:p-6 transition-opacity">
             <div class="bg-white w-full md:max-w-3xl lg:max-w-4xl rounded-t-[2rem] md:rounded-[2rem] neo-border border-b-0 border-x-0 md:border-[3px] transform transition-transform duration-300 translate-y-full flex flex-col max-h-[85vh] md:max-h-[90vh]" id="modal-employee-content">
                 <div class="flex justify-between items-center p-6 pb-4 border-b-2 border-dashed border-gray-300 shrink-0">
@@ -339,9 +313,7 @@
                 <div class="overflow-y-auto hide-scrollbar p-6 flex-1 bg-gray-50/50">
                     <form id="form-employee" class="space-y-5">
                         <input type="hidden" id="emp-id-input">
-                        <!-- Desktop Split Grid -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
-                            <!-- Col 1 -->
                             <div class="space-y-5">
                                 <div class="bg-white p-5 rounded-2xl border-[3px] border-gray-200 shadow-sm space-y-4">
                                     <h4 class="font-extrabold text-[#111827] text-sm md:text-base border-b-2 border-gray-100 pb-2"><i class="fa-solid fa-user text-blue-500 mr-1"></i> ข้อมูลพื้นฐาน</h4>
@@ -355,7 +327,6 @@
                                     <div class="flex gap-4"><div class="flex-1"><label class="text-xs md:text-sm font-bold mb-1 block text-gray-600">เวลาเข้า</label><input type="time" id="emp-start-time" class="neo-input bg-gray-50 focus:bg-white text-sm" required></div><div class="flex-1"><label class="text-xs md:text-sm font-bold mb-1 block text-gray-600">เวลาออก</label><input type="time" id="emp-end-time" class="neo-input bg-gray-50 focus:bg-white text-sm" required></div></div>
                                 </div>
                             </div>
-                            <!-- Col 2 -->
                             <div class="space-y-5">
                                 <div class="bg-white p-5 rounded-2xl border-[3px] border-green-400 shadow-[4px_4px_0px_#4ade80] space-y-4">
                                     <h4 class="font-extrabold text-green-800 text-sm md:text-base border-b-2 border-green-100 pb-2"><i class="fa-solid fa-money-bill-wave text-green-500 mr-1"></i> ค่าจ้าง & เงินเดือน</h4>
@@ -385,7 +356,6 @@
             </div>
         </div>
 
-        <!-- Modal: แบบฟอร์มขอลา -->
         <div id="modal-leave" class="absolute inset-0 z-[60] modal-backdrop flex items-end md:items-center justify-center hidden pt-modal md:p-6 transition-opacity">
             <div class="bg-white w-full md:max-w-lg rounded-t-[2rem] md:rounded-[2rem] p-0 neo-border border-b-0 border-x-0 md:border-[3px] transform transition-transform duration-300 translate-y-full flex flex-col max-h-[85vh]" id="modal-leave-content">
                 <div class="flex justify-between items-center p-6 pb-4 border-b-2 border-dashed border-gray-200 shrink-0"><h3 class="text-2xl font-extrabold text-[#111827]">แบบฟอร์มขอลาหยุด</h3><button onclick="closeLeaveModal()" class="w-10 h-10 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center font-bold text-xl transition-colors">X</button></div>
@@ -406,7 +376,6 @@
             </div>
         </div>
 
-        <!-- Modal: สลับวันหยุด -->
         <div id="modal-swap" class="absolute inset-0 z-[60] modal-backdrop flex items-end md:items-center justify-center hidden pt-modal md:p-6 transition-opacity">
             <div class="bg-white w-full md:max-w-lg rounded-t-[2rem] md:rounded-[2rem] p-0 neo-border border-b-0 border-x-0 md:border-[3px] transform transition-transform duration-300 translate-y-full flex flex-col max-h-[85vh]" id="modal-swap-content">
                 <div class="flex justify-between items-center p-6 pb-4 border-b-2 border-dashed border-gray-200 shrink-0"><div><h3 class="text-2xl font-extrabold text-[#111827]">แบบฟอร์มสลับกะ</h3></div><button type="button" onclick="closeSwapModal()" class="w-10 h-10 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center font-bold text-xl transition-colors">X</button></div>
@@ -414,14 +383,12 @@
                     <form id="form-swap" class="space-y-6">
                         <div class="bg-[#ffde59] p-4 rounded-xl border-[3px] border-[#111827] shadow-[4px_4px_0px_#111827]"><label class="text-sm font-extrabold text-[#111827] mb-2 block"><i class="fa-solid fa-sliders mr-1"></i> รูปแบบการสลับ</label><select id="swap-type-select" class="neo-input bg-white border-[#111827]" onchange="toggleSwapMode()"><option value="self">สลับวันหยุดของตัวเอง (ไม่กระทบคนอื่น)</option><option value="coworker">แลกเวรกับเพื่อนร่วมงาน (2 คน)</option></select></div>
                         
-                        <!-- โหมดสลับตัวเอง -->
                         <div id="swap-mode-self" class="space-y-4 bg-gray-50 p-5 rounded-2xl border-2 border-gray-200">
                             <div class="bg-red-50 p-4 rounded-xl border-[3px] border-red-300"><label class="text-sm font-bold text-red-700 block mb-2"><i class="fa-solid fa-calendar-xmark mr-1"></i> วันหยุดเดิม (จะมาทำแทน)</label><input type="date" id="swap-original" class="neo-input bg-white border-red-400"></div>
                             <div class="flex justify-center -my-5 relative z-10"><div class="bg-[#111827] text-white w-10 h-10 rounded-full flex items-center justify-center neo-border shadow-md"><i class="fa-solid fa-arrow-down text-lg"></i></div></div>
                             <div class="bg-blue-50 p-4 rounded-xl border-[3px] border-blue-300"><label class="text-sm font-bold text-blue-700 block mb-2"><i class="fa-solid fa-calendar-check mr-1"></i> วันที่ขอหยุดชดเชย</label><input type="date" id="swap-new" class="neo-input bg-white border-blue-400"></div>
                         </div>
 
-                        <!-- โหมดแลกเวร -->
                         <div id="swap-mode-coworker" class="space-y-4 hidden bg-gray-50 p-5 rounded-2xl border-2 border-gray-200">
                             <div class="bg-purple-50 p-4 rounded-xl border-[3px] border-purple-300">
                                 <label class="text-sm font-bold text-purple-800 block mb-2"><i class="fa-solid fa-user-group mr-1"></i> เลือกเพื่อนที่จะแลกด้วย</label>
@@ -441,7 +408,6 @@
             </div>
         </div>
 
-        <!-- Modal: รีวิวคำขอ (Owner) -->
         <div id="modal-review" class="absolute inset-0 z-[60] modal-backdrop flex items-center justify-center hidden p-4 md:p-6 transition-opacity">
             <div class="bg-white w-full max-w-sm md:max-w-md rounded-2xl p-0 neo-border neo-shadow transform transition-transform duration-300 scale-95 opacity-0 flex flex-col max-h-[85vh]" id="modal-review-content">
                 <div class="flex items-center gap-4 p-6 pb-4 border-b-2 border-dashed border-gray-200 shrink-0"><div id="rev-icon-bg" class="w-12 h-12 rounded-xl flex items-center justify-center neo-border text-2xl"><i id="rev-icon"></i></div><h3 class="text-2xl font-extrabold text-[#111827]" id="rev-modal-title">รายละเอียด</h3></div>
@@ -461,7 +427,6 @@
             </div>
         </div>
 
-        <!-- Modal: ยืนยัน (Confirm) -->
         <div id="modal-confirm" class="absolute inset-0 z-[80] modal-backdrop flex items-center justify-center hidden p-4 md:p-6 transition-opacity">
             <div class="bg-white w-full max-w-sm md:max-w-md rounded-2xl md:rounded-[2rem] p-6 md:p-8 neo-border neo-shadow text-center flex flex-col max-h-[85vh]">
                 <div class="overflow-y-auto hide-scrollbar flex-1 mb-6 md:mb-8">
@@ -478,7 +443,6 @@
             </div>
         </div>
 
-        <!-- Modal: สลิปเงินเดือน -->
         <div id="modal-payslip" class="absolute inset-0 z-[80] modal-backdrop flex items-center justify-center hidden p-4 md:p-6 transition-opacity">
             <div class="bg-white w-full max-w-sm md:max-w-md rounded-xl md:rounded-2xl p-0 neo-border neo-shadow transform transition-transform duration-300 scale-95 opacity-0 flex flex-col max-h-[90vh]" id="modal-payslip-content">
                 <div class="bg-[#111827] text-white p-5 md:p-6 rounded-t-lg md:rounded-t-xl text-center relative shrink-0 no-print">
@@ -508,7 +472,6 @@
             </div>
         </div>
 
-        <!-- Toast Notification -->
         <div id="toast" class="absolute top-[env(safe-area-inset-top,20px)] left-1/2 transform -translate-x-1/2 px-6 py-4 rounded-xl font-bold shadow-2xl neo-border z-[100] hidden flex items-center gap-3 w-auto max-w-[90%] transition-all">
             <i id="toast-icon" class="mt-0.5 shrink-0 text-2xl"></i>
             <span id="toast-msg" class="break-words text-sm md:text-base leading-snug"></span>
@@ -516,7 +479,6 @@
 
     </div>
 
-    <!-- Core Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -560,7 +522,7 @@
             else el.classList.add('hidden');
         }
 
-        // 1. Initialise Firebase Auth
+        // 1. Initialise Firebase Auth (ปรับแก้ Error: custom-token-mismatch)
         const initAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -587,7 +549,6 @@
         });
 
         function setupRealtimeSync() {
-            // ใช้โครงสร้าง Path ตามกฏ (Rule 1): /artifacts/{appId}/public/data/{collectionName}/{documentId}
             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'timetrack_state', 'main');
             
             onSnapshot(docRef, (snapshot) => {
@@ -595,7 +556,6 @@
                     const data = snapshot.data();
                     let hasChanges = false;
                     
-                    // ป้องกันลูปการดึงข้อมูลที่เพิ่งส่งไปเอง
                     if (data.tt_emps_v10 && localStorage.getItem('tt_emps_v10') !== data.tt_emps_v10) {
                         employees = JSON.parse(data.tt_emps_v10); hasChanges = true;
                     }
@@ -614,7 +574,13 @@
                         refreshCurrentUI();
                     }
                 } else {
-                    if (isFirstLoad) {
+                    // --- แก้ไขตรงนี้: ตรวจสอบข้อมูลในเครื่องก่อนโหลดค่าเริ่มต้นทับ ---
+                    const localEmps = localStorage.getItem('tt_emps_v10');
+                    if (localEmps && localEmps !== "[]") {
+                        console.log("Cloud empty, loading from LocalStorage and pushing to Cloud...");
+                        loadLocalData();
+                        saveData(); // ดันข้อมูลที่มีในเครื่องขึ้น Cloud
+                    } else if (isFirstLoad) {
                         initDefaultData();
                     }
                 }
@@ -679,11 +645,11 @@
             };
 
             try {
-                // บันทึกผ่าน Firestore (รอการตรวจสอบเพื่อซิงค์ไปยังเครื่องอื่น)
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'timetrack_state', 'main');
                 await setDoc(docRef, payload);
             } catch (error) {
-                console.error("Firebase Cloud Save Failed:", error);
+                console.error("Firebase Cloud Save Failed (Check Firestore Rules!):", error);
+                showToast("ไม่สามารถบันทึกขึ้น Cloud ได้ (กรุณาเช็ค Rules)", "error");
             }
         }
         
@@ -1135,13 +1101,6 @@
                 }).join('');
             }
         }
-        function updateOwnerBadge() { 
-    const p = requests.filter(l => l.status === 'pending').length; 
-    document.getElementById('badge-pending').innerText = p; 
-    const d = document.getElementById('dot-pending-leave'); 
-    if(p > 0) d.classList.remove('hidden'); 
-    else d.classList.add('hidden'); 
-}
 
         function updateSalaryUnit() { const type = document.getElementById('emp-salary-type').value; const label = document.getElementById('salary-unit-text'); const input = document.getElementById('emp-base-rate'); if(type === 'monthly') { label.innerText = '(฿/เดือน)'; input.placeholder = 'เช่น 15000'; } else if(type === 'weekly') { label.innerText = '(฿/สัปดาห์)'; input.placeholder = 'เช่น 3500'; } else if(type === 'daily') { label.innerText = '(฿/วัน)'; input.placeholder = 'เช่น 500'; } else if(type === 'hourly') { label.innerText = '(฿/ชม.)'; input.placeholder = 'เช่น 60'; } }
 
