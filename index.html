@@ -12,12 +12,12 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <!-- Google Fonts: Space Grotesk for a geometric, modern 3D UI feel -->
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
         /* Native App Feel Resets */
         body {
-            font-family: 'Space Grotesk', sans-serif;
+            font-family: 'Space Grotesk', 'Noto Sans Thai', sans-serif;
             background-color: #f0fdf4;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
@@ -99,9 +99,6 @@
         .toggle-checkbox:checked + .toggle-label { background-color: #4ade80; }
         .toggle-label { transition: background-color 0.2s; border: 2px solid #1f2937; box-shadow: 2px 2px 0px #1f2937; }
         .toggle-checkbox { right: 0; z-index: 1; border: 2px solid #1f2937; }
-        
-        /* Task checkbox */
-        .task-checkbox.checked { background-color: #1f2937; color: white; }
     </style>
 </head>
 <body class="text-gray-800 flex items-center justify-center min-h-screen">
@@ -109,7 +106,13 @@
     <div id="app-container">
         <!-- Top Header -->
         <header id="app-header" class="px-6 pt-12 pb-4 bg-white border-b-2 border-gray-800 z-10 flex justify-between items-center shadow-sm">
-            <h1 class="text-xl font-bold tracking-tight" id="header-title">WorkFlow</h1>
+            <div class="flex items-center gap-3">
+                <h1 class="text-xl font-bold tracking-tight" id="header-title">WorkFlow</h1>
+                <!-- Language Swap Button -->
+                <button onclick="App.toggleLanguage()" class="btn-sm-3d px-2 py-0.5 text-[10px] bg-gray-100 font-bold flex items-center gap-1 hover:bg-gray-200">
+                    <i class="ph-bold ph-translate"></i> <span id="lang-indicator">EN</span>
+                </button>
+            </div>
             <div id="header-profile" class="hidden h-10 w-10 rounded-full border-2 border-gray-800 flex items-center justify-center font-bold text-lg shadow-[2px_2px_0_0_#1f2937] cursor-pointer" onclick="App.logout()"></div>
         </header>
 
@@ -126,7 +129,190 @@
 
     <!-- APPLICATION LOGIC -->
     <script>
-        // 1. Database & State
+        // 1. Translations Dictionary (EN/TH)
+        const i18n = {
+            en: {
+                "login": "Login", "dashboard": "Dashboard", "my_portal": "My Portal", "app_settings": "App Settings",
+                "welcome": "Welcome to WorkFlow", "select_profile": "Select your profile to continue.",
+                "employee": "EMPLOYEE", "owner": "OWNER",
+                "hello": "Hello", "what_to_do": "What would you like to do today?",
+                "overview": "Overview", "live_office": "Live Office Status", "active": "Active", "offline": "Offline",
+                "floor_plan": "Floor Plan (Isometric)", "floor_plan_desc": "Green indicates clocked-in staff.",
+                "app_features": "App Features", "features_desc": "Turn modules on or off dynamically.",
+                "switch_user": "Switch User Profile", "home": "Home", "features": "Features",
+                
+                // Modules Base
+                "mod_time": "Time Clock", "mod_time_desc": "Allow employees to log work in and out times.",
+                "mod_tasks": "Tasks", "mod_tasks_desc": "Assign and track daily employee tasks.",
+                "mod_leave": "Time Off", "mod_leave_desc": "Manage employee leave and vacation requests.",
+                "mod_news": "Noticeboard", "mod_news_desc": "Broadcast important updates to all employees.",
+                "mod_exp": "Expenses", "mod_exp_desc": "Submit and approve reimbursement claims.",
+                "mod_kudos": "Shoutouts", "mod_kudos_desc": "Send public appreciation to your colleagues.",
+                "mod_mood": "Morale", "mod_mood_desc": "Track daily team wellbeing and mood.",
+                "mod_support": "Support", "mod_support_desc": "Submit maintenance or IT support tickets.",
+                "mod_ideas": "Ideas", "mod_ideas_desc": "Submit and vote on company improvements.",
+                "mod_polls": "Polls", "mod_polls_desc": "Create and vote on team surveys.",
+                "mod_events": "Events", "mod_events_desc": "Company calendar and event RSVPs.",
+                "mod_team": "Team", "mod_team_desc": "Company directory and contact roster.",
+                "mod_goals": "Goals", "mod_goals_desc": "Track company-wide targets and milestones.",
+
+                // Time Clock
+                "clocked_in": "Clocked In", "clocked_out": "Clocked Out", "btn_clock_in": "CLOCK IN", "btn_clock_out": "CLOCK OUT",
+                "time_logs": "Time Logs", "no_activity": "No activity.",
+
+                // Tasks
+                "your_tasks": "Your Tasks", "tap_complete": "Tap to mark as complete.", "done": "done",
+                "no_tasks": "No tasks assigned today!", "task_manager": "Task Manager", "no_tasks_found": "No tasks found.",
+                "new_task": "New task...",
+
+                // Time Off
+                "req_leave": "Request leave or vacation days.", "new_req": "New Request", "date": "Date", "reason": "Reason",
+                "submit_req": "Submit Request", "your_reqs": "Your Requests", "no_reqs": "No requests yet.",
+                "pending": "Pending", "approved": "Approved", "denied": "Denied", "leave_requests": "Leave Requests",
+                "all_caught_up": "All caught up!", "approve": "Approve", "deny": "Deny", "new": "New",
+
+                // Noticeboard
+                "company_news": "Company news and updates.", "no_news": "No new announcements.", "post_announcement": "Post Announcement",
+                "high_priority": "High Priority", "post": "Post", "announcement_title": "Announcement Title", "msg_details": "Message details...",
+
+                // Expenses
+                "submit_receipts": "Submit receipts for reimbursement.", "new_claim": "New Claim", "what_for": "What was this for?",
+                "submit_claim": "Submit Claim", "claim_history": "Claim History", "no_claims": "No claims submitted.",
+                "pending_expenses": "Pending Expenses", "pay": "Pay", "reject": "Reject",
+
+                // Kudos
+                "recognize_team": "Recognize your team for great work!", "send_shoutout": "Send a Shoutout", "select_coworker": "Select a coworker...",
+                "thanks_for": "Thanks for helping me with...", "send_kudos": "Send Kudos", "company_feed": "Company Feed",
+                "no_kudos": "No shoutouts yet. Be the first!", "recent_shoutouts": "Recent Shoutouts",
+
+                // Mood
+                "how_feeling": "How are you feeling today?", "great": "Great", "okay": "Okay", "rough": "Rough",
+                "mood_history": "Your Mood History", "no_mood": "No mood logged yet.", "team_morale": "Team Morale (Today)",
+                "emp_responded": "employees responded today",
+
+                // Support
+                "report_issue": "Report an issue or request help.", "new_ticket": "New Ticket", "desc_issue": "Describe the issue...",
+                "submit_ticket": "Submit Ticket", "your_tickets": "Your Tickets", "no_tickets": "No open tickets. Everything is working!",
+                "open_tickets": "Open Support Tickets", "action_needed": "Action Needed", "resolved": "Resolved", "open": "Open",
+
+                // Ideas
+                "suggest_vote": "Suggest and vote on improvements!", "share_idea": "Share an Idea", "idea_title": "Idea Title (e.g., Casual Fridays)",
+                "why_good": "Why is this a good idea?", "post_idea": "Post Idea", "top_suggestions": "Top Suggestions",
+                "no_ideas": "No open ideas. Be the first to suggest one!", "votes": "Votes", "innovation_board": "Innovation Board",
+                
+                // Polls
+                "have_say": "Have your say in company decisions.", "no_polls": "No active polls at the moment.", "votes_total": "votes total",
+                "live_polls": "Live Polls", "ask_team": "Ask the team a question...", "options_comma": "Options (comma separated)",
+                "create_poll": "Create Poll", "leading": "Leading", "none_yet": "None yet",
+
+                // Events
+                "see_whats_happening": "See what's happening and RSVP.", "no_events": "No upcoming events.", "people_going": "people going",
+                "attending": "Attending", "rsvp": "RSVP", "company_events": "Company Events", "event_name": "Event Name...",
+                "add_event": "Add Event",
+
+                // Directory
+                "contact_colleagues": "Contact your colleagues.", "call": "Call", "email": "Email", "team_management": "Team Management",
+                "total": "Total", "you_have": "You have", "active_emps": "active employees on your roster.", "invite_emp": "Invite New Employee",
+
+                // Goals
+                "track_progress": "Track our team's progress!", "no_goals": "No active goals right now.", "goal": "Goal",
+                "active_milestones": "Active Milestones", "new_goal_name": "New Goal Name...", "target": "Target...", "add_progress": "Add 10% Progress"
+            },
+            th: {
+                "login": "เข้าสู่ระบบ", "dashboard": "แดชบอร์ด", "my_portal": "พอร์ทัลของฉัน", "app_settings": "ตั้งค่าแอป",
+                "welcome": "ยินดีต้อนรับสู่ WorkFlow", "select_profile": "เลือกโปรไฟล์ของคุณเพื่อดำเนินการต่อ",
+                "employee": "พนักงาน", "owner": "เจ้าของ",
+                "hello": "สวัสดี", "what_to_do": "วันนี้คุณต้องการทำอะไร?",
+                "overview": "ภาพรวม", "live_office": "สถานะออฟฟิศสด", "active": "ออนไลน์", "offline": "ออฟไลน์",
+                "floor_plan": "แผนผังชั้น (Isometric)", "floor_plan_desc": "สีเขียวแสดงถึงพนักงานที่เข้างานแล้ว",
+                "app_features": "ฟีเจอร์ของแอป", "features_desc": "เปิดหรือปิดโมดูลแบบไดนามิก",
+                "switch_user": "สลับโปรไฟล์ผู้ใช้", "home": "หน้าแรก", "features": "ฟีเจอร์",
+                
+                // Modules Base
+                "mod_time": "บันทึกเวลา", "mod_time_desc": "ให้พนักงานบันทึกเวลาเข้า-ออกงาน",
+                "mod_tasks": "งาน", "mod_tasks_desc": "มอบหมายและติดตามงานประจำวัน",
+                "mod_leave": "ลางาน", "mod_leave_desc": "จัดการคำขอลางานและวันหยุดพักร้อน",
+                "mod_news": "ประกาศ", "mod_news_desc": "อัปเดตข่าวสารสำคัญให้พนักงานทุกคน",
+                "mod_exp": "เบิกจ่าย", "mod_exp_desc": "ส่งและอนุมัติการเบิกค่าใช้จ่าย",
+                "mod_kudos": "ชื่นชม", "mod_kudos_desc": "ส่งคำชื่นชมถึงเพื่อนร่วมงาน",
+                "mod_mood": "อารมณ์ทีม", "mod_mood_desc": "ติดตามความเป็นอยู่และอารมณ์ของทีม",
+                "mod_support": "ฝ่ายสนับสนุน", "mod_support_desc": "แจ้งซ่อมหรือขอความช่วยเหลือไอที",
+                "mod_ideas": "ไอเดีย", "mod_ideas_desc": "เสนอและโหวตการปรับปรุงบริษัท",
+                "mod_polls": "โพล", "mod_polls_desc": "สร้างและโหวตแบบสำรวจของทีม",
+                "mod_events": "กิจกรรม", "mod_events_desc": "ปฏิทินบริษัทและการตอบรับเข้าร่วม",
+                "mod_team": "รายชื่อ", "mod_team_desc": "รายชื่อและช่องทางติดต่อในบริษัท",
+                "mod_goals": "เป้าหมาย", "mod_goals_desc": "ติดตามเป้าหมายและความสำเร็จของบริษัท",
+
+                // Time Clock
+                "clocked_in": "เข้างานแล้ว", "clocked_out": "ออกงานแล้ว", "btn_clock_in": "เข้างาน", "btn_clock_out": "ออกงาน",
+                "time_logs": "บันทึกเวลา", "no_activity": "ไม่มีกิจกรรม",
+
+                // Tasks
+                "your_tasks": "งานของคุณ", "tap_complete": "แตะเพื่อทำเครื่องหมายว่าเสร็จสิ้น", "done": "เสร็จ",
+                "no_tasks": "ไม่มีงานที่ได้รับมอบหมายวันนี้!", "task_manager": "จัดการงาน", "no_tasks_found": "ไม่พบงาน",
+                "new_task": "งานใหม่...",
+
+                // Time Off
+                "req_leave": "ขอลาหยุดหรือพักร้อน", "new_req": "คำขอใหม่", "date": "วันที่", "reason": "เหตุผล",
+                "submit_req": "ส่งคำขอ", "your_reqs": "คำขอของคุณ", "no_reqs": "ยังไม่มีคำขอ",
+                "pending": "รออนุมัติ", "approved": "อนุมัติแล้ว", "denied": "ถูกปฏิเสธ", "leave_requests": "คำขอลางาน",
+                "all_caught_up": "จัดการครบแล้ว!", "approve": "อนุมัติ", "deny": "ปฏิเสธ", "new": "ใหม่",
+
+                // Noticeboard
+                "company_news": "ข่าวสารและอัปเดตของบริษัท", "no_news": "ไม่มีประกาศใหม่", "post_announcement": "โพสต์ประกาศ",
+                "high_priority": "ด่วนมาก", "post": "โพสต์", "announcement_title": "หัวข้อประกาศ", "msg_details": "รายละเอียดข้อความ...",
+
+                // Expenses
+                "submit_receipts": "ส่งใบเสร็จเพื่อขอเบิก", "new_claim": "เบิกใหม่", "what_for": "ค่าอะไร?",
+                "submit_claim": "ส่งคำขอเบิก", "claim_history": "ประวัติการเบิก", "no_claims": "ไม่มีการส่งเบิก",
+                "pending_expenses": "รายการรออนุมัติ", "pay": "จ่ายเงิน", "reject": "ปฏิเสธ",
+
+                // Kudos
+                "recognize_team": "ชื่นชมทีมของคุณสำหรับผลงานที่ดี!", "send_shoutout": "ส่งคำชื่นชม", "select_coworker": "เลือกเพื่อนร่วมงาน...",
+                "thanks_for": "ขอบคุณที่ช่วยเรื่อง...", "send_kudos": "ส่งความชื่นชม", "company_feed": "ฟีดบริษัท",
+                "no_kudos": "ยังไม่มีคำชื่นชม เป็นคนแรกเลย!", "recent_shoutouts": "คำชื่นชมล่าสุด",
+
+                // Mood
+                "how_feeling": "วันนี้คุณรู้สึกอย่างไร?", "great": "เยี่ยมเลย", "okay": "เรื่อยๆ", "rough": "เหนื่อย/แย่",
+                "mood_history": "ประวัติอารมณ์ของคุณ", "no_mood": "ยังไม่มีการบันทึกอารมณ์", "team_morale": "ขวัญกำลังใจทีม (วันนี้)",
+                "emp_responded": "พนักงานตอบกลับวันนี้",
+
+                // Support
+                "report_issue": "รายงานปัญหาหรือขอความช่วยเหลือ", "new_ticket": "เปิดตั๋วใหม่", "desc_issue": "อธิบายปัญหา...",
+                "submit_ticket": "ส่งปัญหา", "your_tickets": "ปัญหาของคุณ", "no_tickets": "ไม่มีปัญหาค้างอยู่ ทุกอย่างปกติดี!",
+                "open_tickets": "ปัญหาที่ยังไม่ได้รับการแก้ไข", "action_needed": "ต้องดำเนินการ", "resolved": "แก้ไขแล้ว", "open": "รอดำเนินการ",
+
+                // Ideas
+                "suggest_vote": "เสนอแนะและโหวตการปรับปรุง!", "share_idea": "แชร์ไอเดีย", "idea_title": "ชื่อไอเดีย (เช่น แต่งตัวสบายๆ วันศุกร์)",
+                "why_good": "ทำไมถึงเป็นไอเดียที่ดี?", "post_idea": "โพสต์ไอเดีย", "top_suggestions": "ไอเดียยอดนิยม",
+                "no_ideas": "ไม่มีไอเดียใหม่ เป็นคนแรกที่เสนอเลย!", "votes": "โหวต", "innovation_board": "กระดานนวัตกรรม",
+                
+                // Polls
+                "have_say": "แสดงความคิดเห็นในการตัดสินใจของบริษัท", "no_polls": "ขณะนี้ยังไม่มีโพลล์", "votes_total": "โหวตทั้งหมด",
+                "live_polls": "โพลล์ที่กำลังเปิด", "ask_team": "ตั้งคำถามกับทีม...", "options_comma": "ตัวเลือก (คั่นด้วยลูกน้ำ)",
+                "create_poll": "สร้างโพลล์", "leading": "นำอยู่", "none_yet": "ยังไม่มี",
+
+                // Events
+                "see_whats_happening": "ดูว่ามีอะไรเกิดขึ้นและตอบรับเข้าร่วม", "no_events": "ไม่มีกิจกรรมเร็วๆ นี้", "people_going": "คนไป",
+                "attending": "เข้าร่วม", "rsvp": "ตอบรับเข้าร่วม", "company_events": "กิจกรรมของบริษัท", "event_name": "ชื่อกิจกรรม...",
+                "add_event": "เพิ่มกิจกรรม",
+
+                // Directory
+                "contact_colleagues": "ติดต่อเพื่อนร่วมงานของคุณ", "call": "โทรศัพท์", "email": "อีเมล", "team_management": "จัดการทีม",
+                "total": "ทั้งหมด", "you_have": "คุณมีพนักงานทำงานอยู่", "active_emps": "คนในระบบ", "invite_emp": "เชิญพนักงานใหม่",
+
+                // Goals
+                "track_progress": "ติดตามความคืบหน้าของทีม!", "no_goals": "ไม่มีเป้าหมายในขณะนี้", "goal": "เป้าหมาย",
+                "active_milestones": "เป้าหมายที่กำลังดำเนินการ", "new_goal_name": "ชื่อเป้าหมายใหม่...", "target": "เป้าหมาย...", "add_progress": "เพิ่มความคืบหน้า 10%"
+            }
+        };
+
+        // Translation Helper
+        function t(key) {
+            return i18n[state.language][key] || key;
+        }
+
+        // 2. Database & State
         const db = {
             users: [
                 { id: 'u1', name: 'Alice Smith', role: 'employee', initials: 'AS', color: 'bg-pink-300', phone: '555-0101', email: 'alice@workflow.com' },
@@ -190,32 +376,30 @@
         };
 
         const state = {
+            language: 'en', // default language
             currentUser: null,
             currentView: 'login',
             currentModuleId: null, // Tracks which module tab is active
             features: {
-                timeClock: true,
-                taskManager: true, 
-                timeOff: true, 
-                announcements: true, 
-                expenses: true, 
-                kudos: true, 
-                moodTracker: true,
-                helpDesk: true,
-                suggestions: true, 
-                polls: true,
-                events: true,
-                directory: true,
-                goals: true // NEW: Goals Module
+                timeClock: true, taskManager: true, timeOff: true, announcements: true, 
+                expenses: true, kudos: true, moodTracker: true, helpDesk: true,
+                suggestions: true, polls: true, events: true, directory: true, goals: true
             }
         };
 
-        // 2. Application Core Controller
+        // 3. Application Core Controller
         const App = {
             modules: [],
 
             init: function() { this.renderLogin(); },
             registerModule: function(module) { this.modules.push(module); },
+
+            toggleLanguage: function() {
+                state.language = state.language === 'en' ? 'th' : 'en';
+                document.getElementById('lang-indicator').innerText = state.language === 'en' ? 'EN' : 'TH';
+                // Re-render current view to apply language changes
+                this.navigate(state.currentView, state.currentModuleId);
+            },
 
             login: function(userId) {
                 state.currentUser = db.users.find(u => u.id === userId);
@@ -246,24 +430,24 @@
                 if (view === 'login') {
                     this.renderLogin();
                     document.getElementById('app-nav').classList.add('hidden');
-                    document.getElementById('header-title').innerText = "Login";
+                    document.getElementById('header-title').innerText = "WorkFlow";
                 } else if (view === 'owner_dashboard') {
                     this.renderOwnerDashboard();
                     this.renderNav();
-                    document.getElementById('header-title').innerText = "Dashboard";
+                    document.getElementById('header-title').innerText = t('dashboard');
                 } else if (view === 'employee_home') {
                     this.renderEmployeeHome();
                     this.renderNav();
-                    document.getElementById('header-title').innerText = "My Portal";
+                    document.getElementById('header-title').innerText = t('my_portal');
                 } else if (view === 'settings') {
                     this.renderSettings();
                     this.renderNav();
-                    document.getElementById('header-title').innerText = "App Settings";
+                    document.getElementById('header-title').innerText = t('app_settings');
                 } else if (view === 'module' && moduleId) {
                     const mod = this.modules.find(m => m.id === moduleId);
                     if (mod && state.features[mod.id]) {
                         content.innerHTML = mod.renderUserView();
-                        document.getElementById('header-title').innerText = mod.name;
+                        document.getElementById('header-title').innerText = t(mod.nameKey);
                         if(mod.onLoad) mod.onLoad();
                     }
                     this.renderNav();
@@ -278,8 +462,8 @@
                         <div class="w-24 h-24 bg-purple-400 rounded-2xl border-4 border-gray-800 shadow-[6px_6px_0_0_#1f2937] flex items-center justify-center transform rotate-12 mb-4">
                             <i class="ph-fill ph-intersect text-5xl text-white"></i>
                         </div>
-                        <h2 class="text-2xl font-bold text-center">Welcome to WorkFlow</h2>
-                        <p class="text-gray-500 text-center mb-6">Select your profile to continue.</p>
+                        <h2 class="text-2xl font-bold text-center">${t('welcome')}</h2>
+                        <p class="text-gray-500 text-center mb-6">${t('select_profile')}</p>
                         <div class="w-full space-y-4">
                 `;
                 db.users.forEach(user => {
@@ -288,7 +472,7 @@
                             <div class="h-12 w-12 rounded-full border-2 border-gray-800 ${user.color} flex items-center justify-center font-bold text-lg">${user.initials}</div>
                             <div class="text-left flex-1">
                                 <div class="font-bold text-lg">${user.name}</div>
-                                <div class="text-sm text-gray-500 uppercase tracking-wider">${user.role}</div>
+                                <div class="text-sm text-gray-500 uppercase tracking-wider">${t(user.role)}</div>
                             </div>
                             <i class="ph-bold ph-caret-right text-xl"></i>
                         </button>`;
@@ -301,8 +485,8 @@
                 const content = document.getElementById('app-content');
                 let html = `<div class="space-y-6">
                     <div class="mb-4">
-                        <h2 class="text-2xl font-bold">Hello, ${state.currentUser.name.split(' ')[0]}!</h2>
-                        <p class="text-gray-500">What would you like to do today?</p>
+                        <h2 class="text-2xl font-bold">${t('hello')}, ${state.currentUser.name.split(' ')[0]}!</h2>
+                        <p class="text-gray-500">${t('what_to_do')}</p>
                     </div>
                 `;
                 this.modules.forEach(mod => {
@@ -323,17 +507,17 @@
                     <div class="space-y-6">
                         <div class="flex justify-between items-end">
                             <div>
-                                <h2 class="text-2xl font-bold">Overview</h2>
-                                <p class="text-gray-500">Live Office Status</p>
+                                <h2 class="text-2xl font-bold">${t('overview')}</h2>
+                                <p class="text-gray-500">${t('live_office')}</p>
                             </div>
                             <div class="bg-gray-800 text-white px-3 py-1 rounded-lg font-bold text-sm">
-                                <span class="text-green-400">●</span> ${activeUsers.length} Active
+                                <span class="text-green-400">●</span> ${activeUsers.length} ${t('active')}
                             </div>
                         </div>
 
                         <!-- ISOMETRIC OFFICE MAP -->
                         <div class="card-3d bg-blue-50 overflow-hidden relative">
-                            <h3 class="font-bold p-4 border-b-2 border-gray-800 bg-white">Floor Plan (Isometric)</h3>
+                            <h3 class="font-bold p-4 border-b-2 border-gray-800 bg-white">${t('floor_plan')}</h3>
                             <div class="iso-container">
                                 <div class="iso-grid">
                 `;
@@ -348,7 +532,7 @@
                         html += `<div class="iso-cube opacity-50"></div>`;
                     }
                 }
-                html += `</div></div><p class="text-xs text-center text-gray-500 pb-4">Green indicates clocked-in staff.</p></div>`;
+                html += `</div></div><p class="text-xs text-center text-gray-500 pb-4">${t('floor_plan_desc')}</p></div>`;
 
                 // Render Admin Widgets from Modules
                 this.modules.forEach(mod => {
@@ -366,8 +550,8 @@
                 let html = `
                     <div class="space-y-6">
                         <div>
-                            <h2 class="text-2xl font-bold">App Features</h2>
-                            <p class="text-gray-500">Turn modules on or off dynamically.</p>
+                            <h2 class="text-2xl font-bold">${t('app_features')}</h2>
+                            <p class="text-gray-500">${t('features_desc')}</p>
                         </div>
                         <div class="card-3d p-4 space-y-4">
                 `;
@@ -376,8 +560,8 @@
                     html += `
                         <div class="flex items-center justify-between border-b-2 border-gray-100 pb-4 last:border-0 last:pb-0">
                             <div>
-                                <div class="font-bold flex items-center gap-2"><i class="${mod.icon} text-xl"></i> ${mod.name}</div>
-                                <div class="text-sm text-gray-500">${mod.description}</div>
+                                <div class="font-bold flex items-center gap-2"><i class="${mod.icon} text-xl"></i> ${t(mod.nameKey)}</div>
+                                <div class="text-sm text-gray-500">${t(mod.descKey)}</div>
                             </div>
                             <div class="relative inline-block w-14 h-8 align-middle select-none transition duration-200 ease-in">
                                 <input type="checkbox" id="toggle-${mod.id}" ${isChecked} class="toggle-checkbox absolute block w-8 h-8 rounded-full bg-white appearance-none cursor-pointer" onchange="App.toggleFeature('${mod.id}', this.checked)"/>
@@ -390,7 +574,7 @@
                         </div>
                         <div class="mt-8 pt-8 border-t-2 border-gray-200">
                              <button onclick="App.logout()" class="btn-3d w-full py-3 bg-red-100 text-red-600 flex justify-center items-center gap-2">
-                                <i class="ph-bold ph-sign-out"></i> Switch User Profile
+                                <i class="ph-bold ph-sign-out"></i> ${t('switch_user')}
                              </button>
                         </div>
                     </div>
@@ -411,7 +595,7 @@
                 nav.classList.remove('hidden');
                 let html = '';
 
-                const createNavItem = (icon, label, targetView, targetModule, isActive) => {
+                const createNavItem = (icon, labelKey, targetView, targetModule, isActive) => {
                     const clickAction = targetModule ? `App.navigate('${targetView}', '${targetModule}')` : `App.navigate('${targetView}')`;
                     return `
                     <button onclick="${clickAction}" class="flex flex-col items-center justify-center p-2 min-w-[64px] flex-shrink-0 transition-transform ${isActive ? 'text-gray-900 transform -translate-y-1' : 'text-gray-400'}">
@@ -419,20 +603,20 @@
                             <i class="${isActive ? 'ph-fill' : 'ph'} ${icon} text-3xl mb-1 drop-shadow-sm"></i>
                             ${isActive ? '<div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-gray-900 rounded-full"></div>' : ''}
                         </div>
-                        <span class="text-[10px] font-bold mt-1">${label}</span>
+                        <span class="text-[10px] font-bold mt-1">${t(labelKey)}</span>
                     </button>
                 `};
 
                 if (state.currentUser.role === 'owner') {
-                    html += createNavItem('ph-squares-four', 'Overview', 'owner_dashboard', null, state.currentView === 'owner_dashboard');
-                    html += createNavItem('ph-faders', 'Features', 'settings', null, state.currentView === 'settings');
+                    html += createNavItem('ph-squares-four', 'overview', 'owner_dashboard', null, state.currentView === 'owner_dashboard');
+                    html += createNavItem('ph-faders', 'features', 'settings', null, state.currentView === 'settings');
                 } else {
-                    html += createNavItem('ph-house', 'Home', 'employee_home', null, state.currentView === 'employee_home');
+                    html += createNavItem('ph-house', 'home', 'employee_home', null, state.currentView === 'employee_home');
                     
                     this.modules.forEach(mod => {
                         if (state.features[mod.id] && mod.hasUserTab) {
                             const isModActive = state.currentView === 'module' && state.currentModuleId === mod.id;
-                            html += createNavItem(mod.icon, mod.name, 'module', mod.id, isModActive);
+                            html += createNavItem(mod.icon, mod.nameKey, 'module', mod.id, isModActive);
                         }
                     });
                 }
@@ -455,13 +639,14 @@
         // MODULE 1: TIME TRACKING 
         // =========================================
         const TimeTrackerModule = {
-            id: 'timeClock', name: 'Time Clock', description: 'Allow employees to log work in and out times.', icon: 'ph-clock-countdown', hasUserTab: false,
+            id: 'timeClock', nameKey: 'mod_time', descKey: 'mod_time_desc', icon: 'ph-clock-countdown', hasUserTab: false,
 
             renderWidget: function() {
                 const isWorking = isClockedIn(state.currentUser.id);
                 const btnClass = isWorking ? "bg-red-400 shadow-[4px_6px_0_0_#991b1b] border-[#7f1d1d] text-white" : "bg-green-400 shadow-[4px_6px_0_0_#166534] border-[#14532d] text-white";
                 const btnIcon = isWorking ? "ph-sign-out" : "ph-sign-in";
-                const statusText = isWorking ? "Clocked In" : "Clocked Out";
+                const statusText = isWorking ? t("clocked_in") : t("clocked_out");
+                const btnText = isWorking ? t("btn_clock_out") : t("btn_clock_in");
                 return `
                     <div class="card-3d p-6 text-center" id="time-widget-container">
                         <div class="flex justify-between items-center mb-6">
@@ -474,7 +659,7 @@
                             </div>
                         </div>
                         <button onclick="TimeTrackerModule.toggleClock()" class="btn-3d w-full py-4 text-lg tracking-wider flex items-center justify-center gap-3 ${btnClass}">
-                            <i class="ph-bold ${btnIcon} text-xl"></i> ${isWorking ? "CLOCK OUT" : "CLOCK IN"}
+                            <i class="ph-bold ${btnIcon} text-xl"></i> ${btnText}
                         </button>
                     </div>
                 `;
@@ -491,8 +676,8 @@
             },
             renderAdminWidget: function() {
                 const recentLogs = [...db.logs].sort((a,b) => new Date(b.time) - new Date(a.time)).slice(0, 4);
-                let html = `<div class="card-3d p-4"><h3 class="font-bold border-b-2 border-gray-100 pb-2 mb-3 flex items-center gap-2"><i class="ph-fill ph-clock-counter-clockwise"></i> Time Logs</h3><div class="space-y-3">`;
-                if(recentLogs.length === 0) html += `<p class="text-gray-500 text-center py-2 text-sm">No activity.</p>`;
+                let html = `<div class="card-3d p-4"><h3 class="font-bold border-b-2 border-gray-100 pb-2 mb-3 flex items-center gap-2"><i class="ph-fill ph-clock-counter-clockwise"></i> ${t('time_logs')}</h3><div class="space-y-3">`;
+                if(recentLogs.length === 0) html += `<p class="text-gray-500 text-center py-2 text-sm">${t('no_activity')}</p>`;
                 recentLogs.forEach(log => {
                     const user = db.users.find(u => u.id === log.userId);
                     html += `
@@ -509,12 +694,11 @@
         };
 
         // =========================================
-        // MODULE 2: TASK MANAGER (NEW FEATURE)
+        // MODULE 2: TASK MANAGER 
         // =========================================
         const TaskManagerModule = {
-            id: 'taskManager', name: 'Tasks', description: 'Assign and track daily employee tasks.', icon: 'ph-check-square-offset', hasUserTab: true,
+            id: 'taskManager', nameKey: 'mod_tasks', descKey: 'mod_tasks_desc', icon: 'ph-check-square-offset', hasUserTab: true,
 
-            // Full Screen View for Employee
             renderUserView: function() {
                 const myTasks = db.tasks.filter(t => t.assignedTo === state.currentUser.id);
                 const pending = myTasks.filter(t => !t.isDone);
@@ -523,24 +707,22 @@
                 let html = `
                     <div class="space-y-6 pb-20">
                         <div>
-                            <h2 class="text-2xl font-bold">Your Tasks</h2>
-                            <p class="text-gray-500">Tap to mark as complete.</p>
+                            <h2 class="text-2xl font-bold">${t('your_tasks')}</h2>
+                            <p class="text-gray-500">${t('tap_complete')}</p>
                         </div>
                         
-                        <!-- Progress Bar -->
                         <div class="bg-gray-200 rounded-full h-3 border border-gray-800 overflow-hidden">
                             <div class="bg-blue-400 h-full transition-all duration-500" style="width: ${myTasks.length ? (completed.length/myTasks.length)*100 : 0}%"></div>
                         </div>
-                        <p class="text-xs font-bold text-right text-gray-500">${completed.length} of ${myTasks.length} done</p>
+                        <p class="text-xs font-bold text-right text-gray-500">${completed.length} / ${myTasks.length} ${t('done')}</p>
 
                         <div class="space-y-3 mt-4">
                 `;
 
                 if(myTasks.length === 0) {
-                    html += `<div class="text-center text-gray-400 py-10"><i class="ph ph-coffee text-4xl mb-2"></i><p>No tasks assigned today!</p></div>`;
+                    html += `<div class="text-center text-gray-400 py-10"><i class="ph ph-coffee text-4xl mb-2"></i><p>${t('no_tasks')}</p></div>`;
                 }
 
-                // Render tasks
                 myTasks.forEach(task => {
                     const checkClass = task.isDone ? "bg-gray-800 text-white" : "bg-white text-transparent";
                     const textClass = task.isDone ? "line-through text-gray-400" : "text-gray-800";
@@ -563,12 +745,10 @@
                 const task = db.tasks.find(t => t.id === taskId);
                 if(task) {
                     task.isDone = !task.isDone;
-                    // Re-render the user view
                     App.navigate('module', 'taskManager');
                 }
             },
 
-            // Widget for Owner Dashboard
             renderAdminWidget: function() {
                 const total = db.tasks.length;
                 const completed = db.tasks.filter(t => t.isDone).length;
@@ -579,7 +759,7 @@
                 });
 
                 let tasksList = '';
-                db.tasks.slice(-4).reverse().forEach(task => { // Show last 4 tasks
+                db.tasks.slice(-4).reverse().forEach(task => { 
                     const user = db.users.find(u => u.id === task.assignedTo);
                     const statusIcon = task.isDone ? '<i class="ph-fill ph-check-circle text-green-500"></i>' : '<i class="ph-bold ph-circle text-gray-300"></i>';
                     tasksList += `
@@ -596,17 +776,16 @@
                 return `
                     <div class="card-3d p-4 bg-yellow-50">
                         <div class="flex justify-between items-center border-b-2 border-gray-800 pb-2 mb-3">
-                            <h3 class="font-bold flex items-center gap-2"><i class="ph-fill ph-check-square-offset"></i> Task Manager</h3>
-                            <span class="text-xs font-bold bg-white px-2 py-1 border border-gray-800 rounded-full">${completed}/${total} Done</span>
+                            <h3 class="font-bold flex items-center gap-2"><i class="ph-fill ph-check-square-offset"></i> ${t('task_manager')}</h3>
+                            <span class="text-xs font-bold bg-white px-2 py-1 border border-gray-800 rounded-full">${completed}/${total} ${t('done')}</span>
                         </div>
                         
                         <div class="mb-4">
-                            ${tasksList || '<p class="text-xs text-gray-500 text-center">No tasks found.</p>'}
+                            ${tasksList || `<p class="text-xs text-gray-500 text-center">${t('no_tasks_found')}</p>`}
                         </div>
 
-                        <!-- Quick Add Form -->
                         <div class="flex gap-2 mt-2">
-                            <input type="text" id="new-task-input" placeholder="New task..." class="flex-1 border-2 border-gray-800 rounded-lg px-2 py-1 text-sm outline-none focus:bg-white bg-transparent">
+                            <input type="text" id="new-task-input" placeholder="${t('new_task')}" class="flex-1 border-2 border-gray-800 rounded-lg px-2 py-1 text-sm outline-none focus:bg-white bg-transparent">
                             <select id="new-task-user" class="border-2 border-gray-800 rounded-lg px-1 text-sm bg-transparent outline-none">
                                 ${employeeOptions}
                             </select>
@@ -622,16 +801,8 @@
                 const input = document.getElementById('new-task-input');
                 const userSelect = document.getElementById('new-task-user');
                 const title = input.value.trim();
-                
                 if(title) {
-                    db.tasks.push({
-                        id: Date.now(),
-                        title: title,
-                        assignedTo: userSelect.value,
-                        isDone: false,
-                        created: new Date().toISOString()
-                    });
-                    // Refresh owner dashboard
+                    db.tasks.push({ id: Date.now(), title: title, assignedTo: userSelect.value, isDone: false, created: new Date().toISOString() });
                     App.renderOwnerDashboard();
                 }
             }
@@ -641,50 +812,45 @@
         // MODULE 3: TIME OFF / LEAVE REQUESTS
         // =========================================
         const TimeOffModule = {
-            id: 'timeOff', name: 'Time Off', description: 'Manage employee leave and vacation requests.', icon: 'ph-calendar-blank', hasUserTab: true,
+            id: 'timeOff', nameKey: 'mod_leave', descKey: 'mod_leave_desc', icon: 'ph-calendar-blank', hasUserTab: true,
 
-            // Full Screen View for Employee
             renderUserView: function() {
                 const myRequests = db.timeOffRequests.filter(r => r.userId === state.currentUser.id).reverse();
-                
                 let html = `
                     <div class="space-y-6 pb-20">
                         <div>
-                            <h2 class="text-2xl font-bold">Time Off</h2>
-                            <p class="text-gray-500">Request leave or vacation days.</p>
+                            <h2 class="text-2xl font-bold">${t('mod_leave')}</h2>
+                            <p class="text-gray-500">${t('req_leave')}</p>
                         </div>
                         
-                        <!-- Request Form -->
                         <div class="card-3d p-4 bg-purple-50">
-                            <h3 class="font-bold mb-3 flex items-center gap-2"><i class="ph-bold ph-plus-circle"></i> New Request</h3>
+                            <h3 class="font-bold mb-3 flex items-center gap-2"><i class="ph-bold ph-plus-circle"></i> ${t('new_req')}</h3>
                             <div class="space-y-3">
                                 <div>
-                                    <label class="text-xs font-bold text-gray-500 uppercase">Date</label>
+                                    <label class="text-xs font-bold text-gray-500 uppercase">${t('date')}</label>
                                     <input type="date" id="leave-date" class="w-full border-2 border-gray-800 rounded-lg px-3 py-2 outline-none focus:bg-white bg-transparent font-bold">
                                 </div>
                                 <div>
-                                    <label class="text-xs font-bold text-gray-500 uppercase">Reason</label>
-                                    <input type="text" id="leave-reason" placeholder="e.g. Vacation, Sick leave..." class="w-full border-2 border-gray-800 rounded-lg px-3 py-2 outline-none focus:bg-white bg-transparent">
+                                    <label class="text-xs font-bold text-gray-500 uppercase">${t('reason')}</label>
+                                    <input type="text" id="leave-reason" placeholder="..." class="w-full border-2 border-gray-800 rounded-lg px-3 py-2 outline-none focus:bg-white bg-transparent">
                                 </div>
                                 <button onclick="TimeOffModule.submitRequest()" class="btn-3d w-full py-3 bg-purple-400 text-white flex items-center justify-center gap-2 mt-2">
-                                    <i class="ph-bold ph-paper-plane-tilt"></i> Submit Request
+                                    <i class="ph-bold ph-paper-plane-tilt"></i> ${t('submit_req')}
                                 </button>
                             </div>
                         </div>
 
-                        <!-- History -->
                         <div>
-                            <h3 class="font-bold text-gray-500 uppercase text-sm mb-3">Your Requests</h3>
+                            <h3 class="font-bold text-gray-500 uppercase text-sm mb-3">${t('your_reqs')}</h3>
                             <div class="space-y-3">
                 `;
 
                 if(myRequests.length === 0) {
-                    html += `<div class="text-center text-gray-400 py-6"><p>No requests yet.</p></div>`;
+                    html += `<div class="text-center text-gray-400 py-6"><p>${t('no_reqs')}</p></div>`;
                 }
 
                 myRequests.forEach(req => {
-                    let statusColor = "bg-yellow-300";
-                    let statusIcon = "ph-clock";
+                    let statusColor = "bg-yellow-300"; let statusIcon = "ph-clock";
                     if (req.status === 'approved') { statusColor = "bg-green-400 text-white"; statusIcon = "ph-check-circle"; }
                     if (req.status === 'denied') { statusColor = "bg-red-400 text-white"; statusIcon = "ph-x-circle"; }
 
@@ -695,7 +861,7 @@
                                 <div class="text-sm text-gray-500">${req.reason}</div>
                             </div>
                             <div class="px-3 py-1 rounded-full border-2 border-gray-800 text-xs font-bold flex items-center gap-1 ${statusColor}">
-                                <i class="ph-bold ${statusIcon}"></i> ${req.status.charAt(0).toUpperCase() + req.status.slice(1)}
+                                <i class="ph-bold ${statusIcon}"></i> ${t(req.status)}
                             </div>
                         </div>
                     `;
@@ -708,34 +874,25 @@
             submitRequest: function() {
                 const dateVal = document.getElementById('leave-date').value;
                 const reasonVal = document.getElementById('leave-reason').value.trim();
-                
                 if(dateVal && reasonVal) {
-                    db.timeOffRequests.push({
-                        id: Date.now(),
-                        userId: state.currentUser.id,
-                        date: dateVal,
-                        reason: reasonVal,
-                        status: 'pending'
-                    });
-                    App.navigate('module', 'timeOff'); // Refresh view
+                    db.timeOffRequests.push({ id: Date.now(), userId: state.currentUser.id, date: dateVal, reason: reasonVal, status: 'pending' });
+                    App.navigate('module', 'timeOff');
                 }
             },
 
-            // Widget for Owner Dashboard
             renderAdminWidget: function() {
                 const pendingRequests = db.timeOffRequests.filter(r => r.status === 'pending');
-                
                 let html = `
                     <div class="card-3d p-4 bg-purple-50">
                         <div class="flex justify-between items-center border-b-2 border-gray-800 pb-2 mb-3">
-                            <h3 class="font-bold flex items-center gap-2"><i class="ph-fill ph-calendar-blank"></i> Leave Requests</h3>
-                            ${pendingRequests.length > 0 ? `<span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">${pendingRequests.length} New</span>` : ''}
+                            <h3 class="font-bold flex items-center gap-2"><i class="ph-fill ph-calendar-blank"></i> ${t('leave_requests')}</h3>
+                            ${pendingRequests.length > 0 ? `<span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">${pendingRequests.length} ${t('new')}</span>` : ''}
                         </div>
                         <div class="space-y-3">
                 `;
 
                 if(pendingRequests.length === 0) {
-                    html += `<p class="text-xs text-gray-500 text-center py-2">All caught up!</p>`;
+                    html += `<p class="text-xs text-gray-500 text-center py-2">${t('all_caught_up')}</p>`;
                 } else {
                     pendingRequests.forEach(req => {
                         const user = db.users.find(u => u.id === req.userId);
@@ -751,27 +908,23 @@
                                 <div class="text-sm text-gray-600 mb-3">${req.reason}</div>
                                 <div class="flex gap-2">
                                     <button onclick="TimeOffModule.updateStatus(${req.id}, 'approved')" class="flex-1 btn-sm-3d bg-green-400 text-white py-1 text-xs flex items-center justify-center gap-1">
-                                        <i class="ph-bold ph-check"></i> Approve
+                                        <i class="ph-bold ph-check"></i> ${t('approve')}
                                     </button>
                                     <button onclick="TimeOffModule.updateStatus(${req.id}, 'denied')" class="flex-1 btn-sm-3d bg-red-400 text-white py-1 text-xs flex items-center justify-center gap-1">
-                                        <i class="ph-bold ph-x"></i> Deny
+                                        <i class="ph-bold ph-x"></i> ${t('deny')}
                                     </button>
                                 </div>
                             </div>
                         `;
                     });
                 }
-
                 html += `</div></div>`;
                 return html;
             },
 
             updateStatus: function(id, newStatus) {
                 const req = db.timeOffRequests.find(r => r.id === id);
-                if(req) {
-                    req.status = newStatus;
-                    App.renderOwnerDashboard(); // Refresh owner dashboard
-                }
+                if(req) { req.status = newStatus; App.renderOwnerDashboard(); }
             }
         };
 
@@ -779,22 +932,21 @@
         // MODULE 4: ANNOUNCEMENTS / NOTICEBOARD
         // =========================================
         const AnnouncementsModule = {
-            id: 'announcements', name: 'Noticeboard', description: 'Broadcast important updates to all employees.', icon: 'ph-megaphone', hasUserTab: true,
+            id: 'announcements', nameKey: 'mod_news', descKey: 'mod_news_desc', icon: 'ph-megaphone', hasUserTab: true,
 
-            // Full Screen View for Employee
             renderUserView: function() {
                 const sortedNews = [...db.announcements].reverse();
                 let html = `
                     <div class="space-y-6 pb-20">
                         <div>
-                            <h2 class="text-2xl font-bold">Noticeboard</h2>
-                            <p class="text-gray-500">Company news and updates.</p>
+                            <h2 class="text-2xl font-bold">${t('mod_news')}</h2>
+                            <p class="text-gray-500">${t('company_news')}</p>
                         </div>
                         <div class="space-y-4">
                 `;
 
                 if(sortedNews.length === 0) {
-                    html += `<div class="text-center text-gray-400 py-10"><i class="ph ph-envelope-simple text-4xl mb-2"></i><p>No new announcements.</p></div>`;
+                    html += `<div class="text-center text-gray-400 py-10"><i class="ph ph-envelope-simple text-4xl mb-2"></i><p>${t('no_news')}</p></div>`;
                 }
 
                 sortedNews.forEach(news => {
@@ -818,21 +970,20 @@
                 return html;
             },
 
-            // Widget for Owner Dashboard
             renderAdminWidget: function() {
                 return `
                     <div class="card-3d p-4 bg-orange-50">
-                        <h3 class="font-bold mb-3 flex items-center gap-2 border-b-2 border-gray-800 pb-2"><i class="ph-fill ph-megaphone"></i> Post Announcement</h3>
+                        <h3 class="font-bold mb-3 flex items-center gap-2 border-b-2 border-gray-800 pb-2"><i class="ph-fill ph-megaphone"></i> ${t('post_announcement')}</h3>
                         <div class="space-y-2">
-                            <input type="text" id="news-title" placeholder="Announcement Title" class="w-full border-2 border-gray-800 rounded-lg px-2 py-1 text-sm outline-none focus:bg-white bg-transparent font-bold">
-                            <textarea id="news-content" placeholder="Message details..." class="w-full border-2 border-gray-800 rounded-lg px-2 py-1 text-sm outline-none focus:bg-white bg-transparent h-16 resize-none"></textarea>
+                            <input type="text" id="news-title" placeholder="${t('announcement_title')}" class="w-full border-2 border-gray-800 rounded-lg px-2 py-1 text-sm outline-none focus:bg-white bg-transparent font-bold">
+                            <textarea id="news-content" placeholder="${t('msg_details')}" class="w-full border-2 border-gray-800 rounded-lg px-2 py-1 text-sm outline-none focus:bg-white bg-transparent h-16 resize-none"></textarea>
                             <div class="flex items-center justify-between mt-1">
                                 <label class="flex items-center gap-2 text-xs font-bold text-gray-600 cursor-pointer">
                                     <input type="checkbox" id="news-priority" class="rounded border-gray-800 text-orange-500 focus:ring-orange-500 w-4 h-4 cursor-pointer">
-                                    High Priority
+                                    ${t('high_priority')}
                                 </label>
                                 <button onclick="AnnouncementsModule.postNews()" class="btn-sm-3d bg-orange-400 text-white px-4 py-1 text-xs flex items-center gap-1">
-                                    <i class="ph-bold ph-paper-plane-right"></i> Post
+                                    <i class="ph-bold ph-paper-plane-right"></i> ${t('post')}
                                 </button>
                             </div>
                         </div>
@@ -844,67 +995,53 @@
                 const title = document.getElementById('news-title').value.trim();
                 const content = document.getElementById('news-content').value.trim();
                 const isHigh = document.getElementById('news-priority').checked;
-
                 if(title && content) {
-                    db.announcements.push({
-                        id: Date.now(),
-                        title: title,
-                        content: content,
-                        date: new Date().toISOString(),
-                        priority: isHigh ? 'high' : 'normal'
-                    });
+                    db.announcements.push({ id: Date.now(), title: title, content: content, date: new Date().toISOString(), priority: isHigh ? 'high' : 'normal' });
                     App.renderOwnerDashboard();
                 }
             }
         };
 
         // =========================================
-        // MODULE 5: EXPENSE REIMBURSEMENTS
+        // MODULE 5: EXPENSES
         // =========================================
         const ExpensesModule = {
-            id: 'expenses', name: 'Expenses', description: 'Submit and approve reimbursement claims.', icon: 'ph-receipt', hasUserTab: true,
+            id: 'expenses', nameKey: 'mod_exp', descKey: 'mod_exp_desc', icon: 'ph-receipt', hasUserTab: true,
 
-            // Full Screen View for Employee
             renderUserView: function() {
                 const myExpenses = db.expenses.filter(e => e.userId === state.currentUser.id).reverse();
-                
                 let html = `
                     <div class="space-y-6 pb-20">
                         <div>
-                            <h2 class="text-2xl font-bold">Expenses</h2>
-                            <p class="text-gray-500">Submit receipts for reimbursement.</p>
+                            <h2 class="text-2xl font-bold">${t('mod_exp')}</h2>
+                            <p class="text-gray-500">${t('submit_receipts')}</p>
                         </div>
                         
-                        <!-- Submit Form -->
                         <div class="card-3d p-4 bg-green-50">
-                            <h3 class="font-bold mb-3 flex items-center gap-2"><i class="ph-bold ph-currency-dollar"></i> New Claim</h3>
+                            <h3 class="font-bold mb-3 flex items-center gap-2"><i class="ph-bold ph-currency-dollar"></i> ${t('new_claim')}</h3>
                             <div class="space-y-3">
                                 <div class="relative">
                                     <span class="absolute left-3 top-1/2 transform -translate-y-1/2 font-bold text-gray-500">$</span>
                                     <input type="number" step="0.01" id="exp-amount" placeholder="0.00" class="w-full border-2 border-gray-800 rounded-lg pl-8 pr-3 py-2 outline-none focus:bg-white bg-transparent font-bold text-lg">
                                 </div>
                                 <div>
-                                    <input type="text" id="exp-desc" placeholder="What was this for?" class="w-full border-2 border-gray-800 rounded-lg px-3 py-2 outline-none focus:bg-white bg-transparent text-sm">
+                                    <input type="text" id="exp-desc" placeholder="${t('what_for')}" class="w-full border-2 border-gray-800 rounded-lg px-3 py-2 outline-none focus:bg-white bg-transparent text-sm">
                                 </div>
                                 <button onclick="ExpensesModule.submitExpense()" class="btn-3d w-full py-3 bg-green-400 text-white flex items-center justify-center gap-2 mt-2">
-                                    <i class="ph-bold ph-upload-simple"></i> Submit Claim
+                                    <i class="ph-bold ph-upload-simple"></i> ${t('submit_claim')}
                                 </button>
                             </div>
                         </div>
 
-                        <!-- History -->
                         <div>
-                            <h3 class="font-bold text-gray-500 uppercase text-sm mb-3">Claim History</h3>
+                            <h3 class="font-bold text-gray-500 uppercase text-sm mb-3">${t('claim_history')}</h3>
                             <div class="space-y-3">
                 `;
 
-                if(myExpenses.length === 0) {
-                    html += `<div class="text-center text-gray-400 py-6"><p>No claims submitted.</p></div>`;
-                }
+                if(myExpenses.length === 0) { html += `<div class="text-center text-gray-400 py-6"><p>${t('no_claims')}</p></div>`; }
 
                 myExpenses.forEach(exp => {
-                    let statusColor = "bg-yellow-300";
-                    let statusIcon = "ph-clock";
+                    let statusColor = "bg-yellow-300"; let statusIcon = "ph-clock";
                     if (exp.status === 'approved') { statusColor = "bg-green-400 text-white"; statusIcon = "ph-check-circle"; }
                     if (exp.status === 'denied') { statusColor = "bg-red-400 text-white"; statusIcon = "ph-x-circle"; }
 
@@ -915,7 +1052,7 @@
                                 <div class="text-xs text-gray-500 truncate max-w-[150px]">${exp.description}</div>
                             </div>
                             <div class="px-3 py-1 rounded-full border-2 border-gray-800 text-xs font-bold flex items-center gap-1 ${statusColor}">
-                                <i class="ph-bold ${statusIcon}"></i> ${exp.status.charAt(0).toUpperCase() + exp.status.slice(1)}
+                                <i class="ph-bold ${statusIcon}"></i> ${t(exp.status)}
                             </div>
                         </div>
                     `;
@@ -928,36 +1065,26 @@
             submitExpense: function() {
                 const amtVal = document.getElementById('exp-amount').value;
                 const descVal = document.getElementById('exp-desc').value.trim();
-                
                 if(amtVal && descVal) {
-                    db.expenses.push({
-                        id: Date.now(),
-                        userId: state.currentUser.id,
-                        amount: parseFloat(amtVal),
-                        description: descVal,
-                        status: 'pending',
-                        date: new Date().toISOString()
-                    });
+                    db.expenses.push({ id: Date.now(), userId: state.currentUser.id, amount: parseFloat(amtVal), description: descVal, status: 'pending', date: new Date().toISOString() });
                     App.navigate('module', 'expenses');
                 }
             },
 
-            // Widget for Owner Dashboard
             renderAdminWidget: function() {
                 const pending = db.expenses.filter(e => e.status === 'pending');
                 const totalPending = pending.reduce((sum, exp) => sum + exp.amount, 0);
-                
                 let html = `
                     <div class="card-3d p-4 bg-green-50">
                         <div class="flex justify-between items-center border-b-2 border-gray-800 pb-2 mb-3">
-                            <h3 class="font-bold flex items-center gap-2"><i class="ph-fill ph-receipt"></i> Pending Expenses</h3>
+                            <h3 class="font-bold flex items-center gap-2"><i class="ph-fill ph-receipt"></i> ${t('pending_expenses')}</h3>
                             ${pending.length > 0 ? `<span class="bg-gray-800 text-white text-xs font-bold px-2 py-1 rounded-lg border-2 border-gray-800 shadow-[2px_2px_0_0_#4ade80]">$${totalPending.toFixed(2)}</span>` : ''}
                         </div>
                         <div class="space-y-3">
                 `;
 
                 if(pending.length === 0) {
-                    html += `<p class="text-xs text-gray-500 text-center py-2">No pending claims.</p>`;
+                    html += `<p class="text-xs text-gray-500 text-center py-2">${t('no_claims')}</p>`;
                 } else {
                     pending.forEach(exp => {
                         const user = db.users.find(u => u.id === exp.userId);
@@ -976,27 +1103,23 @@
                                 <div class="text-sm text-gray-600 mb-3 bg-gray-50 p-2 rounded border border-gray-200">"${exp.description}"</div>
                                 <div class="flex gap-2">
                                     <button onclick="ExpensesModule.updateStatus(${exp.id}, 'approved')" class="flex-1 btn-sm-3d bg-green-400 text-white py-1 text-xs flex items-center justify-center gap-1">
-                                        <i class="ph-bold ph-check"></i> Pay
+                                        <i class="ph-bold ph-check"></i> ${t('pay')}
                                     </button>
                                     <button onclick="ExpensesModule.updateStatus(${exp.id}, 'denied')" class="flex-1 btn-sm-3d bg-gray-200 text-gray-800 py-1 text-xs flex items-center justify-center gap-1">
-                                        <i class="ph-bold ph-x"></i> Reject
+                                        <i class="ph-bold ph-x"></i> ${t('reject')}
                                     </button>
                                 </div>
                             </div>
                         `;
                     });
                 }
-
                 html += `</div></div>`;
                 return html;
             },
 
             updateStatus: function(id, newStatus) {
                 const exp = db.expenses.find(e => e.id === id);
-                if(exp) {
-                    exp.status = newStatus;
-                    App.renderOwnerDashboard();
-                }
+                if(exp) { exp.status = newStatus; App.renderOwnerDashboard(); }
             }
         };
 
@@ -1004,14 +1127,11 @@
         // MODULE 6: SHOUTOUTS / KUDOS
         // =========================================
         const KudosModule = {
-            id: 'kudos', name: 'Shoutouts', description: 'Send public appreciation to your colleagues.', icon: 'ph-star', hasUserTab: true,
+            id: 'kudos', nameKey: 'mod_kudos', descKey: 'mod_kudos_desc', icon: 'ph-star', hasUserTab: true,
 
-            // Full Screen View for Employee
             renderUserView: function() {
                 const allKudos = [...db.kudos].reverse();
-                
-                // Build dropdown options (exclude current user)
-                let employeeOptions = '<option value="" disabled selected>Select a coworker...</option>';
+                let employeeOptions = `<option value="" disabled selected>${t('select_coworker')}</option>`;
                 db.users.filter(u => u.id !== state.currentUser.id).forEach(u => {
                     employeeOptions += `<option value="${u.id}">${u.name}</option>`;
                 });
@@ -1019,13 +1139,12 @@
                 let html = `
                     <div class="space-y-6 pb-20">
                         <div>
-                            <h2 class="text-2xl font-bold">Shoutouts</h2>
-                            <p class="text-gray-500">Recognize your team for great work!</p>
+                            <h2 class="text-2xl font-bold">${t('mod_kudos')}</h2>
+                            <p class="text-gray-500">${t('recognize_team')}</p>
                         </div>
                         
-                        <!-- Submit Form -->
                         <div class="card-3d p-4 bg-pink-50">
-                            <h3 class="font-bold mb-3 flex items-center gap-2"><i class="ph-fill ph-star text-pink-500"></i> Send a Shoutout</h3>
+                            <h3 class="font-bold mb-3 flex items-center gap-2"><i class="ph-fill ph-star text-pink-500"></i> ${t('send_shoutout')}</h3>
                             <div class="space-y-3">
                                 <div>
                                     <select id="kudos-to" class="w-full border-2 border-gray-800 rounded-lg px-2 py-2 text-sm bg-white outline-none font-bold">
@@ -1033,23 +1152,20 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <textarea id="kudos-message" placeholder="Thanks for helping me with..." class="w-full border-2 border-gray-800 rounded-lg px-3 py-2 outline-none focus:bg-white bg-transparent text-sm h-20 resize-none"></textarea>
+                                    <textarea id="kudos-message" placeholder="${t('thanks_for')}" class="w-full border-2 border-gray-800 rounded-lg px-3 py-2 outline-none focus:bg-white bg-transparent text-sm h-20 resize-none"></textarea>
                                 </div>
                                 <button onclick="KudosModule.submitKudos()" class="btn-3d w-full py-3 bg-pink-400 text-white flex items-center justify-center gap-2 mt-2">
-                                    <i class="ph-bold ph-paper-plane-tilt"></i> Send Kudos
+                                    <i class="ph-bold ph-paper-plane-tilt"></i> ${t('send_kudos')}
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Company Feed -->
                         <div>
-                            <h3 class="font-bold text-gray-500 uppercase text-sm mb-3">Company Feed</h3>
+                            <h3 class="font-bold text-gray-500 uppercase text-sm mb-3">${t('company_feed')}</h3>
                             <div class="space-y-4">
                 `;
 
-                if(allKudos.length === 0) {
-                    html += `<div class="text-center text-gray-400 py-6"><p>No shoutouts yet. Be the first!</p></div>`;
-                }
+                if(allKudos.length === 0) { html += `<div class="text-center text-gray-400 py-6"><p>${t('no_kudos')}</p></div>`; }
 
                 allKudos.forEach(kudo => {
                     const fromUser = db.users.find(u => u.id === kudo.fromId);
@@ -1057,21 +1173,17 @@
 
                     html += `
                         <div class="card-3d p-4 bg-white relative overflow-hidden">
-                            <!-- Decorative Star -->
                             <i class="ph-fill ph-star text-yellow-100 text-6xl absolute -right-4 -bottom-4 opacity-50 transform rotate-12"></i>
-                            
                             <div class="flex items-center gap-2 mb-3 relative z-10">
                                 <div class="w-8 h-8 rounded-full border border-gray-800 ${fromUser.color} flex items-center justify-center text-xs font-bold shadow-[1px_1px_0_0_#1f2937]">${fromUser.initials}</div>
                                 <i class="ph-bold ph-arrow-right text-gray-400 text-sm"></i>
                                 <div class="w-8 h-8 rounded-full border border-gray-800 ${toUser.color} flex items-center justify-center text-xs font-bold shadow-[1px_1px_0_0_#1f2937]">${toUser.initials}</div>
                             </div>
-                            
                             <div class="text-sm text-gray-800 font-medium mb-2 relative z-10">"${kudo.message}"</div>
                             <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider relative z-10">${new Date(kudo.date).toLocaleDateString()}</div>
                         </div>
                     `;
                 });
-
                 html += `</div></div></div>`;
                 return html;
             },
@@ -1079,33 +1191,24 @@
             submitKudos: function() {
                 const toId = document.getElementById('kudos-to').value;
                 const message = document.getElementById('kudos-message').value.trim();
-                
                 if(toId && message) {
-                    db.kudos.push({
-                        id: Date.now(),
-                        fromId: state.currentUser.id,
-                        toId: toId,
-                        message: message,
-                        date: new Date().toISOString()
-                    });
+                    db.kudos.push({ id: Date.now(), fromId: state.currentUser.id, toId: toId, message: message, date: new Date().toISOString() });
                     App.navigate('module', 'kudos');
                 }
             },
 
-            // Widget for Owner Dashboard
             renderAdminWidget: function() {
                 const recentKudos = [...db.kudos].reverse().slice(0, 3);
-                
                 let html = `
                     <div class="card-3d p-4 bg-pink-50">
                         <div class="flex justify-between items-center border-b-2 border-gray-800 pb-2 mb-3">
-                            <h3 class="font-bold flex items-center gap-2"><i class="ph-fill ph-star text-pink-500"></i> Recent Shoutouts</h3>
+                            <h3 class="font-bold flex items-center gap-2"><i class="ph-fill ph-star text-pink-500"></i> ${t('recent_shoutouts')}</h3>
                         </div>
                         <div class="space-y-3">
                 `;
 
                 if(recentKudos.length === 0) {
-                    html += `<p class="text-xs text-gray-500 text-center py-2">No shoutouts yet.</p>`;
+                    html += `<p class="text-xs text-gray-500 text-center py-2">${t('no_kudos')}</p>`;
                 } else {
                     recentKudos.forEach(kudo => {
                         const fromUser = db.users.find(u => u.id === kudo.fromId);
@@ -1122,7 +1225,6 @@
                         `;
                     });
                 }
-
                 html += `</div></div>`;
                 return html;
             }
@@ -1132,50 +1234,44 @@
         // MODULE 7: TEAM MOOD TRACKER
         // =========================================
         const MoodTrackerModule = {
-            id: 'moodTracker', name: 'Morale', description: 'Track daily team wellbeing and mood.', icon: 'ph-smiley', hasUserTab: true,
+            id: 'moodTracker', nameKey: 'mod_mood', descKey: 'mod_mood_desc', icon: 'ph-smiley', hasUserTab: true,
 
-            // Full Screen View for Employee
             renderUserView: function() {
                 const myMoods = db.moods.filter(m => m.userId === state.currentUser.id).reverse();
-                
                 let html = `
                     <div class="space-y-6 pb-20">
                         <div>
-                            <h2 class="text-2xl font-bold">Daily Mood</h2>
-                            <p class="text-gray-500">How are you feeling today?</p>
+                            <h2 class="text-2xl font-bold">${t('mod_mood')}</h2>
+                            <p class="text-gray-500">${t('how_feeling')}</p>
                         </div>
                         
-                        <!-- Submit Form -->
                         <div class="grid grid-cols-3 gap-4">
                             <button onclick="MoodTrackerModule.submitMood('great')" class="btn-3d flex flex-col items-center justify-center p-4 bg-green-100 border-green-800 text-green-800 hover:bg-green-200">
                                 <i class="ph-fill ph-smiley text-4xl mb-2"></i>
-                                <span class="font-bold text-sm">Great</span>
+                                <span class="font-bold text-sm">${t('great')}</span>
                             </button>
                             <button onclick="MoodTrackerModule.submitMood('okay')" class="btn-3d flex flex-col items-center justify-center p-4 bg-yellow-100 border-yellow-800 text-yellow-800 hover:bg-yellow-200">
                                 <i class="ph-fill ph-smiley-meh text-4xl mb-2"></i>
-                                <span class="font-bold text-sm">Okay</span>
+                                <span class="font-bold text-sm">${t('okay')}</span>
                             </button>
                             <button onclick="MoodTrackerModule.submitMood('rough')" class="btn-3d flex flex-col items-center justify-center p-4 bg-red-100 border-red-800 text-red-800 hover:bg-red-200">
                                 <i class="ph-fill ph-smiley-sad text-4xl mb-2"></i>
-                                <span class="font-bold text-sm">Rough</span>
+                                <span class="font-bold text-sm">${t('rough')}</span>
                             </button>
                         </div>
 
-                        <!-- History -->
                         <div class="mt-8">
-                            <h3 class="font-bold text-gray-500 uppercase text-sm mb-3">Your Mood History</h3>
+                            <h3 class="font-bold text-gray-500 uppercase text-sm mb-3">${t('mood_history')}</h3>
                             <div class="space-y-3">
                 `;
 
-                if(myMoods.length === 0) {
-                    html += `<div class="text-center text-gray-400 py-6"><p>No mood logged yet.</p></div>`;
-                }
+                if(myMoods.length === 0) { html += `<div class="text-center text-gray-400 py-6"><p>${t('no_mood')}</p></div>`; }
 
                 myMoods.forEach(mood => {
                     let icon, colorClass, label;
-                    if(mood.type === 'great') { icon = 'ph-smiley'; colorClass = 'text-green-500'; label = 'Great'; }
-                    else if(mood.type === 'okay') { icon = 'ph-smiley-meh'; colorClass = 'text-yellow-500'; label = 'Okay'; }
-                    else { icon = 'ph-smiley-sad'; colorClass = 'text-red-500'; label = 'Rough'; }
+                    if(mood.type === 'great') { icon = 'ph-smiley'; colorClass = 'text-green-500'; label = t('great'); }
+                    else if(mood.type === 'okay') { icon = 'ph-smiley-meh'; colorClass = 'text-yellow-500'; label = t('okay'); }
+                    else { icon = 'ph-smiley-sad'; colorClass = 'text-red-500'; label = t('rough'); }
 
                     html += `
                         <div class="card-3d p-4 flex items-center justify-between mb-0 bg-white">
@@ -1189,34 +1285,25 @@
                         </div>
                     `;
                 });
-
                 html += `</div></div></div>`;
                 return html;
             },
 
             submitMood: function(type) {
-                db.moods.push({
-                    id: Date.now(),
-                    userId: state.currentUser.id,
-                    type: type,
-                    date: new Date().toISOString()
-                });
+                db.moods.push({ id: Date.now(), userId: state.currentUser.id, type: type, date: new Date().toISOString() });
                 App.navigate('module', 'moodTracker');
             },
 
-            // Widget for Owner Dashboard
             renderAdminWidget: function() {
-                // Filter moods for today only
                 const today = new Date().toLocaleDateString();
                 const todayMoods = db.moods.filter(m => new Date(m.date).toLocaleDateString() === today);
-                
                 const counts = { great: 0, okay: 0, rough: 0 };
                 todayMoods.forEach(m => counts[m.type]++);
 
-                let html = `
+                return `
                     <div class="card-3d p-4 bg-blue-50">
                         <div class="flex justify-between items-center border-b-2 border-gray-800 pb-2 mb-3">
-                            <h3 class="font-bold flex items-center gap-2"><i class="ph-fill ph-smiley text-blue-500"></i> Team Morale (Today)</h3>
+                            <h3 class="font-bold flex items-center gap-2"><i class="ph-fill ph-smiley text-blue-500"></i> ${t('team_morale')}</h3>
                         </div>
                         
                         <div class="flex justify-between items-center px-4 py-2">
@@ -1233,10 +1320,9 @@
                                 <div class="font-bold text-xl">${counts.rough}</div>
                             </div>
                         </div>
-                        <p class="text-center text-xs text-gray-500 mt-2 font-bold">${todayMoods.length} employees responded today</p>
+                        <p class="text-center text-xs text-gray-500 mt-2 font-bold">${todayMoods.length} ${t('emp_responded')}</p>
                 </div>
             `;
-            return html;
         }
     };
 
@@ -1244,54 +1330,48 @@
     // MODULE 8: HELP DESK / TICKETS
     // =========================================
     const HelpDeskModule = {
-        id: 'helpDesk', name: 'Support', description: 'Submit maintenance or IT support tickets.', icon: 'ph-lifebuoy', hasUserTab: true,
+        id: 'helpDesk', nameKey: 'mod_support', descKey: 'mod_support_desc', icon: 'ph-lifebuoy', hasUserTab: true,
 
-        // Full Screen View for Employee
         renderUserView: function() {
             const myTickets = db.tickets.filter(t => t.userId === state.currentUser.id).reverse();
-            
             let html = `
                 <div class="space-y-6 pb-20">
                     <div>
-                        <h2 class="text-2xl font-bold">Support Desk</h2>
-                        <p class="text-gray-500">Report an issue or request help.</p>
+                        <h2 class="text-2xl font-bold">${t('mod_support')}</h2>
+                        <p class="text-gray-500">${t('report_issue')}</p>
                     </div>
                     
-                    <!-- Submit Form -->
                     <div class="card-3d p-4 bg-cyan-50">
-                        <h3 class="font-bold mb-3 flex items-center gap-2"><i class="ph-bold ph-plus-circle text-cyan-600"></i> New Ticket</h3>
+                        <h3 class="font-bold mb-3 flex items-center gap-2"><i class="ph-bold ph-plus-circle text-cyan-600"></i> ${t('new_ticket')}</h3>
                         <div class="space-y-3">
                             <div>
-                                <input type="text" id="ticket-title" placeholder="Describe the issue..." class="w-full border-2 border-gray-800 rounded-lg px-3 py-2 outline-none focus:bg-white bg-transparent font-bold">
+                                <input type="text" id="ticket-title" placeholder="${t('desc_issue')}" class="w-full border-2 border-gray-800 rounded-lg px-3 py-2 outline-none focus:bg-white bg-transparent font-bold">
                             </div>
                             <button onclick="HelpDeskModule.submitTicket()" class="btn-3d w-full py-3 bg-cyan-400 text-white flex items-center justify-center gap-2 mt-2">
-                                <i class="ph-bold ph-paper-plane-tilt"></i> Submit Ticket
+                                <i class="ph-bold ph-paper-plane-tilt"></i> ${t('submit_ticket')}
                             </button>
                         </div>
                     </div>
 
-                    <!-- History -->
                     <div>
-                        <h3 class="font-bold text-gray-500 uppercase text-sm mb-3">Your Tickets</h3>
+                        <h3 class="font-bold text-gray-500 uppercase text-sm mb-3">${t('your_tickets')}</h3>
                         <div class="space-y-3">
             `;
 
-            if(myTickets.length === 0) {
-                html += `<div class="text-center text-gray-400 py-6"><p>No open tickets. Everything is working!</p></div>`;
-            }
+            if(myTickets.length === 0) { html += `<div class="text-center text-gray-400 py-6"><p>${t('no_tickets')}</p></div>`; }
 
-            myTickets.forEach(t => {
-                let statusColor = t.status === 'resolved' ? "bg-green-400 text-white" : "bg-yellow-300";
-                let statusIcon = t.status === 'resolved' ? "ph-check-circle" : "ph-clock";
+            myTickets.forEach(tk => {
+                let statusColor = tk.status === 'resolved' ? "bg-green-400 text-white" : "bg-yellow-300";
+                let statusIcon = tk.status === 'resolved' ? "ph-check-circle" : "ph-clock";
 
                 html += `
                     <div class="card-3d p-4 flex items-center justify-between mb-0">
                         <div>
-                            <div class="font-bold text-sm text-gray-800">${t.title}</div>
-                            <div class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1">${new Date(t.date).toLocaleDateString()}</div>
+                            <div class="font-bold text-sm text-gray-800">${tk.title}</div>
+                            <div class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1">${new Date(tk.date).toLocaleDateString()}</div>
                         </div>
                         <div class="px-3 py-1 rounded-full border-2 border-gray-800 text-xs font-bold flex items-center gap-1 ${statusColor}">
-                            <i class="ph-bold ${statusIcon}"></i> ${t.status.charAt(0).toUpperCase() + t.status.slice(1)}
+                            <i class="ph-bold ${statusIcon}"></i> ${t(tk.status)}
                         </div>
                     </div>
                 `;
@@ -1304,35 +1384,27 @@
         submitTicket: function() {
             const title = document.getElementById('ticket-title').value.trim();
             if(title) {
-                db.tickets.push({
-                    id: Date.now(),
-                    userId: state.currentUser.id,
-                    title: title,
-                    status: 'open',
-                    date: new Date().toISOString()
-                });
+                db.tickets.push({ id: Date.now(), userId: state.currentUser.id, title: title, status: 'open', date: new Date().toISOString() });
                 App.navigate('module', 'helpDesk');
             }
         },
 
-        // Widget for Owner Dashboard
         renderAdminWidget: function() {
             const openTickets = db.tickets.filter(t => t.status === 'open');
-            
             let html = `
                 <div class="card-3d p-4 bg-cyan-50">
                     <div class="flex justify-between items-center border-b-2 border-gray-800 pb-2 mb-3">
-                        <h3 class="font-bold flex items-center gap-2"><i class="ph-fill ph-lifebuoy text-cyan-500"></i> Open Support Tickets</h3>
-                        ${openTickets.length > 0 ? `<span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">${openTickets.length} Action Needed</span>` : ''}
+                        <h3 class="font-bold flex items-center gap-2"><i class="ph-fill ph-lifebuoy text-cyan-500"></i> ${t('open_tickets')}</h3>
+                        ${openTickets.length > 0 ? `<span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">${openTickets.length} ${t('action_needed')}</span>` : ''}
                     </div>
                     <div class="space-y-3">
             `;
 
             if(openTickets.length === 0) {
-                html += `<p class="text-xs text-gray-500 text-center py-2">No open tickets. Great job!</p>`;
+                html += `<p class="text-xs text-gray-500 text-center py-2">${t('no_tickets')}</p>`;
             } else {
-                openTickets.forEach(t => {
-                    const user = db.users.find(u => u.id === t.userId);
+                openTickets.forEach(tk => {
+                    const user = db.users.find(u => u.id === tk.userId);
                     html += `
                         <div class="bg-white border-2 border-gray-800 rounded-xl p-3 shadow-[2px_2px_0_0_#1f2937] flex items-center justify-between gap-4">
                             <div class="flex-1">
@@ -1340,9 +1412,9 @@
                                     <div class="w-4 h-4 rounded-full border border-gray-800 ${user.color} flex items-center justify-center text-[8px] font-bold">${user.initials}</div>
                                     <span class="text-xs font-bold text-gray-600">${user.name}</span>
                                 </div>
-                                <div class="text-sm font-bold text-gray-800 leading-tight">${t.title}</div>
+                                <div class="text-sm font-bold text-gray-800 leading-tight">${tk.title}</div>
                             </div>
-                            <button onclick="HelpDeskModule.resolveTicket(${t.id})" class="btn-sm-3d bg-cyan-400 text-white p-2 flex items-center justify-center min-w-[36px]">
+                            <button onclick="HelpDeskModule.resolveTicket(${tk.id})" class="btn-sm-3d bg-cyan-400 text-white p-2 flex items-center justify-center min-w-[36px]">
                                 <i class="ph-bold ph-check text-lg"></i>
                             </button>
                         </div>
@@ -1356,10 +1428,7 @@
 
         resolveTicket: function(id) {
             const ticket = db.tickets.find(t => t.id === id);
-            if(ticket) {
-                ticket.status = 'resolved';
-                App.renderOwnerDashboard();
-            }
+            if(ticket) { ticket.status = 'resolved'; App.renderOwnerDashboard(); }
         }
     };
 
@@ -1367,46 +1436,38 @@
     // MODULE 9: IDEAS / SUGGESTION BOX
     // =========================================
     const SuggestionsModule = {
-        id: 'suggestions', name: 'Ideas', description: 'Submit and vote on company improvements.', icon: 'ph-lightbulb', hasUserTab: true,
+        id: 'suggestions', nameKey: 'mod_ideas', descKey: 'mod_ideas_desc', icon: 'ph-lightbulb', hasUserTab: true,
 
-        // Full Screen View for Employee
         renderUserView: function() {
-            // Sort by votes (highest first)
-            const openIdeas = db.suggestions.filter(s => s.status === 'open')
-                                .sort((a, b) => b.votes.length - a.votes.length);
-            
+            const openIdeas = db.suggestions.filter(s => s.status === 'open').sort((a, b) => b.votes.length - a.votes.length);
             let html = `
                 <div class="space-y-6 pb-20">
                     <div>
-                        <h2 class="text-2xl font-bold">Idea Board</h2>
-                        <p class="text-gray-500">Suggest and vote on improvements!</p>
+                        <h2 class="text-2xl font-bold">${t('mod_ideas')}</h2>
+                        <p class="text-gray-500">${t('suggest_vote')}</p>
                     </div>
                     
-                    <!-- Submit Form -->
                     <div class="card-3d p-4 bg-yellow-50">
-                        <h3 class="font-bold mb-3 flex items-center gap-2"><i class="ph-bold ph-lightbulb text-yellow-500"></i> Share an Idea</h3>
+                        <h3 class="font-bold mb-3 flex items-center gap-2"><i class="ph-bold ph-lightbulb text-yellow-500"></i> ${t('share_idea')}</h3>
                         <div class="space-y-3">
                             <div>
-                                <input type="text" id="idea-title" placeholder="Idea Title (e.g., Casual Fridays)" class="w-full border-2 border-gray-800 rounded-lg px-3 py-2 outline-none focus:bg-white bg-transparent font-bold">
+                                <input type="text" id="idea-title" placeholder="${t('idea_title')}" class="w-full border-2 border-gray-800 rounded-lg px-3 py-2 outline-none focus:bg-white bg-transparent font-bold">
                             </div>
                             <div>
-                                <textarea id="idea-desc" placeholder="Why is this a good idea?" class="w-full border-2 border-gray-800 rounded-lg px-3 py-2 outline-none focus:bg-white bg-transparent text-sm h-16 resize-none"></textarea>
+                                <textarea id="idea-desc" placeholder="${t('why_good')}" class="w-full border-2 border-gray-800 rounded-lg px-3 py-2 outline-none focus:bg-white bg-transparent text-sm h-16 resize-none"></textarea>
                             </div>
                             <button onclick="SuggestionsModule.submitIdea()" class="btn-3d w-full py-3 bg-yellow-400 text-gray-900 flex items-center justify-center gap-2 mt-2">
-                                <i class="ph-bold ph-sparkle"></i> Post Idea
+                                <i class="ph-bold ph-sparkle"></i> ${t('post_idea')}
                             </button>
                         </div>
                     </div>
 
-                    <!-- Idea Feed -->
                     <div>
-                        <h3 class="font-bold text-gray-500 uppercase text-sm mb-3">Top Suggestions</h3>
+                        <h3 class="font-bold text-gray-500 uppercase text-sm mb-3">${t('top_suggestions')}</h3>
                         <div class="space-y-4">
             `;
 
-            if(openIdeas.length === 0) {
-                html += `<div class="text-center text-gray-400 py-6"><p>No open ideas. Be the first to suggest one!</p></div>`;
-            }
+            if(openIdeas.length === 0) { html += `<div class="text-center text-gray-400 py-6"><p>${t('no_ideas')}</p></div>`; }
 
             openIdeas.forEach(idea => {
                 const user = db.users.find(u => u.id === idea.userId);
@@ -1416,15 +1477,12 @@
 
                 html += `
                     <div class="card-3d p-4 bg-white flex gap-4 items-start">
-                        <!-- Upvote Button -->
                         <div class="flex flex-col items-center">
                             <button onclick="SuggestionsModule.toggleVote(${idea.id})" class="btn-sm-3d w-10 h-10 flex flex-col items-center justify-center ${voteBtnClass}">
                                 <i class="${voteIconClass} ph-caret-up text-lg leading-none"></i>
                             </button>
                             <span class="font-bold text-lg mt-1 ${hasVoted ? 'text-yellow-600' : 'text-gray-500'}">${idea.votes.length}</span>
                         </div>
-                        
-                        <!-- Idea Content -->
                         <div class="flex-1">
                             <div class="font-bold text-lg leading-tight text-gray-800 mb-1">${idea.title}</div>
                             <div class="text-sm text-gray-600 mb-2">${idea.description}</div>
@@ -1444,17 +1502,8 @@
         submitIdea: function() {
             const title = document.getElementById('idea-title').value.trim();
             const desc = document.getElementById('idea-desc').value.trim();
-            
             if(title && desc) {
-                db.suggestions.push({
-                    id: Date.now(),
-                    userId: state.currentUser.id,
-                    title: title,
-                    description: desc,
-                    votes: [state.currentUser.id], // Auto-vote for own idea
-                    status: 'open',
-                    date: new Date().toISOString()
-                });
+                db.suggestions.push({ id: Date.now(), userId: state.currentUser.id, title: title, description: desc, votes: [state.currentUser.id], status: 'open', date: new Date().toISOString() });
                 App.navigate('module', 'suggestions');
             }
         },
@@ -1463,60 +1512,49 @@
             const idea = db.suggestions.find(s => s.id === id);
             if(idea) {
                 const voteIndex = idea.votes.indexOf(state.currentUser.id);
-                if(voteIndex > -1) {
-                    idea.votes.splice(voteIndex, 1); // Remove vote
-                } else {
-                    idea.votes.push(state.currentUser.id); // Add vote
-                }
-                App.navigate('module', 'suggestions'); // Refresh UI
+                if(voteIndex > -1) { idea.votes.splice(voteIndex, 1); } else { idea.votes.push(state.currentUser.id); }
+                App.navigate('module', 'suggestions');
             }
         },
 
-        // Widget for Owner Dashboard
         renderAdminWidget: function() {
-            const topIdeas = db.suggestions.filter(s => s.status === 'open')
-                                .sort((a, b) => b.votes.length - a.votes.length).slice(0, 3);
-            
+            const topIdeas = db.suggestions.filter(s => s.status === 'open').sort((a, b) => b.votes.length - a.votes.length).slice(0, 3);
             let html = `
                 <div class="card-3d p-4 bg-yellow-50">
                     <div class="flex justify-between items-center border-b-2 border-gray-800 pb-2 mb-3">
-                        <h3 class="font-bold flex items-center gap-2"><i class="ph-fill ph-lightbulb text-yellow-500"></i> Innovation Board</h3>
+                        <h3 class="font-bold flex items-center gap-2"><i class="ph-fill ph-lightbulb text-yellow-500"></i> ${t('innovation_board')}</h3>
                     </div>
                     <div class="space-y-3">
             `;
 
             if(topIdeas.length === 0) {
-                html += `<p class="text-xs text-gray-500 text-center py-2">No active suggestions.</p>`;
+                html += `<p class="text-xs text-gray-500 text-center py-2">${t('no_ideas')}</p>`;
             } else {
                 topIdeas.forEach(idea => {
                     html += `
                         <div class="bg-white border-2 border-gray-800 rounded-xl p-3 shadow-[2px_2px_0_0_#1f2937] flex items-center gap-3">
                             <div class="w-10 h-10 bg-yellow-100 rounded-full border border-yellow-400 flex flex-col items-center justify-center flex-shrink-0">
                                 <span class="font-bold text-yellow-600 leading-none">${idea.votes.length}</span>
-                                <span class="text-[8px] font-bold text-yellow-600 uppercase">Votes</span>
+                                <span class="text-[8px] font-bold text-yellow-600 uppercase">${t('votes')}</span>
                             </div>
                             <div class="flex-1">
                                 <div class="text-sm font-bold text-gray-800 truncate">${idea.title}</div>
                                 <div class="text-[10px] text-gray-500 truncate max-w-[150px]">${idea.description}</div>
                             </div>
-                            <button onclick="SuggestionsModule.markImplemented(${idea.id})" class="btn-sm-3d bg-yellow-400 text-gray-900 p-2 flex items-center justify-center min-w-[36px]" title="Mark Implemented">
+                            <button onclick="SuggestionsModule.markImplemented(${idea.id})" class="btn-sm-3d bg-yellow-400 text-gray-900 p-2 flex items-center justify-center min-w-[36px]">
                                 <i class="ph-bold ph-check-circle text-lg"></i>
                             </button>
                         </div>
                     `;
                 });
             }
-
             html += `</div></div>`;
             return html;
         },
 
         markImplemented: function(id) {
             const idea = db.suggestions.find(s => s.id === id);
-            if(idea) {
-                idea.status = 'implemented';
-                App.renderOwnerDashboard();
-            }
+            if(idea) { idea.status = 'implemented'; App.renderOwnerDashboard(); }
         }
     };
 
@@ -1524,29 +1562,23 @@
     // MODULE 10: TEAM POLLS & SURVEYS
     // =========================================
     const PollsModule = {
-        id: 'polls', name: 'Polls', description: 'Create and vote on team surveys.', icon: 'ph-chart-bar', hasUserTab: true,
+        id: 'polls', nameKey: 'mod_polls', descKey: 'mod_polls_desc', icon: 'ph-chart-bar', hasUserTab: true,
 
-        // Full Screen View for Employee
         renderUserView: function() {
             const activePolls = [...db.polls].reverse();
-            
             let html = `
                 <div class="space-y-6 pb-20">
                     <div>
-                        <h2 class="text-2xl font-bold">Team Polls</h2>
-                        <p class="text-gray-500">Have your say in company decisions.</p>
+                        <h2 class="text-2xl font-bold">${t('mod_polls')}</h2>
+                        <p class="text-gray-500">${t('have_say')}</p>
                     </div>
                     <div class="space-y-4">
             `;
 
-            if(activePolls.length === 0) {
-                html += `<div class="text-center text-gray-400 py-6"><p>No active polls at the moment.</p></div>`;
-            }
+            if(activePolls.length === 0) { html += `<div class="text-center text-gray-400 py-6"><p>${t('no_polls')}</p></div>`; }
 
             activePolls.forEach(poll => {
-                // Check if current user has voted in this poll
-                let userVoted = false;
-                let totalVotes = 0;
+                let userVoted = false; let totalVotes = 0;
                 poll.options.forEach(opt => {
                     totalVotes += opt.votes.length;
                     if(opt.votes.includes(state.currentUser.id)) userVoted = true;
@@ -1558,7 +1590,7 @@
                             <i class="ph-fill ph-chart-bar text-indigo-500 text-2xl mt-1"></i>
                             <div>
                                 <h3 class="font-bold text-lg leading-tight text-gray-800">${poll.question}</h3>
-                                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-1">${totalVotes} votes total</div>
+                                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-1">${totalVotes} ${t('votes_total')}</div>
                             </div>
                         </div>
                         <div class="space-y-2">
@@ -1569,7 +1601,6 @@
                     const isMyVote = opt.votes.includes(state.currentUser.id);
                     
                     if (userVoted) {
-                        // Show results view
                         const barColor = isMyVote ? 'bg-indigo-400' : 'bg-gray-200';
                         const textColor = isMyVote ? 'font-bold text-indigo-900' : 'text-gray-600';
                         html += `
@@ -1582,7 +1613,6 @@
                             </div>
                         `;
                     } else {
-                        // Show voting buttons
                         html += `
                             <button onclick="PollsModule.castVote(${poll.id}, ${index})" class="btn-sm-3d w-full bg-white hover:bg-indigo-50 py-2 px-4 text-left flex justify-between items-center transition-colors">
                                 <span class="font-bold text-gray-700">${opt.text}</span>
@@ -1591,10 +1621,8 @@
                         `;
                     }
                 });
-
                 html += `</div></div>`;
             });
-
             html += `</div></div>`;
             return html;
         },
@@ -1607,22 +1635,19 @@
             }
         },
 
-        // Widget for Owner Dashboard
         renderAdminWidget: function() {
             const activePolls = [...db.polls].reverse().slice(0,2);
-            
             let html = `
                 <div class="card-3d p-4 bg-indigo-50">
                     <div class="flex justify-between items-center border-b-2 border-gray-800 pb-2 mb-3">
-                        <h3 class="font-bold flex items-center gap-2"><i class="ph-fill ph-chart-bar text-indigo-500"></i> Live Polls</h3>
+                        <h3 class="font-bold flex items-center gap-2"><i class="ph-fill ph-chart-bar text-indigo-500"></i> ${t('live_polls')}</h3>
                     </div>
                     
-                    <!-- Create Poll Form -->
                     <div class="mb-4 space-y-2">
-                        <input type="text" id="poll-question" placeholder="Ask the team a question..." class="w-full border-2 border-gray-800 rounded-lg px-2 py-1 text-sm outline-none focus:bg-white bg-transparent font-bold">
-                        <input type="text" id="poll-options" placeholder="Options (comma separated, e.g. Pizza, Sushi)" class="w-full border-2 border-gray-800 rounded-lg px-2 py-1 text-sm outline-none focus:bg-white bg-transparent">
+                        <input type="text" id="poll-question" placeholder="${t('ask_team')}" class="w-full border-2 border-gray-800 rounded-lg px-2 py-1 text-sm outline-none focus:bg-white bg-transparent font-bold">
+                        <input type="text" id="poll-options" placeholder="${t('options_comma')}" class="w-full border-2 border-gray-800 rounded-lg px-2 py-1 text-sm outline-none focus:bg-white bg-transparent">
                         <button onclick="PollsModule.createPoll()" class="btn-sm-3d w-full bg-indigo-400 text-white py-1 text-xs flex items-center justify-center gap-1">
-                            <i class="ph-bold ph-plus"></i> Create Poll
+                            <i class="ph-bold ph-plus"></i> ${t('create_poll')}
                         </button>
                     </div>
 
@@ -1630,12 +1655,11 @@
             `;
 
             if(activePolls.length === 0) {
-                html += `<p class="text-xs text-gray-500 text-center py-2">No active polls.</p>`;
+                html += `<p class="text-xs text-gray-500 text-center py-2">${t('no_polls')}</p>`;
             } else {
                 activePolls.forEach(poll => {
                     let total = 0;
                     poll.options.forEach(o => total += o.votes.length);
-                    // Find leading option
                     let leading = poll.options.reduce((prev, current) => (prev.votes.length > current.votes.length) ? prev : current);
 
                     html += `
@@ -1643,15 +1667,14 @@
                             <div class="text-sm font-bold text-gray-800 leading-tight mb-1">${poll.question}</div>
                             <div class="flex justify-between items-end">
                                 <div class="text-xs text-gray-600">
-                                    Leading: <span class="font-bold text-indigo-600">${total > 0 ? leading.text : 'None yet'}</span>
+                                    ${t('leading')}: <span class="font-bold text-indigo-600">${total > 0 ? leading.text : t('none_yet')}</span>
                                 </div>
-                                <span class="bg-gray-100 px-2 py-0.5 rounded text-[10px] font-bold border border-gray-300">${total} votes</span>
+                                <span class="bg-gray-100 px-2 py-0.5 rounded text-[10px] font-bold border border-gray-300">${total} ${t('votes')}</span>
                             </div>
                         </div>
                     `;
                 });
             }
-
             html += `</div></div>`;
             return html;
         },
@@ -1659,21 +1682,14 @@
         createPoll: function() {
             const q = document.getElementById('poll-question').value.trim();
             const optString = document.getElementById('poll-options').value.trim();
-            
             if(q && optString) {
                 const optArray = optString.split(',').map(s => s.trim()).filter(s => s.length > 0);
                 if(optArray.length >= 2) {
                     const formattedOptions = optArray.map(text => ({ text: text, votes: [] }));
-                    db.polls.push({
-                        id: Date.now(),
-                        question: q,
-                        options: formattedOptions,
-                        status: 'active',
-                        date: new Date().toISOString()
-                    });
+                    db.polls.push({ id: Date.now(), question: q, options: formattedOptions, status: 'active', date: new Date().toISOString() });
                     App.renderOwnerDashboard();
                 } else {
-                    alert("Please provide at least 2 options."); // Basic fallback validation
+                    alert("Please provide at least 2 options.");
                 }
             }
         }
@@ -1683,54 +1699,47 @@
     // MODULE 11: COMPANY EVENTS / CALENDAR
     // =========================================
     const EventsModule = {
-        id: 'events', name: 'Events', description: 'Company calendar and event RSVPs.', icon: 'ph-calendar-star', hasUserTab: true,
+        id: 'events', nameKey: 'mod_events', descKey: 'mod_events_desc', icon: 'ph-calendar-star', hasUserTab: true,
 
-        // Full Screen View for Employee
         renderUserView: function() {
             const upcomingEvents = [...db.events].sort((a,b) => new Date(a.date) - new Date(b.date));
-            
             let html = `
                 <div class="space-y-6 pb-20">
                     <div>
-                        <h2 class="text-2xl font-bold">Upcoming Events</h2>
-                        <p class="text-gray-500">See what's happening and RSVP.</p>
+                        <h2 class="text-2xl font-bold">${t('mod_events')}</h2>
+                        <p class="text-gray-500">${t('see_whats_happening')}</p>
                     </div>
                     <div class="space-y-4">
             `;
 
-            if(upcomingEvents.length === 0) {
-                html += `<div class="text-center text-gray-400 py-6"><p>No upcoming events.</p></div>`;
-            }
+            if(upcomingEvents.length === 0) { html += `<div class="text-center text-gray-400 py-6"><p>${t('no_events')}</p></div>`; }
 
             upcomingEvents.forEach(evt => {
                 const eventDate = new Date(evt.date);
-                const month = eventDate.toLocaleString('default', { month: 'short' }).toUpperCase();
+                const month = eventDate.toLocaleString(state.language === 'th' ? 'th-TH' : 'default', { month: 'short' }).toUpperCase();
                 const day = eventDate.getDate();
                 
                 const isAttending = evt.attendees.includes(state.currentUser.id);
                 const rsvpBtnClass = isAttending ? 'bg-teal-400 text-white' : 'bg-white text-gray-800';
-                const rsvpText = isAttending ? '<i class="ph-bold ph-check"></i> Attending' : 'RSVP';
+                const rsvpText = isAttending ? `<i class="ph-bold ph-check"></i> ${t('attending')}` : t('rsvp');
 
-                let icon = 'ph-calendar-star';
-                let iconColor = 'text-teal-500';
+                let icon = 'ph-calendar-star'; let iconColor = 'text-teal-500';
                 if(evt.type === 'party') { icon = 'ph-confetti'; iconColor = 'text-pink-500'; }
                 else if(evt.type === 'meeting') { icon = 'ph-users-three'; iconColor = 'text-blue-500'; }
 
                 html += `
                     <div class="card-3d p-0 overflow-hidden bg-white flex">
-                        <!-- Calendar Date Box -->
                         <div class="bg-gray-100 border-r-2 border-gray-800 p-4 flex flex-col items-center justify-center min-w-[80px]">
                             <span class="text-xs font-bold text-red-500 tracking-wider">${month}</span>
                             <span class="text-2xl font-bold text-gray-800 leading-none">${day}</span>
                         </div>
-                        <!-- Event Details -->
                         <div class="p-4 flex-1 flex flex-col justify-between">
                             <div>
                                 <div class="flex items-center gap-2 mb-1">
                                     <i class="ph-fill ${icon} ${iconColor} text-lg"></i>
                                     <h3 class="font-bold text-lg leading-tight text-gray-800">${evt.title}</h3>
                                 </div>
-                                <p class="text-xs text-gray-500 font-bold mb-3">${evt.attendees.length} people going</p>
+                                <p class="text-xs text-gray-500 font-bold mb-3">${evt.attendees.length} ${t('people_going')}</p>
                             </div>
                             <button onclick="EventsModule.toggleRSVP(${evt.id})" class="btn-sm-3d w-full py-2 text-sm flex items-center justify-center gap-2 ${rsvpBtnClass} transition-colors">
                                 ${rsvpText}
@@ -1739,7 +1748,6 @@
                     </div>
                 `;
             });
-
             html += `</div></div>`;
             return html;
         },
@@ -1748,28 +1756,21 @@
             const evt = db.events.find(e => e.id === id);
             if(evt) {
                 const idx = evt.attendees.indexOf(state.currentUser.id);
-                if(idx > -1) {
-                    evt.attendees.splice(idx, 1);
-                } else {
-                    evt.attendees.push(state.currentUser.id);
-                }
+                if(idx > -1) { evt.attendees.splice(idx, 1); } else { evt.attendees.push(state.currentUser.id); }
                 App.navigate('module', 'events');
             }
         },
 
-        // Widget for Owner Dashboard
         renderAdminWidget: function() {
             const upcomingEvents = [...db.events].sort((a,b) => new Date(a.date) - new Date(b.date)).slice(0, 2);
-            
             let html = `
                 <div class="card-3d p-4 bg-teal-50">
                     <div class="flex justify-between items-center border-b-2 border-gray-800 pb-2 mb-3">
-                        <h3 class="font-bold flex items-center gap-2"><i class="ph-fill ph-calendar-star text-teal-600"></i> Company Events</h3>
+                        <h3 class="font-bold flex items-center gap-2"><i class="ph-fill ph-calendar-star text-teal-600"></i> ${t('company_events')}</h3>
                     </div>
                     
-                    <!-- Create Event Form -->
                     <div class="mb-4 space-y-2">
-                        <input type="text" id="evt-title" placeholder="Event Name..." class="w-full border-2 border-gray-800 rounded-lg px-2 py-1 text-sm outline-none focus:bg-white bg-transparent font-bold">
+                        <input type="text" id="evt-title" placeholder="${t('event_name')}" class="w-full border-2 border-gray-800 rounded-lg px-2 py-1 text-sm outline-none focus:bg-white bg-transparent font-bold">
                         <div class="flex gap-2">
                             <input type="date" id="evt-date" class="flex-1 border-2 border-gray-800 rounded-lg px-2 py-1 text-sm outline-none focus:bg-white bg-transparent">
                             <select id="evt-type" class="border-2 border-gray-800 rounded-lg px-1 text-sm bg-transparent outline-none">
@@ -1779,7 +1780,7 @@
                             </select>
                         </div>
                         <button onclick="EventsModule.createEvent()" class="btn-sm-3d w-full bg-teal-400 text-white py-1 text-xs flex items-center justify-center gap-1">
-                            <i class="ph-bold ph-plus"></i> Add Event
+                            <i class="ph-bold ph-plus"></i> ${t('add_event')}
                         </button>
                     </div>
 
@@ -1787,7 +1788,7 @@
             `;
 
             if(upcomingEvents.length === 0) {
-                html += `<p class="text-xs text-gray-500 text-center py-2">No upcoming events.</p>`;
+                html += `<p class="text-xs text-gray-500 text-center py-2">${t('no_events')}</p>`;
             } else {
                 upcomingEvents.forEach(evt => {
                     const eventDate = new Date(evt.date);
@@ -1795,16 +1796,15 @@
                         <div class="bg-white border-2 border-gray-800 rounded-xl p-3 shadow-[2px_2px_0_0_#1f2937] flex items-center justify-between">
                             <div>
                                 <div class="text-sm font-bold text-gray-800 leading-tight">${evt.title}</div>
-                                <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">${eventDate.toLocaleDateString()}</div>
+                                <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">${eventDate.toLocaleDateString(state.language === 'th' ? 'th-TH' : 'en-US')}</div>
                             </div>
                             <div class="bg-gray-100 px-2 py-1 rounded text-[10px] font-bold border border-gray-300 flex items-center gap-1">
-                                <i class="ph-fill ph-users text-teal-500"></i> ${evt.attendees.length} RSVPs
+                                <i class="ph-fill ph-users text-teal-500"></i> ${evt.attendees.length} ${t('rsvp')}
                             </div>
                         </div>
                     `;
                 });
             }
-
             html += `</div></div>`;
             return html;
         },
@@ -1813,15 +1813,8 @@
             const title = document.getElementById('evt-title').value.trim();
             const dateVal = document.getElementById('evt-date').value;
             const typeVal = document.getElementById('evt-type').value;
-            
             if(title && dateVal) {
-                db.events.push({
-                    id: Date.now(),
-                    title: title,
-                    date: dateVal,
-                    type: typeVal,
-                    attendees: []
-                });
+                db.events.push({ id: Date.now(), title: title, date: dateVal, type: typeVal, attendees: [] });
                 App.renderOwnerDashboard();
             }
         }
@@ -1831,25 +1824,23 @@
     // MODULE 12: TEAM DIRECTORY
     // =========================================
     const DirectoryModule = {
-        id: 'directory', name: 'Team', description: 'Company directory and contact roster.', icon: 'ph-address-book', hasUserTab: true,
+        id: 'directory', nameKey: 'mod_team', descKey: 'mod_team_desc', icon: 'ph-address-book', hasUserTab: true,
 
-        // Full Screen View for Employee
         renderUserView: function() {
             let html = `
                 <div class="space-y-6 pb-20">
                     <div>
-                        <h2 class="text-2xl font-bold">Team Directory</h2>
-                        <p class="text-gray-500">Contact your colleagues.</p>
+                        <h2 class="text-2xl font-bold">${t('mod_team')}</h2>
+                        <p class="text-gray-500">${t('contact_colleagues')}</p>
                     </div>
                     <div class="space-y-4">
             `;
             
             db.users.forEach(user => {
-                // Check if user is currently working
                 const isOnline = isClockedIn(user.id);
                 const statusHtml = isOnline 
-                    ? '<span class="text-green-500 flex items-center justify-end gap-1"><i class="ph-fill ph-circle text-[8px]"></i> Active</span>' 
-                    : '<span class="text-gray-400 flex items-center justify-end gap-1"><i class="ph-fill ph-circle text-[8px]"></i> Offline</span>';
+                    ? `<span class="text-green-500 flex items-center justify-end gap-1"><i class="ph-fill ph-circle text-[8px]"></i> ${t('active')}</span>` 
+                    : `<span class="text-gray-400 flex items-center justify-end gap-1"><i class="ph-fill ph-circle text-[8px]"></i> ${t('offline')}</span>`;
 
                 html += `
                     <div class="card-3d p-4 bg-white flex flex-col gap-3">
@@ -1857,41 +1848,37 @@
                             <div class="w-12 h-12 rounded-full border-2 border-gray-800 ${user.color} flex items-center justify-center text-lg font-bold shadow-[2px_2px_0_0_#1f2937] flex-shrink-0">${user.initials}</div>
                             <div class="flex-1 min-w-0">
                                 <div class="font-bold text-lg text-gray-800 leading-tight truncate">${user.name}</div>
-                                <div class="text-xs font-bold text-gray-500 uppercase tracking-wider">${user.role}</div>
+                                <div class="text-xs font-bold text-gray-500 uppercase tracking-wider">${t(user.role)}</div>
                             </div>
                             <div class="text-[10px] font-bold text-right">${statusHtml}</div>
                         </div>
                         <div class="flex gap-2 mt-1">
                             <a href="tel:${user.phone}" class="flex-1 btn-sm-3d bg-gray-50 hover:bg-gray-100 text-gray-800 py-2 flex items-center justify-center gap-2 text-sm transition-colors">
-                                <i class="ph-fill ph-phone text-lg"></i> Call
+                                <i class="ph-fill ph-phone text-lg"></i> ${t('call')}
                             </a>
                             <a href="mailto:${user.email}" class="flex-1 btn-sm-3d bg-gray-50 hover:bg-gray-100 text-gray-800 py-2 flex items-center justify-center gap-2 text-sm transition-colors">
-                                <i class="ph-fill ph-envelope-simple text-lg"></i> Email
+                                <i class="ph-fill ph-envelope-simple text-lg"></i> ${t('email')}
                             </a>
                         </div>
                     </div>
                 `;
             });
-
             html += `</div></div>`;
             return html;
         },
 
-        // Widget for Owner Dashboard
         renderAdminWidget: function() {
             const employees = db.users.filter(u => u.role !== 'owner');
-            
             return `
                 <div class="card-3d p-4 bg-gray-50">
                     <div class="flex justify-between items-center border-b-2 border-gray-800 pb-2 mb-3">
-                        <h3 class="font-bold flex items-center gap-2"><i class="ph-fill ph-users text-gray-700"></i> Team Management</h3>
-                        <span class="bg-gray-200 text-gray-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-gray-300">${db.users.length} Total</span>
+                        <h3 class="font-bold flex items-center gap-2"><i class="ph-fill ph-users text-gray-700"></i> ${t('team_management')}</h3>
+                        <span class="bg-gray-200 text-gray-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-gray-300">${db.users.length} ${t('total')}</span>
                     </div>
-                    <p class="text-sm text-gray-600 mb-4">You have <strong>${employees.length}</strong> active employees on your roster.</p>
+                    <p class="text-sm text-gray-600 mb-4">${t('you_have')} <strong>${employees.length}</strong> ${t('active_emps')}</p>
                     
-                    <!-- Simulated Invite Button (Opens Native Email App) -->
                     <a href="mailto:?subject=Join our WorkFlow Team&body=Please download the WorkFlow app to join our company portal." class="btn-sm-3d w-full bg-gray-800 text-white py-2 text-sm flex items-center justify-center gap-2 hover:bg-gray-700 transition-colors">
-                        <i class="ph-bold ph-user-plus text-lg"></i> Invite New Employee
+                        <i class="ph-bold ph-user-plus text-lg"></i> ${t('invite_emp')}
                     </a>
                 </div>
             `;
@@ -1902,33 +1889,28 @@
     // MODULE 13: COMPANY GOALS & TARGETS
     // =========================================
     const GoalsModule = {
-        id: 'goals', name: 'Goals', description: 'Track company-wide targets and milestones.', icon: 'ph-target', hasUserTab: true,
+        id: 'goals', nameKey: 'mod_goals', descKey: 'mod_goals_desc', icon: 'ph-target', hasUserTab: true,
 
         formatValue: function(val, unit, prefix) {
             return prefix ? `${unit}${val.toLocaleString()}` : `${val.toLocaleString()}${unit}`;
         },
 
-        // Full Screen View for Employee
         renderUserView: function() {
             let html = `
                 <div class="space-y-6 pb-20">
                     <div>
-                        <h2 class="text-2xl font-bold">Company Goals</h2>
-                        <p class="text-gray-500">Track our team's progress!</p>
+                        <h2 class="text-2xl font-bold">${t('mod_goals')}</h2>
+                        <p class="text-gray-500">${t('track_progress')}</p>
                     </div>
                     <div class="space-y-5">
             `;
 
-            if(db.goals.length === 0) {
-                html += `<div class="text-center text-gray-400 py-6"><p>No active goals right now.</p></div>`;
-            }
+            if(db.goals.length === 0) { html += `<div class="text-center text-gray-400 py-6"><p>${t('no_goals')}</p></div>`; }
 
             db.goals.forEach(goal => {
                 const pct = Math.min(100, Math.round((goal.current / goal.target) * 100));
                 const currentFmt = this.formatValue(goal.current, goal.unit, goal.prefix);
                 const targetFmt = this.formatValue(goal.target, goal.unit, goal.prefix);
-                
-                // Show a star icon if 100% completed
                 const titleIcon = pct >= 100 ? '<i class="ph-fill ph-star text-yellow-500 ml-2 animate-pulse"></i>' : '';
 
                 html += `
@@ -1939,16 +1921,12 @@
                             </div>
                             <div class="flex-1">
                                 <h3 class="font-bold text-lg leading-tight text-gray-800 flex items-center">${goal.title} ${titleIcon}</h3>
-                                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-1">Goal: ${targetFmt}</div>
+                                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-1">${t('goal')}: ${targetFmt}</div>
                             </div>
                         </div>
                         
-                        <!-- 3D Progress Bar -->
                         <div class="relative w-full h-8 bg-gray-100 rounded-full border-2 border-gray-800 overflow-hidden shadow-inner flex items-center px-3 z-0">
-                            <!-- Fill -->
                             <div class="absolute top-0 left-0 h-full ${goal.color} transition-all duration-1000 -z-10 border-r-2 border-gray-800" style="width: ${pct}%"></div>
-                            
-                            <!-- Overlay Text -->
                             <div class="flex justify-between w-full text-xs font-bold text-gray-900 z-10 mix-blend-hard-light">
                                 <span>${currentFmt}</span>
                                 <span>${pct}%</span>
@@ -1957,23 +1935,20 @@
                     </div>
                 `;
             });
-
             html += `</div></div>`;
             return html;
         },
 
-        // Widget for Owner Dashboard
         renderAdminWidget: function() {
             let html = `
                 <div class="card-3d p-4 bg-purple-50">
                     <div class="flex justify-between items-center border-b-2 border-gray-800 pb-2 mb-3">
-                        <h3 class="font-bold flex items-center gap-2"><i class="ph-fill ph-target text-purple-600"></i> Active Milestones</h3>
+                        <h3 class="font-bold flex items-center gap-2"><i class="ph-fill ph-target text-purple-600"></i> ${t('active_milestones')}</h3>
                     </div>
                     
-                    <!-- Create Goal Form -->
                     <div class="mb-4 flex gap-2">
-                        <input type="text" id="goal-new-title" placeholder="New Goal Name..." class="flex-1 border-2 border-gray-800 rounded-lg px-2 py-1 text-sm outline-none focus:bg-white bg-transparent font-bold">
-                        <input type="number" id="goal-new-target" placeholder="Target..." class="w-24 border-2 border-gray-800 rounded-lg px-2 py-1 text-sm outline-none focus:bg-white bg-transparent">
+                        <input type="text" id="goal-new-title" placeholder="${t('new_goal_name')}" class="flex-1 border-2 border-gray-800 rounded-lg px-2 py-1 text-sm outline-none focus:bg-white bg-transparent font-bold">
+                        <input type="number" id="goal-new-target" placeholder="${t('target')}" class="w-24 border-2 border-gray-800 rounded-lg px-2 py-1 text-sm outline-none focus:bg-white bg-transparent">
                         <button onclick="GoalsModule.createGoal()" class="btn-sm-3d bg-purple-400 text-white px-3 flex items-center justify-center">
                             <i class="ph-bold ph-plus"></i>
                         </button>
@@ -1983,7 +1958,7 @@
             `;
 
             if(db.goals.length === 0) {
-                html += `<p class="text-xs text-gray-500 text-center py-2">No active goals.</p>`;
+                html += `<p class="text-xs text-gray-500 text-center py-2">${t('no_goals')}</p>`;
             } else {
                 db.goals.forEach(goal => {
                     const pct = Math.min(100, Math.round((goal.current / goal.target) * 100));
@@ -1996,7 +1971,6 @@
                                 <span class="text-xs font-bold ${isDone ? 'text-green-500' : 'text-purple-600'}">${pct}%</span>
                             </div>
                             
-                            <!-- Mini Progress -->
                             <div class="w-full h-2 bg-gray-200 rounded-full mb-3 overflow-hidden">
                                 <div class="h-full ${goal.color}" style="width: ${pct}%"></div>
                             </div>
@@ -2004,14 +1978,13 @@
                             <div class="flex justify-between items-center">
                                 <span class="text-[10px] text-gray-500 font-bold">${this.formatValue(goal.current, goal.unit, goal.prefix)} / ${this.formatValue(goal.target, goal.unit, goal.prefix)}</span>
                                 <button onclick="GoalsModule.addProgress(${goal.id})" class="btn-sm-3d bg-gray-800 text-white px-2 py-1 text-[10px] font-bold ${isDone ? 'opacity-50 pointer-events-none' : ''}">
-                                    Add 10% Progress
+                                    ${t('add_progress')}
                                 </button>
                             </div>
                         </div>
                     `;
                 });
             }
-
             html += `</div></div>`;
             return html;
         },
@@ -2019,20 +1992,10 @@
         createGoal: function() {
             const title = document.getElementById('goal-new-title').value.trim();
             const targetVal = parseFloat(document.getElementById('goal-new-target').value);
-            
             if(title && !isNaN(targetVal) && targetVal > 0) {
                 const colors = ['bg-red-400', 'bg-blue-400', 'bg-emerald-400', 'bg-yellow-400', 'bg-purple-400'];
                 const randomColor = colors[Math.floor(Math.random() * colors.length)];
-                
-                db.goals.push({
-                    id: Date.now(),
-                    title: title,
-                    current: 0,
-                    target: targetVal,
-                    unit: '', // Simplification for user-added goals
-                    prefix: false,
-                    color: randomColor
-                });
+                db.goals.push({ id: Date.now(), title: title, current: 0, target: targetVal, unit: '', prefix: false, color: randomColor });
                 App.renderOwnerDashboard();
             }
         },
@@ -2040,7 +2003,6 @@
         addProgress: function(id) {
             const goal = db.goals.find(g => g.id === id);
             if(goal && goal.current < goal.target) {
-                // Add roughly 10% of the target per click
                 const increment = Math.max(1, Math.ceil(goal.target * 0.1));
                 goal.current = Math.min(goal.target, goal.current + increment);
                 App.renderOwnerDashboard();
@@ -2063,7 +2025,7 @@
     App.registerModule(PollsModule); 
     App.registerModule(EventsModule); 
     App.registerModule(DirectoryModule); 
-    App.registerModule(GoalsModule); // Register the new module!
+    App.registerModule(GoalsModule);
     
     window.onload = () => App.init();
 
