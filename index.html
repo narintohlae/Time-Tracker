@@ -11,16 +11,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Space Grotesk', 'Noto Sans Thai', sans-serif; background-color: #f0fdf4; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; overflow: hidden; }
-        #app-container { max-width: 430px; margin: 0 auto; height: 100vh; height: 100dvh; background-color: #ffffff; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(0,0,0,0.1); position: relative; }
+        /* Clean Modern OS UI Reskin */
+        body { font-family: 'Space Grotesk', 'Noto Sans Thai', sans-serif; background-color: #f8fafc; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; overflow: hidden; }
+        #app-container { max-width: 430px; margin: 0 auto; height: 100vh; height: 100dvh; background-color: #f8fafc; display: flex; flex-direction: column; position: relative; }
         .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* 3D UI */
-        .btn-3d { border: 3px solid #1f2937; border-radius: 16px; box-shadow: 4px 6px 0px #1f2937; transition: all 0.1s ease; position: relative; font-weight: 700; cursor: pointer; }
-        .btn-3d:active { box-shadow: 0px 0px 0px #1f2937; transform: translate(4px, 6px); }
-        .btn-sm-3d { border: 2px solid #1f2937; border-radius: 10px; box-shadow: 2px 3px 0px #1f2937; transition: all 0.1s ease; font-weight: 700; cursor: pointer; }
-        .btn-sm-3d:active { box-shadow: 0px 0px 0px #1f2937; transform: translate(2px, 3px); }
-        .card-3d { border: 2px solid #1f2937; border-radius: 12px; box-shadow: 4px 4px 0px #1f2937; background-color: #ffffff; margin-bottom: 16px; }
+        /* Modernized Buttons & Cards (Overriding the old Brutalist 3D UI) */
+        .btn-3d { border-radius: 16px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); position: relative; font-weight: 600; cursor: pointer; border: none !important; box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important; }
+        .btn-3d:active { transform: scale(0.96); box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important; }
+        .btn-sm-3d { border-radius: 10px; transition: all 0.2s ease; font-weight: 600; cursor: pointer; border: 1px solid #e2e8f0 !important; box-shadow: 0 2px 6px rgba(0,0,0,0.03) !important; background-color: #ffffff; }
+        .btn-sm-3d:active { transform: scale(0.95); }
+        .card-3d { border-radius: 20px; background-color: #ffffff; margin-bottom: 16px; border: 1px solid #f1f5f9 !important; box-shadow: 0 8px 24px rgba(149, 157, 165, 0.08) !important; overflow: hidden; }
+
+        /* Override old hardcoded borders and shadows globally */
+        .border-gray-800 { border-color: #e2e8f0 !important; }
+        .border-2 { border-width: 1px !important; }
+        .bg-gray-800 { background-color: #1e293b !important; }
+        .text-gray-800 { color: #0f172a !important; }
+        .shadow-\[2px_2px_0_0_\#1f2937\], .shadow-\[1px_1px_0_0_\#1f2937\], .shadow-\[6px_6px_0_0_\#1f2937\] { box-shadow: none !important; }
+        
+        /* App Grid Icons */
+        .app-icon { border: 1px solid #f1f5f9; box-shadow: 0 8px 16px rgba(149, 157, 165, 0.08); }
 
         /* Isometric Map */
         .iso-container { perspective: 1000px; padding: 40px 0; display: flex; justify-content: center; overflow: visible; }
@@ -128,9 +139,9 @@
             "Set Location": "บันทึกสถานที่", "Office": "ออฟฟิศ", "Home": "บ้าน", "Remote": "นอกสถานที่",
             "Team Locations": "ตำแหน่งของทีม", "No locations set yet.": "ยังไม่มีการระบุสถานที่",
             "Referrals": "แนะนำเพื่อนงาน", "Refer friends for open positions and earn bonuses.": "แนะนำเพื่อนร่วมงานเพื่อรับโบนัส",
-            "Open Positions": "ตำแหน่งที่เปิดรับ", "Bonus": "โบนัส", "Refer Someone": "แนะนำเพื่อน",
-            "My Referrals": "ประวัติการแนะนำ", "Candidate Name": "ชื่อผู้สมัคร", "Recent Referrals": "การแนะนำล่าสุด",
-            "Interviewing": "กำลังสัมภาษณ์", "Hired": "รับเข้าทำงาน", "Pending": "รอดำเนินการ"
+            "Refer Someone": "แนะนำเพื่อน", "My Referrals": "ประวัติการแนะนำ", "Candidate Name": "ชื่อผู้สมัคร", 
+            "Recent Referrals": "การแนะนำล่าสุด", "Interviewing": "กำลังสัมภาษณ์", "Hired": "รับเข้าทำงาน", "Pending": "รอดำเนินการ",
+            "Profile": "โปรไฟล์", "Manage your account": "จัดการบัญชีของคุณ"
         };
         function t(str) { return (state.lang === 'th' && i18n_th[str]) ? i18n_th[str] : str; }
 
@@ -238,7 +249,7 @@
                 if (view === 'login') { this.renderLogin(); document.getElementById('app-nav').classList.add('hidden'); document.getElementById('header-title').innerText = t("Login"); }
                 else if (view === 'owner_dashboard') { this.renderOwnerDashboard(); this.renderNav(); document.getElementById('header-title').innerText = t("Dashboard"); }
                 else if (view === 'employee_home') { this.renderEmployeeHome(); this.renderNav(); document.getElementById('header-title').innerText = t("My Portal"); }
-                else if (view === 'settings') { this.renderSettings(); this.renderNav(); document.getElementById('header-title').innerText = t("App Settings"); }
+                else if (view === 'settings') { this.renderSettings(); this.renderNav(); document.getElementById('header-title').innerText = state.currentUser.role === 'owner' ? t("App Settings") : t("Profile"); }
                 else if (view === 'module' && moduleId) {
                     const mod = this.modules.find(m => m.id === moduleId);
                     if (mod && state.features[mod.id]) { content.innerHTML = mod.renderUserView(); document.getElementById('header-title').innerText = t(mod.name); if(mod.onLoad) mod.onLoad(); }
@@ -251,10 +262,36 @@
                 document.getElementById('app-content').innerHTML = html + `</div></div>`;
             },
             renderEmployeeHome: function() {
-                let html = `<div class="space-y-6"><div class="mb-4"><h2 class="text-2xl font-bold">${t("Hello")}, ${state.currentUser.name.split(' ')[0]}!</h2><p class="text-gray-500">${t("What would you like to do today?")}</p></div>`;
-                this.modules.forEach(mod => { if (state.features[mod.id] && mod.renderWidget) html += mod.renderWidget(); });
-                document.getElementById('app-content').innerHTML = html + `</div>`;
-                this.modules.forEach(mod => { if (state.features[mod.id] && mod.onWidgetLoad) setTimeout(() => mod.onWidgetLoad(), 0); });
+                let html = `
+                    <div class="space-y-6 pb-20">
+                        <div class="mb-2 bg-white p-6 rounded-[24px] shadow-sm border border-gray-100 flex justify-between items-center">
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-800">${t("Hello")}, ${state.currentUser.name.split(' ')[0]}!</h2>
+                                <p class="text-gray-500 text-sm">${t("What would you like to do today?")}</p>
+                            </div>
+                            <div class="w-14 h-14 rounded-full ${state.currentUser.color} flex items-center justify-center font-bold text-gray-800 text-xl shadow-sm border border-gray-200">
+                                ${state.currentUser.initials}
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-4 gap-y-6 gap-x-2 px-1">
+                `;
+                
+                // Renders a modern App Drawer Grid instead of stacked widgets
+                this.modules.forEach(mod => {
+                    if (state.features[mod.id] && mod.hasUserTab) {
+                        html += `
+                            <button onclick="App.navigate('module', '${mod.id}')" class="flex flex-col items-center gap-2 group outline-none">
+                                <div class="w-[60px] h-[60px] bg-white rounded-[18px] flex items-center justify-center text-3xl text-blue-500 app-icon group-active:scale-90 transition-transform duration-200">
+                                    <i class="ph-fill ${mod.icon}"></i>
+                                </div>
+                                <span class="text-[10px] font-medium text-gray-600 text-center leading-tight w-full truncate">${t(mod.name)}</span>
+                            </button>
+                        `;
+                    }
+                });
+                
+                html += `</div></div>`;
+                document.getElementById('app-content').innerHTML = html;
             },
             renderOwnerDashboard: function() {
                 const activeUsers = db.users.filter(u => u.role !== 'owner' && isClockedIn(u.id));
@@ -271,21 +308,47 @@
                 document.getElementById('app-content').innerHTML = html + `</div>`;
             },
             renderSettings: function() {
-                let html = `<div class="space-y-6"><div><h2 class="text-2xl font-bold">${t("App Features")}</h2><p class="text-gray-500">${t("Turn modules on or off dynamically.")}</p></div><div class="card-3d p-4 space-y-4">`;
-                this.modules.forEach(mod => {
-                    const isChecked = state.features[mod.id] ? 'checked' : '';
-                    html += `<div class="flex items-center justify-between border-b-2 border-gray-100 pb-4 last:border-0 last:pb-0"><div><div class="font-bold flex items-center gap-2"><i class="${mod.icon} text-xl"></i> ${t(mod.name)}</div><div class="text-sm text-gray-500">${t(mod.description)}</div></div><div class="relative inline-block w-14 h-8 align-middle select-none transition duration-200 ease-in"><input type="checkbox" id="toggle-${mod.id}" ${isChecked} class="toggle-checkbox absolute block w-8 h-8 rounded-full bg-white appearance-none cursor-pointer" onchange="App.toggleFeature('${mod.id}', this.checked)"/><label for="toggle-${mod.id}" class="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer"></label></div></div>`;
-                });
-                html += `</div><div class="mt-8 pt-8 border-t-2 border-gray-200"><button onclick="App.logout()" class="btn-3d w-full py-3 bg-red-100 text-red-600 flex justify-center items-center gap-2"><i class="ph-bold ph-sign-out"></i> ${t("Switch User Profile")}</button></div></div>`;
+                let html = `<div class="space-y-6 pb-20">`;
+                
+                if (state.currentUser.role === 'owner') {
+                    html += `<div><h2 class="text-2xl font-bold">${t("App Features")}</h2><p class="text-gray-500">${t("Turn modules on or off dynamically.")}</p></div><div class="card-3d p-4 space-y-4">`;
+                    this.modules.forEach(mod => {
+                        const isChecked = state.features[mod.id] ? 'checked' : '';
+                        html += `<div class="flex items-center justify-between border-b border-gray-100 pb-4 last:border-0 last:pb-0"><div><div class="font-bold flex items-center gap-2"><i class="${mod.icon} text-xl"></i> ${t(mod.name)}</div><div class="text-sm text-gray-500">${t(mod.description)}</div></div><div class="relative inline-block w-14 h-8 align-middle select-none transition duration-200 ease-in"><input type="checkbox" id="toggle-${mod.id}" ${isChecked} class="toggle-checkbox absolute block w-8 h-8 rounded-full bg-white appearance-none cursor-pointer" onchange="App.toggleFeature('${mod.id}', this.checked)"/><label for="toggle-${mod.id}" class="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer"></label></div></div>`;
+                    });
+                    html += `</div>`;
+                } else {
+                    html += `
+                        <div><h2 class="text-2xl font-bold">${t("Profile")}</h2><p class="text-gray-500">${t("Manage your account")}</p></div>
+                        <div class="card-3d p-8 flex flex-col items-center gap-4">
+                            <div class="w-24 h-24 rounded-full ${state.currentUser.color} flex items-center justify-center font-bold text-4xl border border-gray-200 shadow-sm">${state.currentUser.initials}</div>
+                            <div class="text-center">
+                                <h3 class="font-bold text-2xl mb-1">${state.currentUser.name}</h3>
+                                <p class="text-gray-500">${state.currentUser.email}</p>
+                                <div class="bg-gray-100 text-gray-600 px-4 py-1.5 rounded-full text-xs font-bold mt-3 inline-block uppercase tracking-wider">${t(state.currentUser.role)}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                html += `<div class="mt-8 pt-8 border-t border-gray-200"><button onclick="App.logout()" class="btn-3d w-full py-4 bg-red-50 text-red-600 flex justify-center items-center gap-2"><i class="ph-bold ph-sign-out text-lg"></i> ${t("Switch User Profile")}</button></div></div>`;
                 document.getElementById('app-content').innerHTML = html;
             },
             toggleFeature: function(moduleId, isEnabled) { state.features[moduleId] = isEnabled; this.renderNav(); if(state.currentView === 'owner_dashboard') this.renderOwnerDashboard(); },
             renderNav: function() {
                 const nav = document.getElementById('app-nav'); if (!state.currentUser) return; nav.classList.remove('hidden'); let html = '';
-                const createNavItem = (icon, label, targetView, targetModule, isActive) => `<button onclick="App.navigate('${targetView}'${targetModule ? `,'${targetModule}'` : ''})" class="flex flex-col items-center justify-center p-2 min-w-[64px] flex-shrink-0 transition-transform ${isActive ? 'text-gray-900 transform -translate-y-1' : 'text-gray-400'}"><div class="relative"><i class="${isActive ? 'ph-fill' : 'ph'} ${icon} text-3xl mb-1 drop-shadow-sm"></i>${isActive ? '<div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-gray-900 rounded-full"></div>' : ''}</div><span class="text-[10px] font-bold mt-1">${t(label)}</span></button>`;
-                if (state.currentUser.role === 'owner') { html += createNavItem('ph-squares-four', 'Overview', 'owner_dashboard', null, state.currentView === 'owner_dashboard'); html += createNavItem('ph-faders', 'Features', 'settings', null, state.currentView === 'settings'); }
-                else { html += createNavItem('ph-house', 'Home', 'employee_home', null, state.currentView === 'employee_home'); this.modules.forEach(mod => { if (state.features[mod.id] && mod.hasUserTab) html += createNavItem(mod.icon, mod.name, 'module', mod.id, state.currentView === 'module' && state.currentModuleId === mod.id); }); }
-                nav.innerHTML = html;
+                const createNavItem = (icon, label, targetView, targetModule, isActive) => `<button onclick="App.navigate('${targetView}'${targetModule ? `,'${targetModule}'` : ''})" class="flex flex-col items-center justify-center p-2 min-w-[64px] flex-shrink-0 transition-all ${isActive ? 'text-blue-600 transform -translate-y-1' : 'text-gray-400'}"><div class="relative"><i class="${isActive ? 'ph-fill' : 'ph'} ${icon} text-2xl mb-1"></i>${isActive ? '<div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-blue-600 rounded-full"></div>' : ''}</div><span class="text-[10px] font-bold mt-1">${t(label)}</span></button>`;
+                
+                // Fixed Clean Navigation Bar
+                if (state.currentUser.role === 'owner') { 
+                    html += createNavItem('ph-squares-four', 'Dashboard', 'owner_dashboard', null, state.currentView === 'owner_dashboard'); 
+                    html += createNavItem('ph-faders', 'Settings', 'settings', null, state.currentView === 'settings'); 
+                } else { 
+                    html += createNavItem('ph-house', 'Home', 'employee_home', null, state.currentView === 'employee_home'); 
+                    if(state.features['timeClock']) html += createNavItem('ph-clock', 'Time Clock', 'module', 'timeClock', state.currentModuleId === 'timeClock');
+                    html += createNavItem('ph-user', 'Profile', 'settings', null, state.currentView === 'settings'); 
+                }
+                nav.innerHTML = `<div class="flex justify-around w-full max-w-sm mx-auto">${html}</div>`;
             }
         };
 
@@ -297,14 +360,30 @@
         // =========================================
 
         const TimeTrackerModule = { 
-            id: 'timeClock', name: 'Time Clock', description: 'Allow employees to log work in and out times.', icon: 'ph-clock-countdown', hasUserTab: false, 
-            renderWidget: function() { 
+            id: 'timeClock', name: 'Time Clock', description: 'Allow employees to log work in and out times.', icon: 'ph-clock-countdown', hasUserTab: true, 
+            renderUserView: function() { 
                 const isW = isClockedIn(state.currentUser.id); 
-                return `<div class="card-3d p-6 text-center"><div class="flex justify-between items-center mb-6"><div class="text-left"><h3 class="text-xl font-bold">${isW ? t("Clocked In") : t("Clocked Out")}</h3><p class="text-sm text-gray-500 font-bold" id="live-clock">--:--:--</p></div><div class="w-12 h-12 bg-gray-100 rounded-full border-2 border-gray-800 flex items-center justify-center shadow-inner"><i class="ph-fill ph-clock text-2xl text-gray-800"></i></div></div><button onclick="TimeTrackerModule.toggleClock()" class="btn-3d w-full py-4 text-lg tracking-wider flex items-center justify-center gap-3 ${isW ? 'bg-red-400 text-white' : 'bg-green-400 text-white'}"><i class="ph-bold ${isW ? 'ph-sign-out' : 'ph-sign-in'} text-xl"></i> ${isW ? t("CLOCK OUT") : t("CLOCK IN")}</button></div>`; 
+                return `
+                    <div class="space-y-6 pb-20">
+                        <div><h2 class="text-2xl font-bold">${t("Time Clock")}</h2><p class="text-gray-500">${t("Time Logs")}</p></div>
+                        <div class="card-3d p-8 text-center">
+                            <div class="flex flex-col items-center justify-center mb-8">
+                                <div class="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-6">
+                                    <i class="ph-fill ph-clock text-5xl text-blue-500"></i>
+                                </div>
+                                <h3 class="text-2xl font-bold mb-1">${isW ? t("Clocked In") : t("Clocked Out")}</h3>
+                                <p class="text-3xl text-gray-400 font-mono tracking-wider mt-2" id="live-clock">--:--:--</p>
+                            </div>
+                            <button onclick="TimeTrackerModule.toggleClock()" class="btn-3d w-full py-5 text-lg font-bold tracking-wider flex items-center justify-center gap-3 ${isW ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}">
+                                <i class="ph-bold ${isW ? 'ph-sign-out' : 'ph-sign-in'} text-2xl"></i> ${isW ? t("CLOCK OUT") : t("CLOCK IN")}
+                            </button>
+                        </div>
+                    </div>
+                `; 
             }, 
-            onWidgetLoad: function() { const updateTime = () => { if(document.getElementById('live-clock')) document.getElementById('live-clock').innerText = new Date().toLocaleTimeString(); }; updateTime(); if(this.timer) clearInterval(this.timer); this.timer = setInterval(updateTime, 1000); }, 
-            toggleClock: function() { db.logs.push({ id: Date.now(), userId: state.currentUser.id, type: isClockedIn(state.currentUser.id) ? 'OUT' : 'IN', time: new Date().toISOString() }); App.renderEmployeeHome(); }, 
-            renderAdminWidget: function() { return `<div class="card-3d p-4"><h3 class="font-bold border-b-2 border-gray-100 pb-2 mb-3"><i class="ph-fill ph-clock-counter-clockwise"></i> ${t("Time Logs")}</h3><p class="text-sm text-gray-500 text-center py-2">${db.logs.length} records</p></div>`; } 
+            onLoad: function() { const updateTime = () => { if(document.getElementById('live-clock')) document.getElementById('live-clock').innerText = new Date().toLocaleTimeString(); }; updateTime(); if(this.timer) clearInterval(this.timer); this.timer = setInterval(updateTime, 1000); }, 
+            toggleClock: function() { db.logs.push({ id: Date.now(), userId: state.currentUser.id, type: isClockedIn(state.currentUser.id) ? 'OUT' : 'IN', time: new Date().toISOString() }); App.navigate('module', 'timeClock'); }, 
+            renderAdminWidget: function() { return `<div class="card-3d p-4"><h3 class="font-bold border-b-2 border-gray-100 pb-2 mb-3"><i class="ph-fill ph-clock-counter-clockwise text-blue-500"></i> ${t("Time Logs")}</h3><p class="text-sm text-gray-500 text-center py-2">${db.logs.length} records</p></div>`; } 
         };
         
         const TaskManagerModule = { 
