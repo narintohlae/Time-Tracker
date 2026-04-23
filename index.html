@@ -1,1358 +1,845 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#ffffff">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <title>WorkFlow - Employee Management</title>
-    
+    <title>ระบบลงเวลาพนักงาน</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Production Modern OS UI Reskin - Fully Responsive */
-        body { font-family: 'Space Grotesk', 'Noto Sans Thai', sans-serif; background-color: #f8fafc; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; overflow: hidden; }
+        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
         
-        #app-container { 
-            width: 100%; 
-            max-width: 100%; 
-            margin: 0 auto; 
-            height: 100vh; 
-            height: 100dvh; 
-            background-color: #f8fafc; 
-            display: flex; 
-            flex-direction: column; 
-            position: relative; 
-            overflow: hidden; 
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: #f0f4f8;
+            color: #1f2937;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Desktop Container Scaling */
-        @media (min-width: 768px) {
-            #app-container { 
-                max-width: 1280px; 
-                border-left: 1px solid #f1f5f9; 
-                border-right: 1px solid #f1f5f9; 
-                box-shadow: 0 0 40px rgba(0,0,0,0.03); 
-            }
+        /* Isometric / Neo-Brutalism Styles */
+        .iso-card {
+            background: #ffffff;
+            border: 3px solid #111827;
+            box-shadow: 6px 6px 0px #111827;
+            border-radius: 12px;
+            transition: all 0.2s ease;
         }
 
-        .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .iso-btn {
+            border: 3px solid #111827;
+            box-shadow: 4px 4px 0px #111827;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.1s ease;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
         
-        /* Modernized Buttons & Cards */
-        .btn-3d { border-radius: 16px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); position: relative; font-weight: 600; cursor: pointer; border: none !important; box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important; }
-        .btn-3d:active:not(:disabled) { transform: scale(0.96); box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important; }
-        .btn-3d:disabled { opacity: 0.6; cursor: not-allowed; }
-        
-        .btn-sm-3d { border-radius: 10px; transition: all 0.2s ease; font-weight: 600; cursor: pointer; border: 1px solid #e2e8f0 !important; box-shadow: 0 2px 6px rgba(0,0,0,0.03) !important; background-color: #ffffff; }
-        .btn-sm-3d:active:not(:disabled) { transform: scale(0.95); }
-        .btn-sm-3d:disabled { opacity: 0.6; cursor: not-allowed; }
-        
-        .card-3d { border-radius: 20px; background-color: #ffffff; border: 1px solid #f1f5f9 !important; box-shadow: 0 8px 24px rgba(149, 157, 165, 0.08) !important; overflow: hidden; }
+        .iso-btn:active:not(:disabled) {
+            transform: translate(4px, 4px);
+            box-shadow: 0px 0px 0px #111827;
+        }
 
-        /* Override old hardcoded borders globally */
-        .border-gray-800 { border-color: #e2e8f0 !important; }
-        .border-2 { border-width: 1px !important; }
-        .bg-gray-800 { background-color: #1e293b !important; }
-        .text-gray-800 { color: #0f172a !important; }
-        .shadow-\[2px_2px_0_0_\#1f2937\], .shadow-\[1px_1px_0_0_\#1f2937\], .shadow-\[6px_6px_0_0_\#1f2937\] { box-shadow: none !important; }
+        .iso-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: translate(4px, 4px);
+            box-shadow: 0px 0px 0px #111827;
+        }
+
+        .iso-btn-primary { background-color: #3b82f6; color: white; }
+        .iso-btn-success { background-color: #10b981; color: white; }
+        .iso-btn-danger { background-color: #ef4444; color: white; }
+        .iso-btn-warning { background-color: #f59e0b; color: white; }
+        .iso-btn-white { background-color: #ffffff; color: #111827; }
+
+        .iso-input {
+            border: 3px solid #111827;
+            border-radius: 8px;
+            padding: 0.75rem;
+            width: 100%;
+            outline: none;
+            transition: all 0.2s;
+            box-shadow: inset 2px 2px 0px rgba(0,0,0,0.05);
+        }
+        .iso-input:focus {
+            box-shadow: 4px 4px 0px #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        /* Toggle Switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #10b981;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #10b981;
+        }
         
-        /* App Grid Icons */
-        .app-icon { border: 1px solid #f1f5f9; box-shadow: 0 8px 16px rgba(149, 157, 165, 0.08); }
+        /* Modal Overlay */
+        .modal-overlay {
+            background-color: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(4px);
+        }
 
-        /* Isometric Map */
-        .iso-container { perspective: 1000px; padding: 40px 0; display: flex; justify-content: center; overflow: visible; }
-        .iso-grid { display: grid; grid-template-columns: repeat(3, 60px); gap: 20px; transform: rotateX(60deg) rotateY(0deg) rotateZ(-45deg); transform-style: preserve-3d; }
-        .iso-cube { width: 60px; height: 60px; background: #e5e7eb; border: 1px solid #cbd5e1; position: relative; transition: all 0.3s ease; box-shadow: -5px 5px 0px rgba(0,0,0,0.05); border-radius: 8px; }
-        .iso-cube.active { background: #10b981; transform: translateZ(20px) translate(-5px, -5px); box-shadow: -10px 10px 0px #047857, inset 0 0 10px rgba(255,255,255,0.3); border-color: #059669; }
-        
-        /* Toggles */
-        .toggle-checkbox:checked { right: 0; border-color: #3b82f6; }
-        .toggle-checkbox:checked + .toggle-label { background-color: #3b82f6; }
-        .toggle-label { transition: background-color 0.2s; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .toggle-checkbox { right: 0; z-index: 1; border: 1px solid #e2e8f0; }
+        /* Camera Box */
+        #video-container {
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            border: 3px solid #111827;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+        }
+        #camera-video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
 
-        /* Toast Notifications */
-        @keyframes slideInUp { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes fadeOut { to { opacity: 0; } }
-        .toast-enter { animation: slideInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-        .toast-exit { animation: fadeOut 0.2s ease forwards; }
-
-        /* Loader */
-        .loader-spinner { border-top-color: #3b82f6; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="text-gray-800 flex items-center justify-center min-h-screen bg-gray-100">
+<body class="min-h-screen flex flex-col">
 
-    <div id="app-container">
-        <!-- Loader Overlay -->
-        <div id="global-loader" class="hidden absolute inset-0 bg-white/60 backdrop-blur-sm z-[100] flex items-center justify-center transition-opacity duration-200 opacity-0">
-            <div class="w-10 h-10 border-4 border-gray-200 loader-spinner rounded-full"></div>
-        </div>
-
-        <!-- Toast Container -->
-        <div id="toast-container" class="absolute top-4 inset-x-4 md:left-auto md:right-4 md:w-96 z-[200] flex flex-col gap-2 pointer-events-none"></div>
-
-        <header id="app-header" class="px-6 pt-12 md:pt-6 pb-4 bg-white/90 backdrop-blur-md border-b border-gray-100 z-10 flex justify-between items-center shadow-sm">
-            <h1 class="text-xl font-bold tracking-tight" id="header-title">WorkFlow</h1>
-            <div class="flex items-center gap-3">
-                <button id="lang-toggle" onclick="App.toggleLang()" class="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center font-bold text-xs shadow-sm hover:bg-gray-50 active:scale-95 transition-all">EN</button>
-                <div id="header-profile" class="hidden h-9 w-9 rounded-full flex items-center justify-center font-bold text-sm shadow-sm border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity" onclick="App.navigate('settings')"></div>
+    <!-- App Container -->
+    <div id="app" class="flex-grow flex flex-col w-full max-w-md mx-auto relative p-4 pb-20">
+        <!-- Content will be injected here by JS -->
+        <div class="flex items-center justify-center h-full mt-20">
+            <div class="flex flex-col items-center">
+                <div class="loader mb-4"></div>
+                <p class="font-medium">กำลังเชื่อมต่อระบบ...</p>
             </div>
-        </header>
-
-        <main id="app-content" class="flex-1 overflow-y-auto no-scrollbar bg-[#f8fafc] p-6 relative"></main>
-
-        <nav id="app-nav" class="hidden bg-white/90 backdrop-blur-md border-t border-gray-100 pb-8 md:pb-4 pt-3 px-4 z-10 flex overflow-x-auto no-scrollbar gap-2 items-center"></nav>
+        </div>
     </div>
 
-    <script>
-        // =========================================
-        // LOCALIZATION
-        // =========================================
-        const i18n_th = {
-            "Login": "เข้าสู่ระบบ", "Dashboard": "แดชบอร์ด", "My Portal": "พอร์ทัลของฉัน", "App Settings": "ตั้งค่าแอป",
-            "Features": "ฟีเจอร์", "Overview": "ภาพรวม", "Home": "หน้าแรก", "Welcome to WorkFlow": "ยินดีต้อนรับสู่ WorkFlow",
-            "Select your profile to continue.": "เลือกโปรไฟล์ของคุณเพื่อดำเนินการต่อ", "employee": "พนักงาน", "owner": "เจ้าของ",
-            "Hello": "สวัสดี", "What would you like to do today?": "วันนี้คุณต้องการทำอะไร?", "Live Office Status": "สถานะออฟฟิศ",
-            "Active": "ออนไลน์", "Floor Plan (Isometric)": "แผนผังออฟฟิศ (3 มิติ)", "Green indicates clocked-in staff.": "สีเขียวแสดงถึงพนักงานที่ลงเวลาเข้างาน",
-            "App Features": "ฟีเจอร์ของแอป", "Turn modules on or off dynamically.": "เปิด/ปิด การใช้งานโมดูลต่างๆ", "Switch User Profile": "เปลี่ยนโปรไฟล์ผู้ใช้",
-            "Time Clock": "บันทึกเวลา", "Tasks": "งาน", "Time Off": "ลางาน", "Noticeboard": "ประกาศ", "Expenses": "เบิกจ่าย",
-            "Shoutouts": "คำชมเชย", "Morale": "ขวัญกำลังใจ", "Support": "ช่วยเหลือ", "Ideas": "ไอเดีย", "Polls": "โพลล์",
-            "Events": "กิจกรรม", "Team": "ทีม", "Goals": "เป้าหมาย", "Resources": "แหล่งข้อมูล",
-            "Allow employees to log work in and out times.": "ให้พนักงานบันทึกเวลาเข้า-ออกงาน",
-            "Assign and track daily employee tasks.": "มอบหมายและติดตามงานประจำวัน",
-            "Manage employee leave and vacation requests.": "จัดการคำร้องขอลาหยุดและพักร้อน",
-            "Broadcast important updates to all employees.": "ประกาศข่าวสารสำคัญให้พนักงานทุกคน",
-            "Submit and approve reimbursement claims.": "ยื่นและอนุมัติการเบิกค่าใช้จ่าย",
-            "Send public appreciation to your colleagues.": "ส่งคำชมเชยถึงเพื่อนร่วมงาน",
-            "Track daily team wellbeing and mood.": "ติดตามความรู้สึกและสภาพจิตใจของทีม",
-            "Submit maintenance or IT support tickets.": "แจ้งปัญหาการซ่อมบำรุงหรือไอที",
-            "Submit and vote on company improvements.": "เสนอและโหวตไอเดียพัฒนาบริษัท",
-            "Create and vote on team surveys.": "สร้างและโหวตแบบสำรวจของทีม",
-            "Company calendar and event RSVPs.": "ปฏิทินบริษัทและการตอบรับเข้าร่วม",
-            "Company directory and contact roster.": "รายชื่อทีมและข้อมูลติดต่อ",
-            "Track company-wide targets and milestones.": "ติดตามเป้าหมายและความคืบหน้าของบริษัท",
-            "Access company policies and training materials.": "เข้าถึงนโยบายและเอกสารการอบรมของบริษัท",
-            "Book workspace and meeting rooms.": "จองพื้นที่ทำงานและห้องประชุม",
-            "Pre-register office guests and visitors.": "ลงทะเบียนแขกและผู้มาติดต่อล่วงหน้า",
-            "Order daily office lunch.": "สั่งอาหารกลางวันประจำวัน",
-            "Borrow office equipment and devices.": "ยืมอุปกรณ์และเครื่องมือสำนักงาน",
-            "CLOCK IN": "เข้างาน", "CLOCK OUT": "ออกงาน", "Clocked In": "เข้างานแล้ว", "Clocked Out": "ออกงานแล้ว",
-            "Time Logs": "บันทึกเวลา", "No activity.": "ไม่มีความเคลื่อนไหว", "Company Documents": "เอกสารบริษัท",
-            "Bookings": "การจอง", "Meeting Rooms": "ห้องประชุม", "Book Room": "จองห้อง",
-            "Visitors": "ผู้มาติดต่อ", "Register Guest": "ลงทะเบียนแขก", "Expected Today": "คาดว่าจะมาถึงวันนี้",
-            "Cafeteria": "ศูนย์อาหาร", "Today's Menu": "เมนูวันนี้", "Your Order": "รายการสั่งของคุณ", 
-            "Cancel Order": "ยกเลิกการสั่ง", "Lunch Orders Summary": "สรุปยอดสั่งอาหารกลางวัน",
-            "Equipment": "อุปกรณ์", "Borrow": "ยืม", "Return": "คืน", "Available": "ว่าง", "Active Loans": "รายการที่ยืมอยู่",
-            "Available Items": "รายการที่ยืมได้",
-            "Rewards": "รางวัล", "Company Store": "ร้านค้าบริษัท", "Points": "แต้ม", 
-            "Redeem": "แลก", "Redemptions": "การแลกรางวัล", "Pending Fulfillment": "รอการจัดส่ง",
-            "Redeem points for company perks.": "แลกแต้มเพื่อรับสิทธิพิเศษบริษัท",
-            "Lost & Found": "ของหาย", "Report lost items or claim found items.": "แจ้งของหายหรือตามหาของที่เก็บได้",
-            "Report Item": "แจ้งรายการ", "I found something": "ฉันเก็บของได้", "I lost something": "ฉันทำของหาย",
-            "Item Description": "รายละเอียดสิ่งของ", "Location (Optional)": "สถานที่ (ระบุหรือไม่ก็ได้)",
-            "Active Reports": "รายการปัจจุบัน", "Claim / Resolve": "อ้างสิทธิ์ / ปิดงาน",
-            "Lost": "หาย", "Found": "เก็บได้",
-            "Shift Swap": "แลกกะทำงาน", "Trade or cover shifts with coworkers.": "แลกเปลี่ยนหรือรับกะทำงานแทนเพื่อนร่วมงาน",
-            "Offer a Shift": "เสนอกะทำงาน", "Available Shifts": "กะที่ว่าง", "Cover Shift": "รับทำแทน",
-            "Shift Info (e.g., 09:00-17:00)": "ข้อมูลกะ (เช่น 09:00-17:00)", "My Requests": "คำขอของฉัน",
-            "Open Shifts": "กะที่รอคนทำแทน", "Covered": "มีคนทำแทนแล้ว",
-            "Carpool": "คาร์พูล / ติดรถ", "Share rides to the office.": "แชร์รถเดินทางไปออฟฟิศ",
-            "Offer a Ride": "เสนอที่นั่ง", "Available Rides": "รถที่ว่าง", "Join Ride": "ขอติดรถ",
-            "Seats Left": "ที่นั่งว่าง", "From (Area/City)": "จาก (จุดเริ่มต้น)", "Time (e.g., 08:00)": "เวลา (เช่น 08:00)",
-            "My Rides": "การเดินทางของฉัน", "Today's Carpools": "คาร์พูลวันนี้", "Full": "เต็ม",
-            "Wellness": "สุขภาพ", "Track your daily water and steps.": "ติดตามสุขภาพประจำวัน", "Water Intake": "การดื่มน้ำ", 
-            "Add Glass": "เพิ่มแก้ว", "Steps": "ก้าวเดิน", "Log Steps": "บันทึกจำนวนก้าว", "Team Wellness": "สุขภาพของทีม",
-            "Jukebox": "ตู้เพลง", "Suggest and vote on office music.": "เสนอและโหวตเพลงในออฟฟิศ", "Suggest Song": "เสนอเพลง",
-            "Song Name & Artist": "ชื่อเพลงและศิลปิน", "Queue": "คิวเพลง", "Top Requested": "เพลงที่ถูกขอมากที่สุด",
-            "Standups": "อัปเดตงาน", "Share daily updates with the team.": "แชร์อัปเดตงานรายวันกับทีม",
-            "Yesterday": "เมื่อวาน", "Today": "วันนี้", "Blockers": "อุปสรรค", "Submit Update": "ส่งอัปเดต",
-            "Team Updates": "อัปเดตของทีม", "No updates yet.": "ยังไม่มีอัปเดต",
-            "Marketplace": "ตลาดนัด", "Buy, sell, or trade with coworkers.": "ซื้อ ขาย หรือแลกเปลี่ยนกับเพื่อนร่วมงาน",
-            "Post an Item": "ลงประกาศ", "Item Name": "ชื่อสินค้า", "Price (Optional)": "ราคา (ไม่ระบุก็ได้)",
-            "Selling": "ขาย", "Looking For": "ตามหา", "Latest Listings": "ประกาศล่าสุด", "Contact": "ติดต่อ",
-            "Today's Celebrations": "การเฉลิมฉลองวันนี้", "Birthday": "วันเกิด", "Anniversary": "ครบรอบการทำงาน",
-            "Training": "การฝึกอบรม", "Complete mandatory training and courses.": "ทำแบบทดสอบและหลักสูตรอบรมบังคับ",
-            "Assigned Courses": "หลักสูตรที่ได้รับมอบหมาย", "Start Course": "เริ่มเรียน", "Completed": "สำเร็จแล้ว",
-            "Compliance Tracking": "ติดตามการอบรม", "Pending": "รอดำเนินการ",
-            "Work Location": "สถานที่ทำงาน", "Where are you working today?": "วันนี้คุณทำงานที่ไหน?",
-            "Set Location": "บันทึกสถานที่", "Office": "ออฟฟิศ", "Home": "บ้าน", "Remote": "นอกสถานที่",
-            "Team Locations": "ตำแหน่งของทีม", "No locations set yet.": "ยังไม่มีการระบุสถานที่",
-            "Referrals": "แนะนำเพื่อนงาน", "Refer friends for open positions and earn bonuses.": "แนะนำเพื่อนร่วมงานเพื่อรับโบนัส",
-            "Refer Someone": "แนะนำเพื่อน", "My Referrals": "ประวัติการแนะนำ", "Candidate Name": "ชื่อผู้สมัคร", 
-            "Recent Referrals": "การแนะนำล่าสุด", "Interviewing": "กำลังสัมภาษณ์", "Hired": "รับเข้าทำงาน",
-            "Profile": "โปรไฟล์", "Manage your account": "จัดการบัญชีของคุณ",
-            "Please fill all required fields": "กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน",
-            "Action completed successfully": "ดำเนินการเสร็จสิ้น",
-            "Feature coming soon!": "ฟีเจอร์นี้กำลังจะมาในเร็วๆ นี้!",
-            "Coffee Chats": "คอฟฟี่แชท", "Randomly pair with coworkers for a quick chat.": "สุ่มจับคู่กับเพื่อนร่วมงานเพื่อพูดคุยทำความรู้จัก",
-            "Your Match This Week": "คู่ของคุณสัปดาห์นี้", "Opt-in for Next Week": "เข้าร่วมในสัปดาห์หน้า", 
-            "Opt-out": "ยกเลิกการเข้าร่วม", "Active Pairs": "คู่ที่จับแล้ว", "You're on the list!": "คุณอยู่ในรายชื่อแล้ว!", 
-            "No match this week.": "ไม่มีคู่ในสัปดาห์นี้", "Say Hello": "ทักทาย",
-            "Skill Exchange": "แลกเปลี่ยนทักษะ", "Teach or learn new skills with coworkers.": "สอนหรือเรียนรู้ทักษะใหม่ๆ กับเพื่อนร่วมงาน",
-            "I want to teach": "ฉันต้องการสอน", "I want to learn": "ฉันต้องการเรียน", "Skill (e.g., Python, Public Speaking)": "ทักษะ (เช่น Python, การพูดในที่สาธารณะ)",
-            "Post Skill": "ลงประกาศทักษะ", "Teaching": "สอน", "Learning": "เรียนรู้",
-            "Workspace": "พื้นที่ทำงาน", "HR & Ops": "บุคคลและปฏิบัติการ", "Culture": "วัฒนธรรมองค์กร", "Growth": "การพัฒนา"
-        };
-        function t(str) { return (state.lang === 'th' && i18n_th[str]) ? i18n_th[str] : str; }
+    <!-- Custom Modal -->
+    <div id="custom-modal" class="fixed inset-0 modal-overlay z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200 p-4">
+        <div class="iso-card w-full max-w-sm p-6 transform scale-95 transition-transform duration-200" id="modal-content-box">
+            <h3 id="modal-title" class="text-xl font-bold mb-2">แจ้งเตือน</h3>
+            <p id="modal-message" class="text-gray-600 mb-6 whitespace-pre-wrap"></p>
+            <div id="modal-buttons" class="flex justify-end gap-3">
+                <!-- Buttons injected dynamically -->
+            </div>
+        </div>
+    </div>
 
-        // Production ID Generator
-        function generateId() {
-            return window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
+    <!-- Camera Modal -->
+    <div id="camera-modal" class="fixed inset-0 modal-overlay z-50 flex flex-col items-center justify-center hidden opacity-0 transition-opacity duration-200 p-4">
+        <div class="iso-card w-full max-w-sm p-4 text-center">
+            <h3 class="text-xl font-bold mb-4"><i class="fas fa-camera mr-2"></i>ถ่ายรูปยืนยันตัวตน</h3>
+            <div id="video-container" class="mb-4">
+                <video id="camera-video" autoplay playsinline></video>
+                <canvas id="camera-canvas" class="hidden"></canvas>
+            </div>
+            <p id="camera-status" class="text-sm text-gray-500 mb-4">กรุณามองกล้องและจัดใบหน้าให้อยู่ในกรอบ</p>
+            <div class="flex gap-3 justify-center">
+                <button id="btn-cancel-camera" class="iso-btn iso-btn-danger py-2 px-4 flex-1">ยกเลิก</button>
+                <button id="btn-take-photo" class="iso-btn iso-btn-primary py-2 px-4 flex-1"><i class="fas fa-circle"></i> ถ่ายรูป</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, addDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Configuration & Initialization
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-time-app';
+
+        // State Management
+        let currentUser = null;
+        let currentView = 'role-select'; // role-select, emp-login, owner-login, emp-dash, owner-dash
+        let activeEmployee = null; // ข้อมูลพนักงานที่กำลังล็อกอิน
+        
+        // Data Collections
+        let employees = [];
+        let timelogs = [];
+        let appSettings = {
+            ownerPin: '9999', // รหัสผ่านตั้งต้น
+            requireGPS: true,
+            requireSelfie: true
+        };
+
+        // DOM Elements
+        const appDiv = document.getElementById('app');
+        
+        // --- Modal System ---
+        function showModal(title, message, buttons = [{ text: 'ตกลง', type: 'primary', action: closeModal }]) {
+            const modal = document.getElementById('custom-modal');
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            
+            const btnContainer = document.getElementById('modal-buttons');
+            btnContainer.innerHTML = '';
+            
+            buttons.forEach(btn => {
+                const buttonEl = document.createElement('button');
+                buttonEl.className = `iso-btn iso-btn-${btn.type} py-2 px-4`;
+                buttonEl.innerText = btn.text;
+                buttonEl.onclick = () => {
+                    if (btn.action) btn.action();
+                };
+                btnContainer.appendChild(buttonEl);
+            });
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                document.getElementById('modal-content-box').classList.remove('scale-95');
+            }, 10);
         }
 
-        // =========================================
-        // APP STATE & FIREBASE SETUP
-        // =========================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyBHuZGyY1F3v4rCrhrpt9YB90C0Ahh-stE",
-            authDomain: "my-company-time-tracking.firebaseapp.com",
-            projectId: "my-company-time-tracking",
-            storageBucket: "my-company-time-tracking.firebasestorage.app",
-            messagingSenderId: "758524847747",
-            appId: "1:758524847747:web:2e5a49e4064334f1265db6",
-            measurementId: "G-50SYJKTRT1"
-        };
+        function closeModal() {
+            const modal = document.getElementById('custom-modal');
+            modal.classList.add('opacity-0');
+            document.getElementById('modal-content-box').classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        }
 
-        const APP_ID = firebaseConfig.appId.replace(/:/g, '-');
+        // --- Firebase Data Fetching ---
+        function setupRealtimeListeners() {
+            if (!currentUser) return;
 
-        const state = {
-            lang: 'en', currentUser: null, currentView: 'login', currentModuleId: null, isInitialized: false, configDocId: null,
-            features: {
-                timeClock: true, taskManager: true, timeOff: true, announcements: true, expenses: true, kudos: true, moodTracker: true, helpDesk: true, suggestions: true, polls: true, events: true, directory: true, goals: true, resources: true, bookings: true, visitors: true, cafeteria: true, equipment: true, rewards: true, lostFound: true, shiftSwap: true, carpool: true, wellness: true, jukebox: true, standups: true, marketplace: true, celebrations: true, training: true, workLocation: true, referrals: true, coffeeChats: true, skillExchange: true
+            const baseCollectionPath = `artifacts/${appId}/public/data`;
+
+            // Listen to Settings
+            const settingsRef = doc(db, baseCollectionPath, 'config', 'appSettings');
+            onSnapshot(settingsRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    appSettings = docSnap.data();
+                } else {
+                    // Initialize default settings
+                    setDoc(settingsRef, appSettings);
+                }
+                render();
+            }, (error) => console.error("Error fetching settings:", error));
+
+            // Listen to Employees
+            const empRef = collection(db, baseCollectionPath, 'employees');
+            onSnapshot(empRef, (snapshot) => {
+                employees = [];
+                snapshot.forEach(doc => {
+                    employees.push({ id: doc.id, ...doc.data() });
+                });
+                render();
+            }, (error) => console.error("Error fetching employees:", error));
+
+            // Listen to Timelogs
+            const logsRef = collection(db, baseCollectionPath, 'timelogs');
+            onSnapshot(logsRef, (snapshot) => {
+                timelogs = [];
+                snapshot.forEach(doc => {
+                    timelogs.push({ id: doc.id, ...doc.data() });
+                });
+                // Sort in memory (Rule 2: No complex queries)
+                timelogs.sort((a, b) => b.timestamp - a.timestamp);
+                render();
+            }, (error) => console.error("Error fetching logs:", error));
+        }
+
+        // --- Authentication Init ---
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                showModal('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อระบบได้ กรุณารีเฟรชหน้าจอ');
             }
         };
 
-        const db = {
-            users: [
-                { id: 'u1', name: 'Alice Smith', role: 'employee', initials: 'AS', color: 'bg-pink-100 text-pink-700', phone: '555-0101', email: 'alice@workflow.com' },
-                { id: 'u2', name: 'Bob Jones', role: 'employee', initials: 'BJ', color: 'bg-blue-100 text-blue-700', phone: '555-0102', email: 'bob@workflow.com' },
-                { id: 'u3', name: 'Charlie (Owner)', role: 'owner', initials: 'CH', color: 'bg-amber-100 text-amber-700', phone: '555-0100', email: 'charlie@workflow.com' }
-            ]
-        };
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                setupRealtimeListeners();
+            } else {
+                appDiv.innerHTML = `<div class="p-4 text-center text-red-500 font-bold">กรุณาเข้าสู่ระบบ</div>`;
+            }
+        });
 
-        const dynamicCollections = ['appConfig', 'logs', 'tasks', 'timeOffRequests', 'announcements', 'expenses', 'kudos', 'moods', 'tickets', 'suggestions', 'polls', 'events', 'goals', 'resources', 'bookings', 'visitors', 'menuItems', 'lunchOrders', 'inventory', 'loans', 'userPoints', 'rewardItems', 'redemptions', 'lostFound', 'shifts', 'carpools', 'wellness', 'jukebox', 'standups', 'marketplace', 'celebrations', 'courses', 'trainingLogs', 'workLocations', 'openRoles', 'referrals', 'coffeeMatches', 'coffeeOptIns', 'skills'];
-        dynamicCollections.forEach(c => db[c] = []);
+        // Initialize App
+        initAuth();
 
-        let DB = { add: async () => {}, update: async () => {}, delete: async () => {} };
+        // --- Utility Functions ---
+        function formatDate(timestamp) {
+            if (!timestamp) return '-';
+            const d = new Date(timestamp);
+            return d.toLocaleDateString('th-TH', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' + 
+                   d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+        }
 
-        // =========================================
-        // APP CONTROLLER
-        // =========================================
-        const App = {
-            modules: [],
-            init: function() {
-                this.showLoader(1000);
-                import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js").then((appMod) => {
-                    import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js").then((authMod) => {
-                        import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js").then((fsMod) => {
-                            
-                            const app = appMod.initializeApp(firebaseConfig);
-                            const auth = authMod.getAuth(app);
-                            const fdb = fsMod.getFirestore(app);
-                            
-                            const getColl = (name) => fsMod.collection(fdb, 'artifacts', APP_ID, 'public', 'data', name);
-                            const getDocRef = (name, id) => fsMod.doc(fdb, 'artifacts', APP_ID, 'public', 'data', name, id);
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            // Simple distance calculation (optional feature enhancement later)
+            // Currently just fetching GPS to prove presence
+            return 0;
+        }
 
-                            DB.add = async (coll, data) => { try { await fsMod.addDoc(getColl(coll), data); } catch(e) { console.error(e); } };
-                            DB.update = async (coll, id, data) => { try { await fsMod.updateDoc(getDocRef(coll, id), data); } catch(e) { console.error(e); } };
-                            DB.delete = async (coll, id) => { try { await fsMod.deleteDoc(getDocRef(coll, id)); } catch(e) { console.error(e); } };
+        // --- Camera & GPS Actions ---
+        let videoStream = null;
+        
+        async function captureSelfie() {
+            return new Promise((resolve, reject) => {
+                const modal = document.getElementById('camera-modal');
+                const video = document.getElementById('camera-video');
+                const canvas = document.getElementById('camera-canvas');
+                const btnCancel = document.getElementById('btn-cancel-camera');
+                const btnTake = document.getElementById('btn-take-photo');
+                const statusTxt = document.getElementById('camera-status');
 
-                            authMod.signInAnonymously(auth).then(() => {
-                                let loaded = 0;
-                                dynamicCollections.forEach(c => {
-                                    fsMod.onSnapshot(getColl(c), (snap) => {
-                                        db[c] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                                        
-                                        if (c === 'appConfig' && db.appConfig.length > 0) {
-                                            state.features = db.appConfig[0].features || state.features;
-                                            state.configDocId = db.appConfig[0].id;
-                                        }
+                modal.classList.remove('hidden');
+                setTimeout(() => modal.classList.remove('opacity-0'), 10);
+                statusTxt.innerText = "กำลังเปิดกล้อง...";
+                btnTake.disabled = true;
 
-                                        loaded++;
-                                        if (loaded >= dynamicCollections.length && !state.isInitialized) {
-                                            state.isInitialized = true;
-                                            App.renderLogin();
-                                            App.seedDataIfNeeded();
-                                        } else if (state.isInitialized && state.currentView !== 'login') {
-                                            App.navigate(state.currentView, state.currentModuleId, false);
-                                        }
-                                    }, (err) => console.error(`Sync error on ${c}:`, err));
-                                });
-                            }).catch(err => {
-                                console.error("Auth Error", err);
-                                App.showToast("Database Connection Error", "error");
-                                App.renderLogin(); 
-                            });
-                        });
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
+                    .then(stream => {
+                        videoStream = stream;
+                        video.srcObject = stream;
+                        video.play();
+                        statusTxt.innerText = "กรุณามองกล้องและจัดใบหน้าให้อยู่ในกรอบ";
+                        btnTake.disabled = false;
+                    })
+                    .catch(err => {
+                        closeCamera();
+                        reject(new Error("ไม่สามารถเข้าถึงกล้องได้ กรุณาอนุญาตการใช้งานกล้อง"));
                     });
-                });
-            },
-            seedDataIfNeeded: async function() {
-                const toSeed = [
-                    { coll: 'appConfig', data: [ { type: 'global', features: state.features } ] },
-                    { coll: 'inventory', data: [ { name: 'MacBook Charger', icon: 'ph-plug', total: 5, available: 5 }, { name: 'Projector', icon: 'ph-projector-screen', total: 2, available: 2 } ] },
-                    { coll: 'menuItems', data: [ { name: 'Pad Thai / ผัดไทย', emoji: '🍜' }, { name: 'Chicken Rice / ข้าวมันไก่', emoji: '🍗' } ] },
-                    { coll: 'rewardItems', data: [ { name: 'Coffee Gift Card', cost: 500, icon: 'ph-coffee', color: 'text-amber-600' }, { name: 'Company Hoodie', cost: 1200, icon: 'ph-t-shirt', color: 'text-purple-600' } ] },
-                    { coll: 'courses', data: [ { title: 'Data Privacy 101', duration: '15 mins' }, { title: 'Workplace Safety', duration: '30 mins' } ] },
-                    { coll: 'openRoles', data: [ { title: 'Senior Frontend Dev', dept: 'Engineering', bonus: '฿10,000' }, { title: 'Marketing Manager', dept: 'Marketing', bonus: '฿5,000' } ] },
-                    { coll: 'goals', data: [ { title: 'Q2 Revenue Target', current: 15000, target: 50000, unit: '$', prefix: true, color: 'bg-emerald-500' } ] },
-                    { coll: 'resources', data: [ { title: 'Employee Handbook', category: 'HR', icon: 'ph-book-open', color: 'text-blue-500' } ] },
-                    { coll: 'celebrations', data: [ { userId: 'u2', type: 'birthday', title: 'Birthday', dateStr: 'May 15', cheers: [] }, { userId: 'u1', type: 'anniversary', title: 'Anniversary', dateStr: 'May 2', cheers: [] } ] },
-                    { coll: 'coffeeMatches', data: [ { u1: 'u1', u2: 'u2' } ] },
-                    { coll: 'skills', data: [ { userId: 'u3', type: 'teach', skill: 'Leadership & Management', date: new Date().toISOString() }, { userId: 'u2', type: 'learn', skill: 'React JS', date: new Date().toISOString() } ] }
-                ];
-                for (let s of toSeed) {
-                    if (db[s.coll].length === 0) {
-                        for (let item of s.data) await DB.add(s.coll, item);
-                    }
-                }
-            },
-            registerModule: function(module) { this.modules.push(module); },
-            toggleLang: function() {
-                state.lang = state.lang === 'en' ? 'th' : 'en';
-                document.getElementById('lang-toggle').innerText = state.lang === 'en' ? 'EN' : 'TH';
-                this.navigate(state.currentView, state.currentModuleId, false);
-            },
-            showToast: function(message, type = 'success') {
-                const container = document.getElementById('toast-container');
-                const toast = document.createElement('div');
-                let bgColor = type === 'success' ? 'bg-emerald-500' : (type === 'error' ? 'bg-red-500' : 'bg-blue-500');
-                let icon = type === 'success' ? 'ph-check-circle' : (type === 'error' ? 'ph-warning-circle' : 'ph-info');
-                toast.className = `${bgColor} text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 text-sm font-bold pointer-events-auto toast-enter`;
-                toast.innerHTML = `<i class="ph-fill ${icon} text-lg"></i> ${message}`;
-                container.appendChild(toast);
-                setTimeout(() => { toast.classList.replace('toast-enter', 'toast-exit'); setTimeout(() => toast.remove(), 200); }, 1500);
-            },
-            showLoader: function(duration = 200) {
-                return new Promise(resolve => {
-                    const loader = document.getElementById('global-loader');
-                    loader.classList.remove('hidden'); void loader.offsetWidth; loader.classList.remove('opacity-0');
-                    setTimeout(() => { loader.classList.add('opacity-0'); setTimeout(() => { loader.classList.add('hidden'); resolve(); }, 200); }, duration);
-                });
-            },
-            login: async function(userId) {
-                await this.showLoader(400);
-                state.currentUser = db.users.find(u => u.id === userId);
-                const profile = document.getElementById('header-profile');
-                profile.textContent = state.currentUser.initials;
-                profile.className = `h-9 w-9 rounded-full flex items-center justify-center font-bold text-xs shadow-sm border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity ${state.currentUser.color}`;
-                profile.classList.remove('hidden');
-                if (state.currentUser.role === 'owner') this.navigate('owner_dashboard'); else this.navigate('employee_home');
-                this.showToast(t("Login") + " " + t("Action completed successfully"));
-            },
-            logout: async function() {
-                await this.showLoader(300);
-                state.currentUser = null;
-                document.getElementById('header-profile').classList.add('hidden');
-                document.getElementById('app-nav').classList.add('hidden');
-                this.navigate('login');
-            },
-            navigate: async function(view, moduleId = null, showLoad = true) {
-                if (showLoad && state.currentView !== view && view !== 'login') await this.showLoader(150);
-                
-                state.currentView = view; state.currentModuleId = moduleId;
-                const content = document.getElementById('app-content'); content.innerHTML = ''; content.scrollTop = 0;
-                
-                if (view === 'login') { this.renderLogin(); document.getElementById('app-nav').classList.add('hidden'); document.getElementById('header-title').innerText = t("Login"); }
-                else if (view === 'owner_dashboard') { this.renderOwnerDashboard(); this.renderNav(); document.getElementById('header-title').innerText = t("Dashboard"); }
-                else if (view === 'employee_home') { this.renderEmployeeHome(); this.renderNav(); document.getElementById('header-title').innerText = t("My Portal"); }
-                else if (view === 'settings') { this.renderSettings(); this.renderNav(); document.getElementById('header-title').innerText = state.currentUser.role === 'owner' ? t("App Settings") : t("Profile"); }
-                else if (view === 'module' && moduleId) {
-                    const mod = this.modules.find(m => m.id === moduleId);
-                    if (mod && state.features[mod.id]) { content.innerHTML = mod.renderUserView(); document.getElementById('header-title').innerText = t(mod.name); if(mod.onLoad) mod.onLoad(); }
-                    this.renderNav();
-                }
-            },
-            renderLogin: function() {
-                let html = `<div class="flex flex-col items-center justify-center h-full space-y-8 pb-12 max-w-sm mx-auto w-full"><div class="w-24 h-24 bg-blue-500 rounded-[28px] border border-blue-600 shadow-lg flex items-center justify-center transform rotate-12 mb-4"><i class="ph-fill ph-intersect text-5xl text-white"></i></div><h2 class="text-2xl font-bold text-center">${t("Welcome to WorkFlow")}</h2><p class="text-gray-500 text-center mb-6">${t("Select your profile to continue.")}</p><div class="w-full space-y-3 px-2">`;
-                db.users.forEach(user => { html += `<button onclick="App.login('${user.id}')" class="btn-3d w-full py-4 px-5 bg-white flex items-center space-x-4 border border-gray-100 shadow-sm hover:border-blue-200 transition-colors"><div class="h-12 w-12 rounded-full ${user.color} flex items-center justify-center font-bold text-lg">${user.initials}</div><div class="text-left flex-1"><div class="font-bold text-[15px] text-gray-800">${user.name}</div><div class="text-[11px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">${t(user.role)}</div></div><i class="ph-bold ph-caret-right text-gray-300"></i></button>`; });
-                document.getElementById('app-content').innerHTML = html + `</div></div>`;
-            },
-            renderEmployeeHome: function() {
-                const categories = [
-                    { id: 'Workspace', title: 'Workspace' },
-                    { id: 'Office', title: 'Office' },
-                    { id: 'HR & Ops', title: 'HR & Ops' },
-                    { id: 'Culture', title: 'Culture' },
-                    { id: 'Growth', title: 'Growth' },
-                    { id: 'Wellness', title: 'Wellness' }
-                ];
-                
-                const groupedModules = {};
-                categories.forEach(c => groupedModules[c.id] = []);
-                
-                this.modules.forEach(mod => {
-                    if(state.features[mod.id] && mod.hasUserTab) {
-                        const cat = mod.category || 'Workspace';
-                        if(groupedModules[cat]) groupedModules[cat].push(mod);
-                    }
-                });
 
-                let html = `
-                    <div class="space-y-6 pb-20 max-w-7xl mx-auto w-full">
-                        <div class="mb-6 bg-white p-6 rounded-[24px] shadow-sm border border-gray-100 flex justify-between items-center max-w-3xl mx-auto">
-                            <div>
-                                <h2 class="text-2xl font-bold text-gray-800">${t("Hello")}, ${state.currentUser.name.split(' ')[0]}!</h2>
-                                <p class="text-gray-500 text-sm">${t("What would you like to do today?")}</p>
-                            </div>
-                            <div class="w-14 h-14 rounded-full ${state.currentUser.color} flex items-center justify-center font-bold text-xl shadow-sm border border-gray-50">
-                                ${state.currentUser.initials}
-                            </div>
-                        </div>
-                `;
-                
-                categories.forEach(cat => {
-                    if (groupedModules[cat.id].length > 0) {
-                        html += `
-                            <div class="mb-8 px-2 max-w-3xl mx-auto">
-                                <h3 class="font-bold text-gray-400 uppercase tracking-wider text-[11px] mb-4 ml-1">${t(cat.title)}</h3>
-                                <div class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-y-6 gap-x-2">
-                        `;
-                        groupedModules[cat.id].forEach(mod => {
-                            html += `
-                                <button onclick="App.navigate('module', '${mod.id}')" class="flex flex-col items-center gap-2 group outline-none">
-                                    <div class="w-[60px] h-[60px] bg-white rounded-[18px] flex items-center justify-center text-3xl text-blue-500 app-icon group-active:scale-90 transition-transform duration-200">
-                                        <i class="ph-fill ${mod.icon}"></i>
-                                    </div>
-                                    <span class="text-[10px] font-medium text-gray-600 text-center leading-tight w-full truncate px-1">${t(mod.name)}</span>
-                                </button>
-                            `;
-                        });
-                        html += `</div></div>`;
-                    }
-                });
-                
-                html += `</div>`;
-                document.getElementById('app-content').innerHTML = html;
-            },
-            renderOwnerDashboard: function() {
-                const activeUsers = db.users.filter(u => u.role !== 'owner' && isClockedIn(u.id));
-                let html = `
-                    <div class="space-y-6 pb-20 max-w-7xl mx-auto w-full">
-                        <div class="flex justify-between items-end">
-                            <div><h2 class="text-2xl font-bold">${t("Overview")}</h2><p class="text-gray-500">${t("Live Office Status")}</p></div>
-                            <div class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-lg font-bold text-sm flex items-center gap-1"><span class="text-emerald-500">●</span> ${activeUsers.length} ${t("Active")}</div>
-                        </div>
-                        <div class="card-3d bg-blue-50/50 overflow-hidden relative">
-                            <h3 class="font-bold text-sm p-4 border-b border-gray-100 bg-white/80 backdrop-blur-sm text-gray-700">${t("Floor Plan (Isometric)")}</h3>
-                            <div class="iso-container">
-                                <div class="iso-grid md:gap-8 lg:gap-10">
-                `;
-                const employees = db.users.filter(u => u.role !== 'owner');
-                for(let i=0; i<6; i++) {
-                    const emp = employees[i];
-                    if (emp && isClockedIn(emp.id)) html += `<div class="iso-cube active flex items-center justify-center"><span class="text-xs font-bold text-white transform -rotate-45">${emp.initials}</span></div>`;
-                    else if (emp) html += `<div class="iso-cube flex items-center justify-center"><span class="text-xs font-bold text-gray-400 transform -rotate-45">${emp.initials}</span></div>`;
-                    else html += `<div class="iso-cube opacity-50"></div>`;
-                }
-                html += `</div></div><p class="text-[10px] uppercase font-bold tracking-wider text-center text-gray-400 pb-4">${t("Green indicates clocked-in staff.")}</p></div>`;
-                
-                // Owner Widgets Grid
-                html += `<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 w-full">`;
-                this.modules.forEach(mod => { 
-                    if (state.features[mod.id] && mod.renderAdminWidget) {
-                        let widgetHtml = mod.renderAdminWidget();
-                        widgetHtml = widgetHtml.replace('class="card-3d', 'class="card-3d h-full flex flex-col');
-                        html += widgetHtml;
-                    }
-                });
-                html += `</div></div>`;
-                document.getElementById('app-content').innerHTML = html;
-            },
-            renderSettings: function() {
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full">`;
-                if (state.currentUser.role === 'owner') {
-                    html += `<div><h2 class="text-2xl font-bold">${t("App Features")}</h2><p class="text-gray-500">${t("Turn modules on or off dynamically.")}</p></div>`;
+                btnTake.onclick = () => {
+                    const context = canvas.getContext('2d');
+                    // Resize to save space
+                    canvas.width = 300;
+                    canvas.height = (video.videoHeight / video.videoWidth) * 300;
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
                     
-                    const categories = [ { id: 'Workspace', title: 'Workspace' }, { id: 'Office', title: 'Office' }, { id: 'HR & Ops', title: 'HR & Ops' }, { id: 'Culture', title: 'Culture' }, { id: 'Growth', title: 'Growth' }, { id: 'Wellness', title: 'Wellness' } ];
-                    const groupedModules = {};
-                    categories.forEach(c => groupedModules[c.id] = []);
-                    this.modules.forEach(mod => { const cat = mod.category || 'Workspace'; if(groupedModules[cat]) groupedModules[cat].push(mod); });
+                    const photoData = canvas.toDataURL('image/jpeg', 0.6); // Compress quality
+                    closeCamera();
+                    resolve(photoData);
+                };
 
-                    categories.forEach(cat => {
-                        if (groupedModules[cat.id].length > 0) {
-                            html += `
-                                <div class="mb-8">
-                                    <h3 class="font-bold text-gray-400 uppercase tracking-wider text-[11px] mb-4 ml-1">${t(cat.title)}</h3>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            `;
-                            groupedModules[cat.id].forEach(mod => {
-                                const isChecked = state.features[mod.id] ? 'checked' : '';
-                                html += `<div class="card-3d m-0 p-4 flex items-center justify-between bg-white"><div><div class="font-bold flex items-center gap-2 text-gray-800"><i class="${mod.icon} text-xl text-blue-500"></i> ${t(mod.name)}</div><div class="text-[11px] text-gray-500 mt-0.5">${t(mod.description)}</div></div><div class="relative inline-block w-12 h-6 align-middle select-none transition duration-200 ease-in"><input type="checkbox" id="toggle-${mod.id}" ${isChecked} class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white appearance-none cursor-pointer" onchange="App.toggleFeature('${mod.id}', this.checked)"/><label for="toggle-${mod.id}" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-200 cursor-pointer"></label></div></div>`;
-                            });
-                            html += `</div></div>`;
-                        }
-                    });
-                } else {
-                    html += `
-                        <div class="max-w-2xl mx-auto">
-                        <div class="mb-4"><h2 class="text-2xl font-bold">${t("Profile")}</h2><p class="text-gray-500">${t("Manage your account")}</p></div>
-                        <div class="card-3d p-8 flex flex-col items-center gap-4 bg-white">
-                            <div class="w-24 h-24 rounded-full ${state.currentUser.color} flex items-center justify-center font-bold text-4xl border border-gray-100 shadow-sm">${state.currentUser.initials}</div>
-                            <div class="text-center">
-                                <h3 class="font-bold text-2xl mb-1">${state.currentUser.name}</h3>
-                                <p class="text-gray-500 text-sm">${state.currentUser.email}</p>
-                                <div class="bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full text-[10px] font-bold mt-4 inline-block uppercase tracking-wider border border-blue-100">${t(state.currentUser.role)}</div>
-                            </div>
-                        </div>
-                        </div>
-                    `;
-                }
-                html += `<div class="mt-8 max-w-2xl mx-auto"><button onclick="App.logout()" class="btn-3d w-full py-4 bg-white text-red-500 border border-red-100 flex justify-center items-center gap-2 hover:bg-red-50"><i class="ph-bold ph-sign-out text-lg"></i> ${t("Switch User Profile")}</button></div></div>`;
-                document.getElementById('app-content').innerHTML = html;
-            },
-            toggleFeature: function(moduleId, isEnabled) { 
-                state.features[moduleId] = isEnabled; 
-                if(state.configDocId) {
-                    DB.update('appConfig', state.configDocId, { features: state.features });
-                } else {
-                    DB.add('appConfig', { type: 'global', features: state.features });
-                }
-                this.renderNav(); 
-                if(state.currentView === 'owner_dashboard') this.renderOwnerDashboard(); 
-                this.showToast(t("Action completed successfully")); 
-            },
-            renderNav: function() {
-                const nav = document.getElementById('app-nav'); if (!state.currentUser) return; nav.classList.remove('hidden'); let html = '';
-                const createNavItem = (icon, label, targetView, targetModule, isActive) => `<button onclick="App.navigate('${targetView}'${targetModule ? `,'${targetModule}'` : ''})" class="flex flex-col items-center justify-center p-2 min-w-[64px] flex-shrink-0 transition-all ${isActive ? 'text-blue-600 transform -translate-y-1' : 'text-gray-400 hover:text-gray-600'}"><div class="relative"><i class="${isActive ? 'ph-fill' : 'ph'} ${icon} text-[26px] mb-1"></i>${isActive ? '<div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-blue-600 rounded-full"></div>' : ''}</div><span class="text-[10px] font-bold mt-1">${t(label)}</span></button>`;
-                
-                if (state.currentUser.role === 'owner') { 
-                    html += createNavItem('ph-squares-four', 'Dashboard', 'owner_dashboard', null, state.currentView === 'owner_dashboard'); 
-                    html += createNavItem('ph-faders', 'Settings', 'settings', null, state.currentView === 'settings'); 
-                } else { 
-                    html += createNavItem('ph-house', 'Home', 'employee_home', null, state.currentView === 'employee_home'); 
-                    if(state.features['timeClock']) html += createNavItem('ph-clock', 'Time Clock', 'module', 'timeClock', state.currentModuleId === 'timeClock');
-                    html += createNavItem('ph-user', 'Profile', 'settings', null, state.currentView === 'settings'); 
-                }
-                nav.innerHTML = `<div class="flex justify-around w-full max-w-md mx-auto">${html}</div>`;
+                btnCancel.onclick = () => {
+                    closeCamera();
+                    reject(new Error("ยกเลิกการถ่ายรูป"));
+                };
+            });
+        }
+
+        function closeCamera() {
+            const modal = document.getElementById('camera-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 200);
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
             }
-        };
+        }
 
-        function isClockedIn(userId) { const logs = db.logs.filter(l => l.userId === userId).sort((a,b) => new Date(b.time) - new Date(a.time)); return logs.length > 0 && logs[0].type === 'IN'; }
-        function formatTime(isoStr) { return new Date(isoStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
+        async function getLocation() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject(new Error("อุปกรณ์ของคุณไม่รองรับ GPS"));
+                }
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        resolve({
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        });
+                    },
+                    (error) => {
+                        reject(new Error("ไม่สามารถระบุตำแหน่งได้ กรุณาเปิด GPS"));
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            });
+        }
 
-        // =========================================
-        // FULL MODULE DEFINITIONS (1-32) WITH CATEGORIES
-        // =========================================
+        // --- Core Application Logic ---
 
-        const TimeTrackerModule = { 
-            id: 'timeClock', name: 'Time Clock', category: 'Workspace', description: 'Allow employees to log work in and out times.', icon: 'ph-clock-countdown', hasUserTab: true, 
-            renderUserView: function() { 
-                const isW = isClockedIn(state.currentUser.id); 
-                return `
-                    <div class="space-y-6 pb-20 max-w-7xl mx-auto w-full">
-                        <div><h2 class="text-2xl font-bold">${t("Time Clock")}</h2><p class="text-gray-500">${t("Time Logs")}</p></div>
-                        <div class="card-3d p-8 text-center bg-gradient-to-b from-white to-gray-50 max-w-md mx-auto">
-                            <div class="flex flex-col items-center justify-center mb-8">
-                                <div class="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-6 shadow-inner border border-blue-100">
-                                    <i class="ph-fill ph-clock text-5xl text-blue-500"></i>
-                                </div>
-                                <h3 class="text-2xl font-bold mb-1 text-gray-800">${isW ? t("Clocked In") : t("Clocked Out")}</h3>
-                                <p class="text-3xl text-gray-400 font-mono tracking-wider mt-2" id="live-clock">--:--:--</p>
-                            </div>
-                            <button onclick="TimeTrackerModule.toggleClock()" class="btn-3d w-full py-4 text-lg font-bold tracking-wider flex items-center justify-center gap-3 ${isW ? 'bg-rose-500 text-white hover:bg-rose-600' : 'bg-emerald-500 text-white hover:bg-emerald-600'}">
-                                <i class="ph-bold ${isW ? 'ph-sign-out' : 'ph-sign-in'} text-2xl"></i> ${isW ? t("CLOCK OUT") : t("CLOCK IN")}
+        async function processTimeLog(type) {
+            if (!activeEmployee) return;
+
+            let photoData = null;
+            let locationData = null;
+
+            try {
+                // 1. Check Camera
+                if (appSettings.requireSelfie) {
+                    photoData = await captureSelfie();
+                }
+
+                // 2. Check GPS
+                if (appSettings.requireGPS) {
+                    showModal('กำลังดำเนินการ', 'กำลังตรวจสอบตำแหน่ง GPS...', []);
+                    locationData = await getLocation();
+                    closeModal();
+                }
+
+                // 3. Save to Firestore
+                showModal('กำลังบันทึก', 'กำลังบันทึกข้อมูลเข้าระบบ...', []);
+                
+                const baseCollectionPath = `artifacts/${appId}/public/data`;
+                await addDoc(collection(db, baseCollectionPath, 'timelogs'), {
+                    empId: activeEmployee.id,
+                    empName: activeEmployee.name,
+                    type: type, // 'IN' or 'OUT'
+                    timestamp: Date.now(),
+                    photoData: photoData,
+                    location: locationData
+                });
+
+                closeModal();
+                showModal('สำเร็จ!', `บันทึกเวลา${type === 'IN' ? 'เข้า' : 'ออก'}งานเรียบร้อยแล้ว`, [
+                    { text: 'ตกลง', type: 'success', action: () => {
+                        closeModal();
+                        activeEmployee = null; // Logout employee after action
+                        currentView = 'role-select';
+                        render();
+                    }}
+                ]);
+
+            } catch (error) {
+                closeModal();
+                showModal('ข้อผิดพลาด', error.message);
+            }
+        }
+
+        // --- Render Views ---
+
+        window.changeView = (view) => {
+            currentView = view;
+            if(view === 'role-select') activeEmployee = null;
+            render();
+        }
+
+        function render() {
+            if (!currentUser) return; // Wait for auth
+
+            let html = '';
+
+            switch (currentView) {
+                case 'role-select':
+                    html = renderRoleSelect();
+                    break;
+                case 'emp-login':
+                    html = renderEmpLogin();
+                    break;
+                case 'emp-dash':
+                    html = renderEmpDash();
+                    break;
+                case 'owner-login':
+                    html = renderOwnerLogin();
+                    break;
+                case 'owner-dash':
+                    html = renderOwnerDash();
+                    break;
+            }
+
+            appDiv.innerHTML = html;
+            attachEventListeners();
+        }
+
+        function renderRoleSelect() {
+            return `
+                <div class="flex flex-col items-center justify-center h-full gap-6 mt-10">
+                    <div class="text-center mb-6">
+                        <div class="w-24 h-24 bg-blue-500 rounded-3xl mx-auto mb-4 border-4 border-gray-900 box-shadow: 6px 6px 0px #111827 flex items-center justify-center text-white text-4xl" style="box-shadow: 6px 6px 0px #111827; transform: rotate(-5deg);">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h1 class="text-3xl font-black text-gray-900 drop-shadow-md">TimeCheck</h1>
+                        <p class="text-gray-600 mt-2 font-medium">เลือกระบบที่ต้องการใช้งาน</p>
+                    </div>
+
+                    <button data-action="go-emp-login" class="iso-btn iso-btn-primary w-full py-5 text-xl">
+                        <i class="fas fa-user-clock text-2xl"></i> พนักงานลงเวลา
+                    </button>
+                    
+                    <button data-action="go-owner-login" class="iso-btn iso-btn-white w-full py-4 text-lg mt-4">
+                        <i class="fas fa-store"></i> สำหรับเจ้าของร้าน
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderEmpLogin() {
+            return `
+                <div class="mt-4">
+                    <button data-action="go-home" class="mb-4 text-gray-600 font-medium"><i class="fas fa-arrow-left"></i> กลับ</button>
+                    <div class="iso-card p-6">
+                        <h2 class="text-2xl font-bold mb-6 text-center border-b-2 border-gray-200 pb-4">เข้าสู่ระบบพนักงาน</h2>
+                        
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-bold mb-2">เลือกชื่อพนักงาน</label>
+                            <select id="emp-select" class="iso-input bg-white cursor-pointer">
+                                <option value="">-- กรุณาเลือกชื่อ --</option>
+                                ${employees.map(emp => `<option value="${emp.id}">${emp.name}</option>`).join('')}
+                            </select>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-gray-700 font-bold mb-2">รหัส PIN 4 หลัก</label>
+                            <input type="password" id="emp-pin" class="iso-input text-center text-2xl tracking-widest" placeholder="****" maxlength="4" pattern="[0-9]*" inputmode="numeric">
+                        </div>
+
+                        <button id="btn-emp-login" class="iso-btn iso-btn-primary w-full py-3 text-lg">เข้าสู่ระบบ</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderEmpDash() {
+            if (!activeEmployee) return renderRoleSelect();
+            return `
+                <div class="mt-4 flex flex-col h-full">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <p class="text-sm text-gray-500 font-bold">ยินดีต้อนรับ</p>
+                            <h2 class="text-2xl font-black text-blue-600">${activeEmployee.name}</h2>
+                        </div>
+                        <button data-action="logout" class="iso-btn iso-btn-white px-3 py-1 text-sm"><i class="fas fa-sign-out-alt"></i> ออก</button>
+                    </div>
+
+                    <div class="iso-card p-6 text-center flex-grow flex flex-col justify-center gap-6 mb-6 bg-blue-50">
+                        <div class="text-5xl font-black text-gray-800 mb-4" id="live-clock">
+                            --:--
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <button id="btn-clock-in" class="iso-btn iso-btn-success py-8 text-xl flex flex-col items-center gap-2">
+                                <i class="fas fa-sign-in-alt text-3xl"></i>
+                                เข้างาน
+                            </button>
+                            <button id="btn-clock-out" class="iso-btn iso-btn-danger py-8 text-xl flex flex-col items-center gap-2">
+                                <i class="fas fa-sign-out-alt text-3xl"></i>
+                                ออกงาน
                             </button>
                         </div>
-                    </div>
-                `; 
-            }, 
-            onLoad: function() { const updateTime = () => { if(document.getElementById('live-clock')) document.getElementById('live-clock').innerText = new Date().toLocaleTimeString(); }; updateTime(); if(this.timer) clearInterval(this.timer); this.timer = setInterval(updateTime, 1000); }, 
-            toggleClock: function() { DB.add('logs', { userId: state.currentUser.id, type: isClockedIn(state.currentUser.id) ? 'OUT' : 'IN', time: new Date().toISOString() }); App.showToast(t("Action completed successfully")); }, 
-            renderAdminWidget: function() { return `<div class="card-3d p-4"><h3 class="font-bold border-b border-gray-100 pb-2 mb-3 text-sm flex items-center gap-2"><i class="ph-fill ph-clock-counter-clockwise text-blue-500"></i> ${t("Time Logs")}</h3><div class="flex-1 flex items-center justify-center"><p class="text-sm text-gray-500 font-medium">${db.logs.length} records processed</p></div></div>`; } 
-        };
-        
-        const TaskManagerModule = { 
-            id: 'taskManager', name: 'Tasks', category: 'Workspace', description: 'Assign and track daily employee tasks.', icon: 'ph-check-square-offset', hasUserTab: true, 
-            renderUserView: function() { 
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Tasks")}</h2></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
-                const myTasks = db.tasks.filter(t => t.assignedTo === state.currentUser.id);
-                if(myTasks.length === 0) html += `<p class="text-center text-gray-400 py-6 text-sm col-span-full">No tasks assigned.</p>`;
-                myTasks.forEach(task => { html += `<button onclick="TaskManagerModule.toggleTask('${task.id}')" class="btn-sm-3d w-full bg-white p-4 flex items-center gap-4 hover:bg-gray-50 text-left outline-none"><div class="w-6 h-6 rounded-md border-2 ${task.isDone ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-gray-300 text-transparent'} flex items-center justify-center flex-shrink-0 transition-colors"><i class="ph-bold ph-check text-sm"></i></div><span class="font-medium text-sm ${task.isDone ? 'line-through text-gray-400' : 'text-gray-800'}">${task.title}</span></button>`; });
-                return html + `</div></div>`; 
-            }, 
-            toggleTask: function(id) { const task=db.tasks.find(t=>t.id===id); if(task){ DB.update('tasks', id, {isDone: !task.isDone}); if(!task.isDone) App.showToast(t("Action completed successfully")); } },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-amber-50/50 border-amber-100"><h3 class="font-bold text-sm mb-3 flex items-center gap-2 text-amber-800"><i class="ph-fill ph-check-square-offset text-amber-500"></i> ${t("Tasks")}</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-amber-600">${db.tasks.length} <span class="text-xs font-medium text-amber-700/60 uppercase tracking-wider block">Tasks</span></p></div></div>`; } 
-        };
-
-        const WorkLocationModule = {
-            id: 'workLocation', name: 'Work Location', category: 'Workspace', description: 'Where are you working today?', icon: 'ph-map-pin', hasUserTab: true,
-            renderUserView: function() {
-                const today = new Date().toISOString().split('T')[0];
-                const myLoc = db.workLocations.find(l => l.userId === state.currentUser.id && l.date === today);
-                const teamLocs = db.workLocations.filter(l => l.date === today && l.userId !== state.currentUser.id);
-                
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Work Location")}</h2><p class="text-gray-500 text-sm">${t("Where are you working today?")}</p></div><div class="grid grid-cols-3 gap-3 max-w-2xl">`;
-                
-                const locs = [{id:'office', icon:'🏢', text:t('Office'), color:'blue'}, {id:'home', icon:'🏠', text:t('Home'), color:'orange'}, {id:'remote', icon:'☕', text:t('Remote'), color:'emerald'}];
-                locs.forEach(l => {
-                    const isSel = myLoc?.location === l.id;
-                    html += `<button onclick="WorkLocationModule.setLocation('${l.id}')" class="btn-3d p-5 flex flex-col items-center justify-center transition-all border ${isSel ? `bg-${l.color}-50 border-${l.color}-200 shadow-inner scale-95` : 'bg-white border-gray-100 hover:bg-gray-50'}"><div class="text-4xl mb-2">${l.icon}</div><span class="font-bold text-xs ${isSel ? `text-${l.color}-700` : 'text-gray-600'}">${l.text}</span></button>`;
-                });
-
-                html += `</div><div><h3 class="font-bold text-gray-400 uppercase tracking-wider text-[11px] mb-4 ml-1 mt-6">${t("Team Locations")}</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
-                if (teamLocs.length === 0) html += `<p class="text-center text-gray-400 py-4 text-sm bg-white rounded-2xl border border-gray-100 border-dashed col-span-full">No locations set yet.</p>`;
-                teamLocs.forEach(loc => {
-                    const user = db.users.find(u => u.id === loc.userId);
-                    let icon = '🏢', badge = 'bg-blue-50 text-blue-700 border-blue-200', label = t('Office');
-                    if (loc.location === 'home') { icon = '🏠'; badge = 'bg-orange-50 text-orange-700 border-orange-200'; label = t('Home'); }
-                    if (loc.location === 'remote') { icon = '☕'; badge = 'bg-emerald-50 text-emerald-700 border-emerald-200'; label = t('Remote'); }
-                    html += `<div class="card-3d p-4 flex items-center justify-between mb-0 bg-white border border-gray-100"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full ${user.color} flex items-center justify-center text-sm font-bold">${user.initials}</div><span class="font-bold text-sm text-gray-800">${user.name}</span></div><div class="px-3 py-1.5 rounded-lg text-[10px] font-bold border flex items-center gap-1.5 uppercase tracking-wider ${badge}"><span class="text-base">${icon}</span> ${label}</div></div>`;
-                });
-                return html + `</div></div></div>`;
-            },
-            setLocation: function(loc) { const today = new Date().toISOString().split('T')[0]; const myLoc = db.workLocations.find(l => l.userId === state.currentUser.id && l.date === today); if (myLoc) { DB.update('workLocations', myLoc.id, {location: loc}); } else { DB.add('workLocations', {userId: state.currentUser.id, date: today, location: loc}); } App.showToast(t("Action completed successfully")); },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-sky-50/50 border-sky-100"><h3 class="font-bold text-sm text-sky-800 flex items-center gap-2"><i class="ph-fill ph-map-pin text-sky-500"></i> Locations</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-sky-600">${db.workLocations.filter(l=>l.date===new Date().toISOString().split('T')[0]).length} <span class="text-xs font-medium text-sky-700/60 uppercase tracking-wider block">Checked In</span></p></div></div>`; }
-        };
-
-        const StandupsModule = {
-            id: 'standups', name: 'Standups', category: 'Workspace', description: 'Share daily updates with the team.', icon: 'ph-chat-teardrop-text', hasUserTab: true,
-            renderUserView: function() {
-                const today = new Date().toISOString().split('T')[0]; const myUpdate = db.standups.find(s => s.userId === state.currentUser.id && s.date === today); const teamUpdates = db.standups.filter(s => s.date === today && s.userId !== state.currentUser.id);
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Standups")}</h2><p class="text-gray-500 text-sm">${t("Share daily updates with the team.")}</p></div>`;
-                if (myUpdate) {
-                    html += `<div class="card-3d p-6 bg-lime-50 border-lime-200 max-w-2xl"><h3 class="font-bold text-lime-800 mb-4 flex items-center gap-2 text-base"><i class="ph-fill ph-check-circle text-xl"></i> Update Submitted</h3><div class="text-sm space-y-3 bg-white/60 p-5 rounded-xl"><div class="flex gap-3"><span class="font-bold text-gray-500 w-20">${t("Yesterday")}:</span> <span class="text-gray-800 flex-1">${myUpdate.yesterday}</span></div><div class="flex gap-3"><span class="font-bold text-lime-700 w-20">${t("Today")}:</span> <span class="text-gray-800 font-bold flex-1">${myUpdate.today}</span></div><div class="flex gap-3"><span class="font-bold text-rose-500 w-20">${t("Blockers")}:</span> <span class="text-rose-600 flex-1">${myUpdate.blockers || 'None'}</span></div></div></div>`;
-                } else {
-                    html += `<div class="card-3d p-6 bg-white border border-gray-100 max-w-2xl"><div class="space-y-4"><input type="text" id="su-yesterday" placeholder="${t("Yesterday")}..." class="w-full border border-gray-200 rounded-xl p-3.5 bg-gray-50 text-sm font-medium outline-none focus:border-lime-400"><input type="text" id="su-today" placeholder="${t("Today")}..." class="w-full border border-gray-200 rounded-xl p-3.5 bg-gray-50 text-sm font-bold outline-none focus:border-lime-400"><input type="text" id="su-blockers" placeholder="${t("Blockers")} (Optional)" class="w-full border border-gray-200 rounded-xl p-3.5 bg-gray-50 text-sm outline-none focus:border-lime-400"><button onclick="StandupsModule.submit()" class="btn-sm-3d w-full py-3.5 bg-lime-500 text-white border-lime-600 font-bold text-sm">${t("Submit Update")}</button></div></div>`;
-                }
-                html += `<div><h3 class="font-bold text-gray-400 uppercase tracking-wider text-[11px] mb-4 ml-1">${t("Team Updates")}</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">`;
-                if (teamUpdates.length === 0) html += `<p class="text-center text-gray-400 py-4 text-sm bg-white rounded-2xl border border-gray-100 border-dashed col-span-full">${t("No updates yet.")}</p>`;
-                teamUpdates.forEach(su => {
-                    const user = db.users.find(u => u.id === su.userId);
-                    html += `<div class="card-3d p-6 bg-white border border-gray-100 mb-0 flex flex-col"><div class="flex items-center gap-3 mb-4 pb-4 border-b border-gray-50"><div class="w-10 h-10 rounded-full ${user.color} flex items-center justify-center text-sm font-bold">${user.initials}</div><div class="font-bold text-base text-gray-800">${user.name}</div></div><div class="text-xs space-y-2.5 flex-1"><div class="flex gap-2"><span class="font-bold text-gray-400 w-16">${t("Yesterday")}:</span> <span class="text-gray-700 flex-1">${su.yesterday}</span></div><div class="flex gap-2"><span class="font-bold text-lime-600 w-16">${t("Today")}:</span> <span class="text-gray-800 font-bold flex-1">${su.today}</span></div>${su.blockers ? `<div class="flex gap-2"><span class="font-bold text-rose-500 w-16">${t("Blockers")}:</span> <span class="text-rose-600 flex-1 font-bold">${su.blockers}</span></div>` : ''}</div></div>`;
-                });
-                return html + `</div></div></div>`;
-            },
-            submit: function() { const y = document.getElementById('su-yesterday').value.trim(); const t_input = document.getElementById('su-today').value.trim(); const b = document.getElementById('su-blockers').value.trim(); if (y && t_input) { const today = new Date().toISOString().split('T')[0]; DB.add('standups', { userId: state.currentUser.id, date: today, yesterday: y, today: t_input, blockers: b }); App.showToast(t("Action completed successfully")); } else { App.showToast(t("Please fill all required fields"), "error"); } },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-lime-50/50 border-lime-100"><h3 class="font-bold text-sm text-lime-800 flex items-center gap-2"><i class="ph-fill ph-chat-teardrop-text text-lime-500"></i> Team Updates</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-lime-600">${db.standups.filter(s=>s.date===new Date().toISOString().split('T')[0]).length} <span class="text-xs font-medium text-lime-700/60 uppercase tracking-wider block">Today</span></p></div></div>`; }
-        };
-
-        const DirectoryModule = { 
-            id: 'directory', name: 'Team', category: 'Workspace', description: 'Company directory and contact roster.', icon: 'ph-address-book', hasUserTab: true, 
-            renderUserView: function() { 
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Team")}</h2></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">`;
-                db.users.forEach(u => { 
-                    const online = isClockedIn(u.id);
-                    html += `<div class="card-3d p-5 flex items-center gap-4 bg-white mb-0"><div class="relative"><div class="w-14 h-14 rounded-full border border-gray-200 ${u.color} flex items-center justify-center text-lg font-bold shadow-sm">${u.initials}</div>${online?'<div class="absolute bottom-0 right-0 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full"></div>':''}</div><div class="flex-1 min-w-0"><div class="font-bold text-base text-gray-800 truncate">${u.name}</div><div class="text-xs text-gray-500 truncate mt-0.5">${u.email}</div></div><a href="mailto:${u.email}" class="w-10 h-10 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-colors flex-shrink-0"><i class="ph-fill ph-envelope-simple text-lg"></i></a></div>`; 
-                });
-                return html + `</div></div>`; 
-            }, 
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-gray-100/50 border-gray-200"><h3 class="font-bold text-sm text-gray-800 flex items-center gap-2"><i class="ph-fill ph-users text-gray-500"></i> ${t("Team")}</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-gray-700">${db.users.length} <span class="text-xs font-medium text-gray-500 uppercase tracking-wider block">Members</span></p></div></div>`; } 
-        };
-
-        const BookingsModule = {
-            id: 'bookings', name: 'Bookings', category: 'Office', description: 'Book workspace and meeting rooms.', icon: 'ph-door', hasUserTab: true,
-            renderUserView: function() {
-                const myBookings = db.bookings.filter(b => b.userId === state.currentUser.id).sort((a,b) => new Date(a.date+'T'+a.time) - new Date(b.date+'T'+b.time));
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Meeting Rooms")}</h2></div><div class="card-3d p-6 bg-white border border-gray-100 max-w-2xl"><h3 class="font-bold text-base mb-5 flex items-center gap-2 text-gray-800"><i class="ph-fill ph-calendar-plus text-orange-500 text-xl"></i> ${t("Book Room")}</h3><div class="space-y-4"><select id="bk-room" class="w-full border border-gray-200 rounded-xl p-3.5 bg-gray-50 text-sm font-medium outline-none focus:border-orange-400"><option value="Boardroom A">Boardroom A (10 pax)</option><option value="Creative Studio">Creative Studio (4 pax)</option><option value="Focus Pod">Focus Pod (1 pax)</option></select><div class="flex gap-4"><input type="date" id="bk-date" class="flex-1 border border-gray-200 rounded-xl p-3.5 bg-gray-50 text-sm outline-none focus:border-orange-400"><input type="time" id="bk-time" class="w-1/3 border border-gray-200 rounded-xl p-3.5 bg-gray-50 text-sm outline-none focus:border-orange-400"></div><button onclick="BookingsModule.submit()" class="btn-sm-3d w-full py-3.5 bg-orange-500 text-white border-orange-600 font-bold text-sm">${t("Book Room")}</button></div></div><div><h3 class="font-bold text-gray-400 uppercase tracking-wider text-[11px] mb-4 ml-1">Your Bookings</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
-                if(myBookings.length===0) html+=`<p class="text-gray-400 text-center text-sm py-4 bg-white rounded-2xl border border-gray-100 border-dashed col-span-full">No upcoming bookings</p>`;
-                myBookings.forEach(b => { html += `<div class="card-3d p-5 flex justify-between items-center bg-white border border-gray-100 mb-0"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center"><i class="ph-fill ph-door text-2xl"></i></div><div><div class="font-bold text-base text-gray-800 leading-tight">${b.room}</div><div class="text-xs text-gray-500 font-medium mt-1">${b.date} @ ${b.time}</div></div></div><button onclick="BookingsModule.cancel('${b.id}')" class="w-10 h-10 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center hover:bg-rose-100 transition-colors"><i class="ph-bold ph-x text-lg"></i></button></div>`; });
-                return html + `</div></div></div>`;
-            },
-            submit: function() { const r=document.getElementById('bk-room').value; const d=document.getElementById('bk-date').value; const tUser=document.getElementById('bk-time').value; if(r&&d&&tUser){ DB.add('bookings', {userId:state.currentUser.id, room:r, date:d, time:tUser}); App.showToast(t("Action completed successfully")); } else { App.showToast(t("Please fill all required fields"), "error"); } },
-            cancel: function(id) { DB.delete('bookings', id); App.showToast(t("Action completed successfully")); },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-orange-50/50 border-orange-100"><h3 class="font-bold text-sm text-orange-800 flex items-center gap-2"><i class="ph-fill ph-door text-orange-500"></i> Room Bookings</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-orange-600">${db.bookings.length} <span class="text-xs font-medium text-orange-700/60 uppercase tracking-wider block">Active</span></p></div></div>`; }
-        };
-
-        const VisitorsModule = {
-            id: 'visitors', name: 'Visitors', category: 'Office', description: 'Pre-register office guests and visitors.', icon: 'ph-identification-badge', hasUserTab: true,
-            renderUserView: function() {
-                const myVisitors = db.visitors.filter(v => v.userId === state.currentUser.id).sort((a,b) => new Date(b.date) - new Date(a.date));
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Visitors")}</h2></div><div class="card-3d p-6 bg-white border border-gray-100 max-w-2xl"><h3 class="font-bold text-base mb-5 flex items-center gap-2 text-gray-800"><i class="ph-fill ph-user-plus text-rose-500 text-xl"></i> ${t("Register Guest")}</h3><div class="space-y-4"><input type="text" id="vs-name" placeholder="Guest Name" class="w-full border border-gray-200 rounded-xl p-3.5 bg-gray-50 text-sm font-medium outline-none focus:border-rose-400"><input type="date" id="vs-date" class="w-full border border-gray-200 rounded-xl p-3.5 bg-gray-50 text-sm outline-none focus:border-rose-400"><button onclick="VisitorsModule.submit()" class="btn-sm-3d w-full py-3.5 bg-rose-500 text-white border-rose-600 font-bold text-sm">${t("Register Guest")}</button></div></div><div><h3 class="font-bold text-gray-400 uppercase tracking-wider text-[11px] mb-4 ml-1">Your Guests</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
-                if(myVisitors.length===0) html+=`<p class="text-gray-400 text-center text-sm py-4 bg-white rounded-2xl border border-gray-100 border-dashed col-span-full">No guests registered</p>`;
-                myVisitors.forEach(v => { html += `<div class="card-3d p-5 flex justify-between items-center bg-white border border-gray-100 mb-0"><div><div class="font-bold text-base text-gray-800">${v.guestName}</div><div class="text-xs text-gray-500 mt-1">${v.date}</div></div><span class="px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${v.status==='arrived'?'bg-emerald-100 text-emerald-700':'bg-amber-100 text-amber-700'}">${v.status}</span></div>`; });
-                return html + `</div></div></div>`;
-            },
-            submit: function() { const n=document.getElementById('vs-name').value; const d=document.getElementById('vs-date').value; if(n&&d){ DB.add('visitors', {userId:state.currentUser.id, guestName:n, date:d, status:'expected'}); App.showToast(t("Action completed successfully")); } else { App.showToast(t("Please fill all required fields"), "error"); } },
-            renderAdminWidget: function() { 
-                let html=`<div class="card-3d p-4 bg-rose-50/50 border-rose-100"><h3 class="font-bold text-sm mb-3 flex items-center gap-2 text-rose-800"><i class="ph-fill ph-identification-badge text-rose-500"></i> ${t("Expected Today")}</h3><div class="overflow-y-auto flex-1 pr-1">`;
-                const expected = db.visitors.filter(v=>v.status==='expected');
-                if(expected.length === 0) html += `<p class="text-xs text-rose-600/60 text-center py-2">No visitors expected.</p>`;
-                expected.forEach(v=>{ html+=`<div class="bg-white border border-rose-100 rounded-xl p-3 mb-2 flex justify-between items-center shadow-sm"><span class="text-xs font-bold text-gray-800">${v.guestName}</span><button onclick="VisitorsModule.checkIn('${v.id}')" class="btn-sm-3d bg-rose-500 text-white px-3 py-1.5 text-xs border-rose-600">Check In</button></div>`; });
-                return html+`</div></div>`;
-            },
-            checkIn: function(id) { DB.update('visitors', id, {status: 'arrived'}); App.showToast(t("Action completed successfully")); }
-        };
-
-        const CafeteriaModule = {
-            id: 'cafeteria', name: 'Cafeteria', category: 'Office', description: 'Order daily office lunch.', icon: 'ph-fork-knife', hasUserTab: true,
-            renderUserView: function() {
-                const today = new Date().toISOString().split('T')[0]; const myOrder = db.lunchOrders.find(o => o.userId === state.currentUser.id && o.date === today);
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Cafeteria")}</h2><p class="text-gray-500 text-sm">${t("Today's Menu")}</p></div>`;
-                if(myOrder) { 
-                    const it = db.menuItems.find(m=>m.id===myOrder.itemId); 
-                    html += `<div class="card-3d p-10 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-100 text-center relative overflow-hidden max-w-2xl mx-auto"><div class="absolute -right-6 -top-6 text-9xl opacity-10 transform rotate-12">${it.emoji}</div><div class="text-[10px] font-bold text-amber-600 uppercase tracking-wider mb-4">${t("Your Order")}</div><div class="text-7xl mb-4 relative z-10">${it.emoji}</div><div class="font-bold text-2xl text-gray-800 mb-8 relative z-10">${it.name.split(' / ')[state.lang === 'th' ? 1 : 0] || it.name}</div><button onclick="CafeteriaModule.cancel('${myOrder.id}')" class="btn-sm-3d py-3 px-8 bg-white text-rose-500 border-gray-200 relative z-10 mx-auto block text-sm">${t("Cancel Order")}</button></div>`; 
-                } 
-                else { 
-                    html += `<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">`; 
-                    db.menuItems.forEach(item => { html += `<button onclick="CafeteriaModule.order(${item.id})" class="card-3d flex flex-col items-center justify-center p-8 bg-white border border-gray-100 hover:border-amber-300 hover:shadow-md transition-all active:scale-95 outline-none mb-0"><div class="text-6xl mb-4">${item.emoji}</div><span class="font-bold text-sm text-gray-800 text-center leading-tight">${item.name.split(' / ')[state.lang === 'th' ? 1 : 0] || item.name}</span></button>`; }); 
-                    html += `</div>`; 
-                }
-                return html + `</div>`;
-            },
-            order: function(id) { DB.add('lunchOrders', {userId:state.currentUser.id, itemId:id, date:new Date().toISOString().split('T')[0]}); App.showToast(t("Action completed successfully")); },
-            cancel: function(id) { DB.delete('lunchOrders', id); App.showToast(t("Action completed successfully")); },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-amber-50/50 border-amber-100"><h3 class="font-bold text-sm text-amber-800 flex items-center gap-2"><i class="ph-fill ph-fork-knife text-amber-500"></i> ${t("Lunch Orders Summary")}</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-amber-600">${db.lunchOrders.length} <span class="text-xs font-medium text-amber-700/60 uppercase tracking-wider block">Today</span></p></div></div>`; }
-        };
-
-        const EquipmentModule = {
-            id: 'equipment', name: 'Equipment', category: 'Office', description: 'Borrow office equipment and devices.', icon: 'ph-laptop', hasUserTab: true,
-            renderUserView: function() {
-                const myLoans = db.loans.filter(l => l.userId === state.currentUser.id && l.status === 'borrowed');
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Equipment")}</h2></div>`;
-                if(myLoans.length>0) { 
-                    html+=`<div><h3 class="font-bold text-gray-400 uppercase tracking-wider text-[11px] mb-4 ml-1">${t("Active Loans")}</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`; 
-                    myLoans.forEach(l=>{ const it=db.inventory.find(i=>i.id===l.equipmentId); html+=`<div class="card-3d p-5 flex justify-between items-center bg-indigo-50 border-indigo-100 mb-0"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-white text-indigo-500 flex items-center justify-center shadow-sm"><i class="ph-fill ${it.icon} text-xl"></i></div><div><div class="font-bold text-base text-indigo-900">${it.name}</div><div class="text-xs text-indigo-600/70 mt-1">Borrowed</div></div></div><button onclick="EquipmentModule.ret('${l.id}')" class="btn-sm-3d bg-indigo-500 text-white border-indigo-600 px-4 py-2 text-xs">Return</button></div>`; }); 
-                    html+=`</div></div>`; 
-                }
-                html += `<div><h3 class="font-bold text-gray-400 uppercase tracking-wider text-[11px] mb-4 ml-1">${t("Available Items")}</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`; 
-                db.inventory.forEach(i=>{ 
-                    const outCount = db.loans.filter(l => l.equipmentId === i.id && l.status === 'borrowed').length;
-                    const available = i.total - outCount;
-                    html+=`<div class="card-3d p-5 flex justify-between items-center bg-white border border-gray-100 mb-0"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-gray-50 text-gray-500 flex items-center justify-center"><i class="ph-fill ${i.icon} text-xl"></i></div><div><div class="font-bold text-base text-gray-800">${i.name}</div><div class="text-xs font-medium mt-1 ${available>0?'text-emerald-500':'text-rose-500'}">${available} left</div></div></div><button onclick="EquipmentModule.bor(${i.id})" class="btn-sm-3d bg-gray-800 text-white border-gray-900 px-5 py-2.5 text-xs transition-opacity ${available<=0?'opacity-30 pointer-events-none':''}" ${available<=0?'disabled':''}>Borrow</button></div>`; 
-                });
-                return html + `</div></div></div>`;
-            },
-            bor: function(id) { const outCount = db.loans.filter(l => l.equipmentId === id && l.status === 'borrowed').length; const it=db.inventory.find(x=>x.id===id); if(it&& (it.total-outCount)>0){ DB.add('loans', {userId:state.currentUser.id, equipmentId:id, status:'borrowed', date:new Date().toISOString().split('T')[0]}); App.showToast(t("Action completed successfully"));} },
-            ret: function(id) { DB.update('loans', id, {status:'returned'}); App.showToast(t("Action completed successfully")); },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-indigo-50/50 border-indigo-100"><h3 class="font-bold text-sm text-indigo-800 flex items-center gap-2"><i class="ph-fill ph-laptop text-indigo-500"></i> Equipment Loans</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-indigo-600">${db.loans.filter(x=>x.status==='borrowed').length} <span class="text-xs font-medium text-indigo-700/60 uppercase tracking-wider block">Active</span></p></div></div>`; }
-        };
-
-        const LostFoundModule = {
-            id: 'lostFound', name: 'Lost & Found', category: 'Office', description: 'Report lost items or claim found items.', icon: 'ph-magnifying-glass', hasUserTab: true,
-            renderUserView: function() {
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Lost & Found")}</h2></div><div class="card-3d p-6 bg-white border border-gray-100 max-w-2xl"><input type="text" id="lf-name" placeholder="What did you lose/find?" class="w-full mb-4 p-3.5 border border-gray-200 rounded-xl bg-gray-50 text-sm outline-none focus:border-sky-400"><button onclick="LostFoundModule.sub()" class="btn-sm-3d w-full py-3.5 bg-sky-500 text-white border-sky-600 font-bold text-sm">Report Item</button></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
-                const openItems = db.lostFound.filter(x=>x.status==='open').sort((a,b)=>new Date(b.date)-new Date(a.date));
-                if(openItems.length === 0) html += `<p class="text-center text-gray-400 py-4 text-sm col-span-full">No active reports.</p>`;
-                openItems.forEach(lf => { html += `<div class="card-3d p-5 flex justify-between items-center bg-white border border-gray-100 mb-0"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-sky-50 text-sky-500 flex items-center justify-center"><i class="ph-fill ph-magnifying-glass text-xl"></i></div><div><div class="font-bold text-base text-gray-800">${lf.itemName}</div><div class="text-[11px] text-gray-500 mt-1 uppercase tracking-wider">${lf.type}</div></div></div><button onclick="LostFoundModule.res('${lf.id}')" class="btn-sm-3d bg-sky-50 text-sky-700 border-sky-200 px-4 py-2 text-xs hover:bg-sky-100 transition-colors">Resolve</button></div>`; });
-                return html + `</div></div>`;
-            },
-            sub: function() { const n=document.getElementById('lf-name').value; if(n){ DB.add('lostFound', {userId:state.currentUser.id, type:'lost', itemName:n, status:'open', date:new Date().toISOString()}); App.showToast(t("Action completed successfully")); } else { App.showToast(t("Please fill all required fields"), "error"); } },
-            res: function(id) { DB.update('lostFound', id, {status: 'resolved'}); App.showToast(t("Action completed successfully")); },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-sky-50/50 border-sky-100"><h3 class="font-bold text-sm text-sky-800 flex items-center gap-2"><i class="ph-fill ph-magnifying-glass text-sky-500"></i> Lost & Found</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-sky-600">${db.lostFound.filter(x=>x.status==='open').length} <span class="text-xs font-medium text-sky-700/60 uppercase tracking-wider block">Open</span></p></div></div>`; }
-        };
-
-        const TimeOffModule = { 
-            id: 'timeOff', name: 'Time Off', category: 'HR & Ops', description: 'Manage employee leave and vacation requests.', icon: 'ph-calendar-blank', hasUserTab: true, 
-            renderUserView: function() { 
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Time Off")}</h2></div><div class="card-3d p-5 bg-white max-w-2xl"><input type="date" id="to-date" class="w-full mb-3 p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm font-medium outline-none focus:border-blue-400 focus:bg-white transition-colors"><input type="text" id="to-reason" placeholder="Reason" class="w-full mb-3 p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm font-medium outline-none focus:border-blue-400 focus:bg-white transition-colors"><button onclick="TimeOffModule.submit()" class="btn-sm-3d w-full py-3 bg-purple-500 text-white border-purple-600">Submit Request</button></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
-                const reqs = db.timeOffRequests.filter(r => r.userId === state.currentUser.id);
-                if(reqs.length === 0) html += `<p class="text-center text-gray-400 py-4 text-sm col-span-full">No requests.</p>`;
-                reqs.forEach(req => { 
-                    const statusColors = { pending: 'bg-amber-100 text-amber-700 border-amber-200', approved: 'bg-emerald-100 text-emerald-700 border-emerald-200', denied: 'bg-rose-100 text-rose-700 border-rose-200' };
-                    html += `<div class="card-3d p-4 flex justify-between items-center bg-white mb-0"><span class="font-medium text-sm text-gray-800">${req.date} <span class="text-gray-400 text-xs ml-1 block md:inline">(${req.reason})</span></span><span class="px-2 py-1 rounded-md text-[10px] font-bold border uppercase tracking-wider ${statusColors[req.status]}">${req.status}</span></div>`; 
-                });
-                return html + `</div></div>`; 
-            }, 
-            submit: function() { const d=document.getElementById('to-date').value; const r=document.getElementById('to-reason').value; if(d&&r){ DB.add('timeOffRequests', {userId:state.currentUser.id, date:d, reason:r, status:'pending'}); App.showToast(t("Action completed successfully")); } else { App.showToast(t("Please fill all required fields"), "error"); } },
-            renderAdminWidget: function() { 
-                let html = `<div class="card-3d p-4 bg-purple-50/50 border-purple-100"><h3 class="font-bold text-sm border-b border-purple-100 pb-2 mb-3 flex items-center gap-2 text-purple-800"><i class="ph-fill ph-calendar-blank text-purple-500"></i> ${t("Time Off")}</h3><div class="overflow-y-auto flex-1 pr-1">`;
-                const pending = db.timeOffRequests.filter(r=>r.status==='pending');
-                if(pending.length === 0) html += `<p class="text-xs text-purple-600/60 text-center py-2">No pending requests.</p>`;
-                pending.forEach(req => { const u = db.users.find(x=>x.id===req.userId); html += `<div class="bg-white p-3 border border-purple-100 rounded-xl mb-2 flex justify-between items-center shadow-sm"><div class="text-xs text-gray-800"><span class="font-bold">${u.name}</span><br><span class="text-gray-500">${req.date} (${req.reason})</span></div><div class="flex gap-1"><button onclick="TimeOffModule.upd('${req.id}', 'approved')" class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center hover:bg-emerald-200 transition-colors"><i class="ph-bold ph-check"></i></button><button onclick="TimeOffModule.upd('${req.id}', 'denied')" class="w-7 h-7 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center hover:bg-rose-200 transition-colors"><i class="ph-bold ph-x"></i></button></div></div>`; });
-                return html + `</div></div>`; 
-            },
-            upd: function(id, status) { DB.update('timeOffRequests', id, {status}); App.showToast(t("Action completed successfully")); }
-        };
-
-        const ExpensesModule = { 
-            id: 'expenses', name: 'Expenses', category: 'HR & Ops', description: 'Submit and approve reimbursement claims.', icon: 'ph-receipt', hasUserTab: true, 
-            renderUserView: function() { 
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Expenses")}</h2></div><div class="card-3d p-5 bg-white max-w-2xl"><div class="flex gap-3 mb-3"><div class="relative w-1/3"><span class="absolute left-3 top-3.5 text-gray-400 font-medium">$</span><input type="number" id="exp-amt" placeholder="0.00" class="w-full pl-7 p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm font-bold outline-none focus:border-blue-400 focus:bg-white"></div><input type="text" id="exp-desc" placeholder="Description" class="flex-1 p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm font-medium outline-none focus:border-blue-400 focus:bg-white"></div><button onclick="ExpensesModule.sub()" class="btn-sm-3d w-full py-3 bg-emerald-500 text-white border-emerald-600">Submit Claim</button></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
-                const myExps = db.expenses.filter(e => e.userId === state.currentUser.id).sort((a,b)=>new Date(b.date)-new Date(a.date));
-                if(myExps.length === 0) html += `<p class="text-center text-gray-400 py-4 text-sm col-span-full">No expenses submitted.</p>`;
-                myExps.forEach(exp => { 
-                    const statusColors = { pending: 'bg-amber-100 text-amber-700', approved: 'bg-emerald-100 text-emerald-700', denied: 'bg-rose-100 text-rose-700' };
-                    html += `<div class="card-3d p-4 flex justify-between items-center bg-white mb-0"><div class="flex flex-col"><span class="font-bold text-base text-gray-800">$${exp.amount.toFixed(2)}</span><span class="text-xs text-gray-500">${exp.description}</span></div><span class="text-[10px] px-2 py-1 rounded-md font-bold uppercase tracking-wider ${statusColors[exp.status]}">${exp.status}</span></div>`; 
-                });
-                return html + `</div></div>`; 
-            }, 
-            sub: function() { const a=document.getElementById('exp-amt').value; const d=document.getElementById('exp-desc').value; if(a&&d){ DB.add('expenses', {userId:state.currentUser.id, amount:parseFloat(a), description:d, status:'pending', date:new Date().toISOString()}); App.showToast(t("Action completed successfully")); } else { App.showToast(t("Please fill all required fields"), "error"); } },
-            renderAdminWidget: function() { 
-                let html = `<div class="card-3d p-4 bg-emerald-50/50 border-emerald-100"><h3 class="font-bold text-sm mb-3 flex items-center gap-2 text-emerald-800"><i class="ph-fill ph-receipt text-emerald-500"></i> Pending Expenses</h3><div class="overflow-y-auto flex-1 pr-1">`;
-                const pending = db.expenses.filter(e=>e.status==='pending');
-                if(pending.length === 0) html += `<p class="text-xs text-emerald-600/60 text-center py-2">No pending claims.</p>`;
-                pending.forEach(exp => { const u = db.users.find(x=>x.id===exp.userId); html += `<div class="bg-white p-3 border border-emerald-100 rounded-xl mb-2 flex justify-between items-center shadow-sm"><div class="text-xs text-gray-800"><span class="font-bold text-sm">$${exp.amount.toFixed(2)}</span><br><span class="text-gray-500">${u.name} - ${exp.description}</span></div><div><button onclick="ExpensesModule.upd('${exp.id}', 'approved')" class="w-8 h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center hover:bg-emerald-600 transition-colors shadow-sm"><i class="ph-bold ph-check"></i></button></div></div>`; });
-                return html + `</div></div>`; 
-            },
-            upd: function(id, status) { DB.update('expenses', id, {status}); App.showToast(t("Action completed successfully")); }
-        };
-
-        const HelpDeskModule = { 
-            id: 'helpDesk', name: 'Support', category: 'HR & Ops', description: 'Submit maintenance or IT support tickets.', icon: 'ph-lifebuoy', hasUserTab: true, 
-            renderUserView: function() { 
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Support")}</h2></div><div class="card-3d p-5 bg-white max-w-2xl"><input type="text" id="hd-t" placeholder="Describe the issue..." class="w-full mb-3 p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm outline-none focus:border-cyan-400"><button onclick="HelpDeskModule.sub()" class="btn-sm-3d w-full py-3 bg-cyan-500 text-white border-cyan-600">Submit Ticket</button></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
-                const myTkts = db.tickets.filter(t=>t.userId===state.currentUser.id).sort((a,b)=>new Date(b.date)-new Date(a.date));
-                if(myTkts.length===0) html += `<p class="text-center text-gray-400 py-4 text-sm col-span-full">No tickets submitted.</p>`;
-                myTkts.forEach(tk => { html += `<div class="card-3d p-4 flex justify-between items-center bg-white mb-0"><span class="font-medium text-sm text-gray-800">${tk.title}</span><span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md ${tk.status==='open'?'bg-amber-100 text-amber-700':'bg-emerald-100 text-emerald-700'}">${tk.status}</span></div>`; });
-                return html + `</div></div>`; 
-            }, 
-            sub: function() { const t_input=document.getElementById('hd-t').value; if(t_input){ DB.add('tickets', {userId:state.currentUser.id, title:t_input, status:'open', date:new Date().toISOString()}); App.showToast(t("Action completed successfully")); } else { App.showToast(t("Please fill all required fields"), "error"); } },
-            renderAdminWidget: function() { 
-                let html = `<div class="card-3d p-4 bg-cyan-50/50 border-cyan-100"><h3 class="font-bold text-sm mb-3 flex items-center gap-2 text-cyan-800"><i class="ph-fill ph-lifebuoy text-cyan-500"></i> Open Tickets</h3><div class="overflow-y-auto flex-1 pr-1">`;
-                const openTkts = db.tickets.filter(t=>t.status==='open');
-                if(openTkts.length === 0) html += `<p class="text-xs text-cyan-600/60 text-center py-2">Inbox zero!</p>`;
-                openTkts.forEach(tk => { const u = db.users.find(x=>x.id===tk.userId); html += `<div class="bg-white p-3 border border-cyan-100 rounded-xl mb-2 flex justify-between items-center shadow-sm"><div class="text-xs text-gray-800"><span class="font-bold">${u.name}</span><br><span class="text-gray-500">${tk.title}</span></div><button onclick="HelpDeskModule.res('${tk.id}')" class="btn-sm-3d bg-cyan-500 text-white px-3 py-1.5 text-xs border-cyan-600">Resolve</button></div>`; });
-                return html + `</div></div>`; 
-            },
-            res: function(id) { DB.update('tickets', id, {status: 'resolved'}); App.showToast(t("Action completed successfully")); }
-        };
-
-        const ShiftSwapModule = {
-            id: 'shiftSwap', name: 'Shift Swap', category: 'HR & Ops', description: 'Trade or cover shifts with coworkers.', icon: 'ph-arrows-left-right', hasUserTab: true,
-            renderUserView: function() {
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Shift Swap")}</h2></div><div class="card-3d p-6 bg-white border border-gray-100 max-w-2xl"><div class="flex gap-3 mb-4"><input type="date" id="ss-date" class="w-1/3 p-3.5 border border-gray-200 rounded-xl bg-gray-50 text-sm outline-none focus:border-emerald-400"><input type="text" id="ss-info" placeholder="Shift Info (e.g. 9-5)" class="flex-1 p-3.5 border border-gray-200 rounded-xl bg-gray-50 text-sm outline-none focus:border-emerald-400"></div><button onclick="ShiftSwapModule.sub()" class="btn-sm-3d w-full py-3.5 bg-emerald-500 text-white border-emerald-600 font-bold text-sm">Offer Shift</button></div><div><h3 class="font-bold text-gray-400 uppercase tracking-wider text-[11px] mb-4 ml-1">${t("Available Shifts")}</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
-                const openShifts = db.shifts.filter(s=>s.status==='open').sort((a,b)=>new Date(a.date)-new Date(b.date));
-                if(openShifts.length === 0) html += `<p class="text-center text-gray-400 py-4 text-sm col-span-full bg-white rounded-2xl border border-gray-100 border-dashed">No shifts available to cover.</p>`;
-                openShifts.forEach(s => { html += `<div class="card-3d p-5 flex justify-between items-center bg-white border border-gray-100 mb-0"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center"><i class="ph-fill ph-clock text-xl"></i></div><div><div class="font-bold text-base text-gray-800">${s.date}</div><div class="text-xs text-gray-500 mt-1">${s.info}</div></div></div><button onclick="ShiftSwapModule.cov('${s.id}')" class="btn-sm-3d bg-emerald-500 text-white border-emerald-600 px-5 py-2.5 text-xs">Cover</button></div>`; });
-                return html + `</div></div></div>`;
-            },
-            sub: function() { const d=document.getElementById('ss-date').value; const i=document.getElementById('ss-info').value; if(d&&i){ DB.add('shifts', {userId:state.currentUser.id, date:d, info:i, status:'open', coveredBy:null}); App.showToast(t("Action completed successfully")); } else { App.showToast(t("Please fill all required fields"), "error"); } },
-            cov: function(id) { DB.update('shifts', id, {status:'covered', coveredBy:state.currentUser.id}); App.showToast(t("Action completed successfully")); },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-emerald-50/50 border-emerald-100"><h3 class="font-bold text-sm text-emerald-800 flex items-center gap-2"><i class="ph-fill ph-arrows-left-right text-emerald-500"></i> Open Shifts</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-emerald-600">${db.shifts.filter(x=>x.status==='open').length} <span class="text-xs font-medium text-emerald-700/60 uppercase tracking-wider block">Unstaffed</span></p></div></div>`; }
-        };
-
-        const AnnouncementsModule = { 
-            id: 'announcements', name: 'Noticeboard', category: 'Culture', description: 'Broadcast important updates to all employees.', icon: 'ph-megaphone', hasUserTab: true, 
-            renderUserView: function() { 
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Noticeboard")}</h2></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">`;
-                if(db.announcements.length === 0) html += `<p class="text-center text-gray-400 py-6 text-sm col-span-full">No announcements.</p>`;
-                db.announcements.slice().reverse().forEach(news => { html += `<div class="card-3d p-6 bg-white border-l-4 mb-0 flex flex-col justify-between ${news.priority==='high'?'border-l-rose-500 bg-rose-50/30':'border-l-blue-500'}"><div><h3 class="font-bold text-lg text-gray-800 mb-2 leading-tight">${news.title}</h3><p class="text-sm text-gray-600 leading-relaxed">${news.content}</p></div><div class="text-[10px] text-gray-400 mt-4 font-medium">${new Date(news.date).toLocaleDateString()}</div></div>`; });
-                return html + `</div></div>`; 
-            }, 
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-orange-50/50 border-orange-100"><h3 class="font-bold text-sm mb-3 flex items-center gap-2 text-orange-800"><i class="ph-fill ph-megaphone text-orange-500"></i> Post News</h3><div class="flex flex-col h-full"><input type="text" id="news-t" placeholder="Title" class="w-full mb-3 p-2.5 border border-orange-200 rounded-xl bg-white text-sm outline-none focus:border-orange-400"><textarea id="news-c" placeholder="Content" class="w-full flex-1 min-h-[80px] mb-3 p-2.5 border border-orange-200 rounded-xl bg-white text-sm outline-none focus:border-orange-400 resize-none"></textarea><button onclick="AnnouncementsModule.post()" class="btn-sm-3d w-full py-2.5 bg-orange-500 text-white border-orange-600 mt-auto">Post</button></div></div>`; },
-            post: function() { const t_input=document.getElementById('news-t').value; const c=document.getElementById('news-c').value; if(t_input&&c){ DB.add('announcements', {title:t_input, content:c, priority:'normal', date:new Date().toISOString()}); App.showToast(t("Action completed successfully")); } else { App.showToast(t("Please fill all required fields"), "error"); } }
-        };
-
-        const KudosModule = { 
-            id: 'kudos', name: 'Shoutouts', category: 'Culture', description: 'Send public appreciation to your colleagues.', icon: 'ph-star', hasUserTab: true, 
-            renderUserView: function() { 
-                let opts = '<option value="" disabled selected>-- Select Teammate --</option>'; db.users.filter(u=>u.id!==state.currentUser.id).forEach(u=>{opts+=`<option value="${u.id}">${u.name}</option>`});
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Shoutouts")}</h2></div><div class="card-3d p-5 bg-white max-w-2xl"><select id="ku-to" class="w-full mb-3 p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm font-medium outline-none focus:border-pink-400 focus:bg-white">${opts}</select><textarea id="ku-msg" placeholder="Say something nice..." class="w-full mb-3 p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm font-medium outline-none focus:border-pink-400 focus:bg-white h-20 resize-none"></textarea><button onclick="KudosModule.sub()" class="btn-sm-3d w-full py-3 bg-pink-500 text-white border-pink-600 flex justify-center items-center gap-2"><i class="ph-bold ph-paper-plane-right"></i> Send</button></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">`;
-                const allKudos = [...db.kudos].sort((a,b)=>new Date(b.date)-new Date(a.date));
-                if(allKudos.length === 0) html += `<p class="text-center text-gray-400 py-4 text-sm col-span-full">No shoutouts yet. Be the first!</p>`;
-                allKudos.forEach(k => { 
-                    const f=db.users.find(u=>u.id===k.fromId); const tUser=db.users.find(u=>u.id===k.toId); 
-                    html += `<div class="card-3d p-5 mb-0 bg-gradient-to-br from-white to-pink-50/30 border-pink-100 flex flex-col justify-between"><div class="flex items-center gap-2 mb-3 pb-3 border-b border-pink-100/50"><div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5"><i class="ph-fill ph-star text-pink-400 text-base"></i> ${f.name} <span class="text-pink-300 mx-1">&rarr;</span> ${tUser.name}</div></div><div class="font-medium text-sm text-gray-700 italic leading-relaxed">"${k.message}"</div></div>`; 
-                });
-                return html + `</div></div>`; 
-            }, 
-            sub: function() { const to=document.getElementById('ku-to').value; const m=document.getElementById('ku-msg').value; if(to&&m){ DB.add('kudos', {fromId:state.currentUser.id, toId:to, message:m, date:new Date().toISOString()}); App.showToast(t("Action completed successfully")); } else { App.showToast(t("Please fill all required fields"), "error"); } },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-pink-50/50 border-pink-100"><h3 class="font-bold text-sm text-pink-800 flex items-center gap-2"><i class="ph-fill ph-star text-pink-500"></i> Shoutouts Given</h3><div class="flex-1 flex items-center justify-center"><p class="text-3xl font-bold text-pink-500">${db.kudos.length}</p></div></div>`; } 
-        };
-
-        const EventsModule = { 
-            id: 'events', name: 'Events', category: 'Culture', description: 'Company calendar and event RSVPs.', icon: 'ph-calendar-star', hasUserTab: true, 
-            renderUserView: function() { 
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Events")}</h2></div><div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">`;
-                if(db.events.length===0) html+=`<p class="text-center text-gray-400 py-4 text-sm col-span-full">No upcoming events.</p>`;
-                db.events.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(e => { 
-                    const rsvp = e.attendees.includes(state.currentUser.id); 
-                    const eventDate = new Date(e.date);
-                    const month = eventDate.toLocaleString('default', { month: 'short' }).toUpperCase();
-                    const day = eventDate.getDate();
-                    html += `<div class="card-3d p-0 overflow-hidden bg-white flex border border-gray-100 mb-0"><div class="bg-gray-50 border-r border-gray-100 p-5 flex flex-col items-center justify-center min-w-[80px]"><span class="text-xs font-bold text-red-500 tracking-wider mb-1">${month}</span><span class="text-3xl font-bold text-gray-800 leading-none">${day}</span></div><div class="p-5 flex-1 flex flex-col justify-between"><div><h3 class="font-bold text-lg text-gray-800 leading-tight mb-1">${e.title}</h3><p class="text-xs text-gray-500 font-bold mb-4 uppercase tracking-wider"><i class="ph-fill ph-users"></i> ${e.attendees.length} attending</p></div><button onclick="EventsModule.rsvp('${e.id}')" class="btn-sm-3d w-full py-2.5 text-xs font-bold transition-colors ${rsvp?'bg-teal-50 text-teal-700 border-teal-200':'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}">${rsvp?'<i class="ph-bold ph-check text-sm"></i> Attending':'RSVP'}</button></div></div>`; 
-                });
-                return html + `</div></div>`; 
-            }, 
-            rsvp: function(id) { const e=db.events.find(x=>x.id===id); if(e){ let att=[...e.attendees]; if(att.includes(state.currentUser.id)) att=att.filter(x=>x!==state.currentUser.id); else att.push(state.currentUser.id); DB.update('events', id, {attendees: att}); } },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-teal-50/50 border-teal-100"><h3 class="font-bold text-sm text-teal-800 flex items-center gap-2"><i class="ph-fill ph-calendar-star text-teal-500"></i> Events</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-teal-600">${db.events.length} <span class="text-xs font-medium text-teal-700/60 uppercase tracking-wider block">Upcoming</span></p></div></div>`; } 
-        };
-
-        const CelebrationsModule = {
-            id: 'celebrations', name: 'Celebrations', category: 'Culture', description: 'Track team birthdays and work anniversaries.', icon: 'ph-confetti', hasUserTab: true,
-            renderUserView: function() {
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Celebrations")}</h2></div><div><h3 class="font-bold text-gray-400 uppercase tracking-wider text-[11px] mb-4 ml-1">${t("Upcoming Celebrations")}</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
-                db.celebrations.forEach(c => {
-                    const user = db.users.find(u => u.id === c.userId);
-                    const hasCheered = c.cheers.includes(state.currentUser.id);
-                    html += `<div class="card-3d p-5 bg-white border border-gray-100 flex flex-col gap-4 mb-0"><div class="flex items-center gap-4"><div class="w-14 h-14 rounded-full ${user.color} flex items-center justify-center text-2xl font-bold shadow-sm flex-shrink-0">${c.type === 'birthday' ? '🎂' : '🏆'}</div><div class="flex-1"><div class="font-bold text-lg text-gray-800 leading-tight">${user.name}</div><div class="text-xs text-gray-500 mt-1">${t(c.title)} • <span class="font-bold text-pink-500">${c.dateStr}</span></div></div></div><button onclick="CelebrationsModule.cheer('${c.id}')" class="btn-sm-3d w-full py-3 flex items-center justify-center gap-2 text-xs font-bold transition-colors ${hasCheered ? 'bg-pink-50 text-pink-600 border-pink-200' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}"><i class="ph-bold ph-hands-clapping text-pink-500 text-base"></i> ${hasCheered ? t("Cheered!") : t("Cheer")} (${c.cheers.length})</button></div>`;
-                });
-                return html + `</div></div></div>`;
-            },
-            cheer: function(id) { const c = db.celebrations.find(x => x.id === id); if(c) { let ch = [...c.cheers]; const idx = ch.indexOf(state.currentUser.id); if(idx > -1) ch.splice(idx, 1); else ch.push(state.currentUser.id); DB.update('celebrations', id, {cheers: ch}); } },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-pink-50/50 border-pink-100"><h3 class="font-bold text-sm text-pink-800 flex items-center gap-2"><i class="ph-fill ph-confetti text-pink-500"></i> Celebrations</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-pink-600">${db.celebrations.length} <span class="text-xs font-medium text-pink-700/60 uppercase tracking-wider block">Upcoming</span></p></div></div>`; }
-        };
-
-        const JukeboxModule = {
-            id: 'jukebox', name: 'Jukebox', category: 'Culture', description: 'Suggest and vote on office music.', icon: 'ph-music-notes', hasUserTab: true,
-            renderUserView: function() {
-                const queue = db.jukebox.filter(s => s.status === 'queued').sort((a,b) => b.votes.length - a.votes.length);
-                let html = `
-                    <div class="space-y-6 pb-20 max-w-7xl mx-auto w-full">
-                        <div><h2 class="text-2xl font-bold">${t("Jukebox")}</h2><p class="text-gray-500 text-sm">${t("Suggest and vote on office music.")}</p></div>
-                        <div class="card-3d p-6 bg-white border border-gray-100 max-w-2xl">
-                            <input type="text" id="jk-song" placeholder="${t("Song Name & Artist")}" class="w-full mb-4 p-3.5 border border-gray-200 rounded-xl bg-gray-50 text-sm font-medium outline-none focus:border-fuchsia-400">
-                            <button onclick="JukeboxModule.sub()" class="btn-sm-3d w-full py-3.5 bg-fuchsia-500 text-white border-fuchsia-600 font-bold flex items-center justify-center gap-2 text-sm"><i class="ph-bold ph-music-notes-plus text-lg"></i> ${t("Suggest Song")}</button>
+                        
+                        <div class="flex justify-center gap-4 mt-4 text-sm text-gray-600 font-medium">
+                            <span class="${appSettings.requireGPS ? 'text-green-600' : 'text-gray-400'}">
+                                <i class="fas fa-map-marker-alt"></i> GPS: ${appSettings.requireGPS ? 'เปิด' : 'ปิด'}
+                            </span>
+                            <span class="${appSettings.requireSelfie ? 'text-green-600' : 'text-gray-400'}">
+                                <i class="fas fa-camera"></i> รูป: ${appSettings.requireSelfie ? 'เปิด' : 'ปิด'}
+                            </span>
                         </div>
-                        <div><h3 class="font-bold text-gray-400 uppercase tracking-wider text-[11px] mb-4 ml-1">${t("Queue")}</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                `;
-                if(queue.length === 0) html += `<p class="text-center text-gray-400 py-4 text-sm bg-white rounded-2xl border border-gray-100 border-dashed col-span-full">No songs in queue.</p>`;
-                queue.forEach(song => {
-                    const isVoted = song.votes.includes(state.currentUser.id);
-                    html += `<div class="card-3d p-5 flex justify-between items-center bg-white border border-gray-100 mb-0"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-fuchsia-50 text-fuchsia-500 flex items-center justify-center"><i class="ph-fill ph-music-notes text-xl"></i></div><div><div class="font-bold text-base text-gray-800 leading-tight pr-2">${song.song}</div><div class="text-xs text-gray-500 font-medium mt-1">${song.votes.length} votes</div></div></div><button onclick="JukeboxModule.vote('${song.id}')" class="btn-sm-3d px-4 py-2.5 text-xs flex items-center gap-1 transition-colors ${isVoted ? 'bg-fuchsia-50 text-fuchsia-600 border-fuchsia-200' : 'bg-white text-gray-500 hover:bg-gray-50'}"><i class="ph-bold ph-caret-up text-sm"></i></button></div>`;
-                });
-                return html + `</div></div></div>`;
-            },
-            sub: function() { const s = document.getElementById('jk-song').value; if(s) { DB.add('jukebox', {userId:state.currentUser.id, song:s, votes:[state.currentUser.id], status:'queued'}); App.showToast(t("Action completed successfully")); } else { App.showToast(t("Please fill all required fields"), "error"); } },
-            vote: function(id) { const s = db.jukebox.find(x => x.id === id); if(s) { let v = [...s.votes]; const idx = v.indexOf(state.currentUser.id); if(idx > -1) v.splice(idx, 1); else v.push(state.currentUser.id); DB.update('jukebox', id, {votes: v}); } },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-fuchsia-50/50 border-fuchsia-100"><h3 class="font-bold text-sm text-fuchsia-800 flex items-center gap-2"><i class="ph-fill ph-music-notes text-fuchsia-500"></i> ${t("Top Requested")}</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-fuchsia-600">${db.jukebox.filter(s=>s.status==='queued').length} <span class="text-xs font-medium text-fuchsia-700/60 uppercase tracking-wider block">Queued</span></p></div></div>`; }
-        };
+                    </div>
+                </div>
+            `;
+        }
 
-        const CoffeeChatsModule = {
-            id: 'coffeeChats', name: 'Coffee Chats', category: 'Culture', description: 'Randomly pair with coworkers for a quick chat.', icon: 'ph-coffee', hasUserTab: true,
-            renderUserView: function() {
-                const myMatch = db.coffeeMatches.find(m => m.u1 === state.currentUser.id || m.u2 === state.currentUser.id);
-                const optInRecord = db.coffeeOptIns.find(o => o.userId === state.currentUser.id);
-                const isOptedIn = !!optInRecord;
-                
-                let partner = null;
-                if (myMatch) {
-                    const partnerId = myMatch.u1 === state.currentUser.id ? myMatch.u2 : myMatch.u1;
-                    partner = db.users.find(u => u.id === partnerId);
-                }
-
-                let html = `
-                    <div class="space-y-6 pb-20 max-w-7xl mx-auto w-full">
-                        <div>
-                            <h2 class="text-2xl font-bold">${t("Coffee Chats")}</h2>
-                            <p class="text-gray-500 text-sm">${t("Randomly pair with coworkers for a quick chat.")}</p>
+        function renderOwnerLogin() {
+            return `
+                <div class="mt-10">
+                    <button data-action="go-home" class="mb-4 text-gray-600 font-medium"><i class="fas fa-arrow-left"></i> กลับ</button>
+                    <div class="iso-card p-6 bg-gray-800 text-white border-gray-900 box-shadow: 6px 6px 0px #000;">
+                        <div class="text-center mb-6">
+                            <i class="fas fa-lock text-4xl mb-2 text-yellow-400"></i>
+                            <h2 class="text-2xl font-bold">ระบบจัดการ (Owner)</h2>
                         </div>
                         
-                        <div>
-                            <h3 class="font-bold text-gray-400 uppercase tracking-wider text-[11px] mb-4 ml-1">${t("Your Match This Week")}</h3>
-                `;
+                        <div class="mb-6">
+                            <label class="block text-gray-300 font-bold mb-2">รหัสผ่านเจ้าของร้าน</label>
+                            <input type="password" id="owner-pin" class="iso-input text-center text-2xl tracking-widest text-black" placeholder="****" inputmode="numeric">
+                            <p class="text-xs text-gray-400 mt-2 text-center">รหัสเริ่มต้นคือ 9999</p>
+                        </div>
 
-                if (partner) {
-                    html += `
-                        <div class="card-3d p-8 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200 max-w-2xl">
-                            <div class="flex flex-col items-center text-center">
-                                <div class="flex items-center justify-center gap-4 mb-5">
-                                    <div class="w-16 h-16 rounded-full ${state.currentUser.color} flex items-center justify-center text-xl font-bold shadow-md border-4 border-white z-10">${state.currentUser.initials}</div>
-                                    <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-500 -mx-6 z-0"><i class="ph-bold ph-coffee text-lg"></i></div>
-                                    <div class="w-16 h-16 rounded-full ${partner.color} flex items-center justify-center text-xl font-bold shadow-md border-4 border-white z-10">${partner.initials}</div>
-                                </div>
-                                <h4 class="font-bold text-2xl text-gray-800 mb-1">${partner.name}</h4>
-                                <p class="text-xs font-bold text-amber-700 uppercase tracking-wider mb-6">${t(partner.role)}</p>
-                                <a href="mailto:${partner.email}?subject=Coffee Chat ☕" class="btn-3d w-full py-3.5 bg-amber-500 text-white hover:bg-amber-600 transition-colors flex items-center justify-center gap-2 font-bold text-sm">
-                                    <i class="ph-bold ph-paper-plane-tilt text-lg"></i> ${t("Say Hello")}
-                                </a>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    html += `<p class="text-center text-gray-400 py-8 text-sm bg-white rounded-2xl border border-gray-100 border-dashed max-w-2xl">${t("No match this week.")}</p>`;
-                }
+                        <button id="btn-owner-login" class="iso-btn iso-btn-warning w-full py-3 text-lg text-gray-900">ปลดล็อก</button>
+                    </div>
+                </div>
+            `;
+        }
 
-                html += `
-                        </div>
-                        <div class="mt-8 max-w-2xl">
-                            <h3 class="font-bold text-gray-400 uppercase tracking-wider text-[11px] mb-4 ml-1">${t("Opt-in for Next Week")}</h3>
-                            <div class="card-3d p-5 bg-white border border-gray-100 flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-12 h-12 rounded-full ${isOptedIn ? 'bg-emerald-50 text-emerald-500' : 'bg-gray-50 text-gray-400'} flex items-center justify-center transition-colors">
-                                        <i class="ph-fill ${isOptedIn ? 'ph-check-circle' : 'ph-coffee'} text-2xl"></i>
+        // Global state for owner dashboard tab
+        let ownerTab = 'logs'; // logs, emps, settings
+
+        window.setOwnerTab = (tab) => {
+            ownerTab = tab;
+            render();
+        };
+
+        function renderOwnerDash() {
+            let tabContent = '';
+            
+            if (ownerTab === 'logs') {
+                tabContent = `
+                    <div class="space-y-4">
+                        <h3 class="font-bold text-lg border-b-2 pb-2">ประวัติลงเวลาล่าสุด</h3>
+                        ${timelogs.length === 0 ? '<p class="text-center text-gray-500 py-4">ยังไม่มีข้อมูล</p>' : ''}
+                        ${timelogs.map(log => `
+                            <div class="iso-card p-4 flex gap-4 items-center">
+                                ${log.photoData ? `<img src="${log.photoData}" class="w-16 h-16 rounded-lg object-cover border-2 border-gray-800">` : `<div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center border-2 border-gray-800"><i class="fas fa-user text-gray-400"></i></div>`}
+                                <div class="flex-grow">
+                                    <div class="flex justify-between items-start">
+                                        <h4 class="font-bold text-lg">${log.empName}</h4>
+                                        <span class="px-2 py-1 text-xs font-bold rounded ${log.type === 'IN' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'} border border-current">
+                                            ${log.type === 'IN' ? 'เข้างาน' : 'ออกงาน'}
+                                        </span>
                                     </div>
-                                    <div class="font-bold text-sm ${isOptedIn ? 'text-gray-800' : 'text-gray-500'}">
-                                        ${isOptedIn ? t("You're on the list!") : t("Opt-in for Next Week")}
-                                    </div>
+                                    <p class="text-sm text-gray-600 mt-1"><i class="far fa-clock"></i> ${formatDate(log.timestamp)}</p>
+                                    ${log.location ? `<p class="text-xs text-blue-500 mt-1"><a href="https://maps.google.com/?q=${log.location.lat},${log.location.lng}" target="_blank"><i class="fas fa-map-marker-alt"></i> ดูแผนที่</a></p>` : ''}
                                 </div>
-                                <button onclick="CoffeeChatsModule.toggleOptIn('${isOptedIn ? optInRecord.id : ''}')" class="btn-sm-3d px-5 py-2.5 text-xs font-bold transition-colors ${isOptedIn ? 'bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-100' : 'bg-emerald-500 text-white border-emerald-600 hover:bg-emerald-600'}">
-                                    ${isOptedIn ? t("Opt-out") : "Opt-In"}
-                                </button>
                             </div>
-                        </div>
+                        `).join('')}
                     </div>
                 `;
-                return html;
-            },
-            toggleOptIn: function(recordId) {
-                if (recordId) {
-                    DB.delete('coffeeOptIns', recordId);
-                    App.showToast(t("Action completed successfully"));
-                } else {
-                    DB.add('coffeeOptIns', { userId: state.currentUser.id, dateAdded: new Date().toISOString() });
-                    App.showToast("Opted in successfully!", "success");
-                }
-            },
-            renderAdminWidget: function() {
-                return `
-                    <div class="card-3d p-4 bg-amber-50/50 border-amber-100">
-                        <h3 class="font-bold text-sm text-amber-800 flex items-center gap-2"><i class="ph-fill ph-coffee text-amber-500"></i> Coffee Chats</h3>
-                        <div class="flex-1 flex items-center justify-center gap-8 mt-2">
-                            <div class="text-center">
-                                <p class="text-3xl font-bold text-amber-600">${db.coffeeMatches.length}</p>
-                                <span class="text-[10px] font-bold text-amber-700/60 uppercase tracking-wider block mt-1">${t("Active Pairs")}</span>
+            } else if (ownerTab === 'emps') {
+                tabContent = `
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center border-b-2 pb-2">
+                            <h3 class="font-bold text-lg">พนักงานทั้งหมด</h3>
+                            <button id="btn-add-emp" class="iso-btn iso-btn-primary px-3 py-1 text-sm"><i class="fas fa-plus"></i> เพิ่ม</button>
+                        </div>
+                        
+                        <div id="add-emp-form" class="iso-card p-4 hidden bg-blue-50 border-blue-800">
+                            <h4 class="font-bold mb-3 text-blue-800">เพิ่มพนักงานใหม่</h4>
+                            <input type="text" id="new-emp-name" placeholder="ชื่อ-นามสกุล" class="iso-input mb-3">
+                            <input type="text" id="new-emp-pin" placeholder="ตั้งรหัส PIN 4 หลัก" class="iso-input mb-3" maxlength="4" pattern="[0-9]*" inputmode="numeric">
+                            <div class="flex gap-2">
+                                <button id="save-new-emp" class="iso-btn iso-btn-success flex-1 py-2">บันทึก</button>
+                                <button onclick="document.getElementById('add-emp-form').classList.add('hidden')" class="iso-btn iso-btn-white flex-1 py-2">ยกเลิก</button>
                             </div>
-                            <div class="w-px h-10 bg-amber-200"></div>
-                            <div class="text-center">
-                                <p class="text-3xl font-bold text-emerald-600">${db.coffeeOptIns.length}</p>
-                                <span class="text-[10px] font-bold text-emerald-700/60 uppercase tracking-wider block mt-1">Opt-ins</span>
+                        </div>
+
+                        ${employees.length === 0 ? '<p class="text-center text-gray-500 py-4">ยังไม่มีพนักงาน</p>' : ''}
+                        ${employees.map(emp => `
+                            <div class="iso-card p-3 flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-bold">${emp.name}</h4>
+                                    <p class="text-sm text-gray-500">PIN: ${emp.pin}</p>
+                                </div>
+                                <button data-delete-emp="${emp.id}" class="iso-btn iso-btn-danger px-3 py-1 text-sm"><i class="fas fa-trash"></i></button>
                             </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else if (ownerTab === 'settings') {
+                tabContent = `
+                    <div class="space-y-6">
+                        <h3 class="font-bold text-lg border-b-2 pb-2">ตั้งค่าระบบ</h3>
+                        
+                        <div class="iso-card p-4">
+                            <h4 class="font-bold mb-4 border-b pb-2">ฟังก์ชันลงเวลา</h4>
+                            
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <div class="font-bold">ถ่ายรูปเซลฟี่ (Selfie)</div>
+                                    <div class="text-xs text-gray-500">บังคับถ่ายรูปตอนเข้า-ออกงาน</div>
+                                </div>
+                                <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                                    <input type="checkbox" id="toggle-selfie" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300 z-10 top-0 left-0" ${appSettings.requireSelfie ? 'checked' : ''}/>
+                                    <label for="toggle-selfie" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="font-bold">พิกัด GPS</div>
+                                    <div class="text-xs text-gray-500">บันทึกพิกัดสถานที่ลงเวลา</div>
+                                </div>
+                                <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                                    <input type="checkbox" id="toggle-gps" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300 z-10 top-0 left-0" ${appSettings.requireGPS ? 'checked' : ''}/>
+                                    <label for="toggle-gps" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="iso-card p-4 bg-red-50 border-red-800">
+                            <h4 class="font-bold mb-4 border-b border-red-200 pb-2 text-red-800">เปลี่ยนรหัส Owner</h4>
+                            <input type="text" id="new-owner-pin" placeholder="รหัสผ่านใหม่" class="iso-input mb-3" inputmode="numeric">
+                            <button id="btn-save-owner-pin" class="iso-btn iso-btn-danger w-full py-2">บันทึกรหัสใหม่</button>
                         </div>
                     </div>
                 `;
             }
-        };
 
-        const MarketplaceModule = {
-            id: 'marketplace', name: 'Marketplace', category: 'Culture', description: 'Buy, sell, or trade with coworkers.', icon: 'ph-storefront', hasUserTab: true,
-            renderUserView: function() {
-                const listings = [...db.marketplace].sort((a,b) => new Date(b.date) - new Date(a.date));
-                let html = `
-                    <div class="space-y-6 pb-20 max-w-7xl mx-auto w-full">
-                        <div>
-                            <h2 class="text-2xl font-bold">${t("Marketplace")}</h2>
-                            <p class="text-gray-500 text-sm">${t("Buy, sell, or trade with coworkers.")}</p>
-                        </div>
-                        <div class="card-3d p-6 bg-white border border-gray-100 max-w-2xl">
-                            <div class="flex gap-2 mb-5 p-1 bg-gray-50 rounded-xl border border-gray-200">
-                                <label class="flex-1 flex items-center justify-center py-2.5 rounded-lg cursor-pointer transition-colors relative">
-                                    <input type="radio" name="mk-type" value="selling" checked class="peer sr-only">
-                                    <div class="absolute inset-0 bg-white rounded-lg shadow-sm border border-gray-200 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
-                                    <span class="text-xs font-bold text-gray-500 peer-checked:text-violet-600 relative z-10">${t("Selling")}</span>
-                                </label>
-                                <label class="flex-1 flex items-center justify-center py-2.5 rounded-lg cursor-pointer transition-colors relative">
-                                    <input type="radio" name="mk-type" value="looking" class="peer sr-only">
-                                    <div class="absolute inset-0 bg-white rounded-lg shadow-sm border border-gray-200 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
-                                    <span class="text-xs font-bold text-gray-500 peer-checked:text-violet-600 relative z-10">${t("Looking For")}</span>
-                                </label>
-                            </div>
-                            <div class="space-y-4">
-                                <input type="text" id="mk-title" placeholder="${t("Item Name")}" class="w-full border border-gray-200 rounded-xl p-3.5 bg-gray-50 text-sm font-bold outline-none focus:border-violet-400">
-                                <input type="text" id="mk-price" placeholder="${t("Price (Optional)")}" class="w-full border border-gray-200 rounded-xl p-3.5 bg-gray-50 text-sm outline-none focus:border-violet-400">
-                                <button onclick="MarketplaceModule.submit()" class="btn-sm-3d w-full py-3.5 bg-violet-500 text-white border-violet-600 font-bold flex items-center justify-center gap-2 text-sm">
-                                    <i class="ph-bold ph-storefront text-lg"></i> ${t("Post an Item")}
-                                </button>
-                            </div>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-gray-400 uppercase tracking-wider text-[11px] mb-4 ml-1">${t("Latest Listings")}</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                `;
-                if (listings.length === 0) { html += `<p class="text-center text-gray-400 py-4 text-sm bg-white rounded-2xl border border-gray-100 border-dashed col-span-full">No items listed yet.</p>`; }
-                listings.forEach(item => {
-                    const user = db.users.find(u => u.id === item.userId);
-                    const isSelling = item.type === 'selling';
-                    const badgeColor = isSelling ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-blue-50 text-blue-600 border-blue-200';
-                    const badgeText = isSelling ? t('Selling') : t('Looking For');
-                    html += `
-                        <div class="card-3d p-6 bg-white border border-gray-100 mb-0 flex flex-col justify-between">
-                            <div>
-                                <div class="flex justify-between items-start mb-3">
-                                    <span class="px-2.5 py-1 rounded-md text-[10px] font-bold border uppercase tracking-wider ${badgeColor}">${badgeText}</span>
-                                    <span class="font-bold text-violet-600 text-sm bg-violet-50 px-2.5 py-1 rounded-md">${item.price || 'Free / Offer'}</span>
-                                </div>
-                                <h4 class="font-bold text-lg text-gray-800 leading-tight mb-5 mt-2">${item.title}</h4>
-                            </div>
-                            <div class="flex items-center justify-between border-t border-gray-50 pt-4 mt-auto">
-                                <div class="flex items-center gap-2.5">
-                                    <div class="w-8 h-8 rounded-full ${user.color} flex items-center justify-center text-xs font-bold">${user.initials}</div>
-                                    <span class="text-xs font-medium text-gray-500">${user.name}</span>
-                                </div>
-                                <a href="mailto:${user.email}?subject=Marketplace: ${item.title}" class="btn-sm-3d px-4 py-2 bg-violet-50 text-violet-700 border-violet-200 text-xs flex items-center gap-1.5 hover:bg-violet-100 transition-colors">
-                                    <i class="ph-bold ph-envelope-simple text-sm"></i> ${t("Contact")}
-                                </a>
-                            </div>
-                        </div>
-                    `;
-                });
-                html += `</div></div></div>`;
-                return html;
-            },
-            submit: function() { const type = document.querySelector('input[name="mk-type"]:checked').value; const title = document.getElementById('mk-title').value.trim(); const price = document.getElementById('mk-price').value.trim(); if (title) { DB.add('marketplace', {userId: state.currentUser.id, type: type, title: title, price: price, date: new Date().toISOString()}); App.showToast(t("Action completed successfully")); } else { App.showToast(t("Please fill all required fields"), "error"); } },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-violet-50/50 border-violet-100"><h3 class="font-bold text-sm text-violet-800 flex items-center gap-2"><i class="ph-fill ph-storefront text-violet-500"></i> Marketplace</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-violet-600">${db.marketplace.length} <span class="text-xs font-medium text-violet-700/60 uppercase tracking-wider block">Listings</span></p></div></div>`; }
-        };
+            return `
+                <div class="flex flex-col h-full mt-2">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-black text-gray-800"><i class="fas fa-cog"></i> ส่วนจัดการร้าน</h2>
+                        <button data-action="go-home" class="iso-btn iso-btn-white px-3 py-1 text-sm"><i class="fas fa-sign-out-alt"></i> ออก</button>
+                    </div>
 
-        const CarpoolModule = {
-            id: 'carpool', name: 'Carpool', category: 'Culture', description: 'Share rides to the office.', icon: 'ph-car-profile', hasUserTab: true,
-            renderUserView: function() {
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Carpool")}</h2></div><div class="card-3d p-6 bg-white border border-gray-100 max-w-2xl"><input type="text" id="cp-from" placeholder="From Location" class="w-full mb-4 p-3.5 border border-gray-200 rounded-xl bg-gray-50 text-sm outline-none focus:border-teal-400"><button onclick="CarpoolModule.sub()" class="btn-sm-3d w-full py-3.5 bg-teal-500 text-white border-teal-600 font-bold text-sm">Offer Ride</button></div><div><h3 class="font-bold text-gray-400 uppercase tracking-wider text-[11px] mb-4 ml-1">${t("Available Rides")}</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
-                const activeRides = db.carpools.sort((a,b)=>new Date(a.date)-new Date(b.date));
-                if(activeRides.length === 0) html += `<p class="text-center text-gray-400 py-4 text-sm col-span-full bg-white rounded-2xl border border-gray-100 border-dashed">No rides offered yet.</p>`;
-                activeRides.forEach(c => { html += `<div class="card-3d p-5 flex justify-between items-center bg-white border border-gray-100 mb-0"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-teal-50 text-teal-500 flex items-center justify-center"><i class="ph-fill ph-car-profile text-xl"></i></div><div><div class="font-bold text-base text-gray-800">${c.from}</div><div class="text-xs text-gray-500 mt-1">${c.passengers.length}/${c.seats} passengers</div></div></div><button onclick="CarpoolModule.join('${c.id}')" class="btn-sm-3d bg-teal-500 text-white border-teal-600 px-5 py-2.5 text-xs transition-opacity ${c.passengers.length>=c.seats||c.passengers.includes(state.currentUser.id)?'opacity-30 pointer-events-none':''}" ${c.passengers.length>=c.seats||c.passengers.includes(state.currentUser.id)?'disabled':''}>Join</button></div>`; });
-                return html + `</div></div></div>`;
-            },
-            sub: function() { const f=document.getElementById('cp-from').value; if(f){ DB.add('carpools', {driverId:state.currentUser.id, from:f, seats:3, passengers:[], date:new Date().toISOString().split('T')[0], time:'08:00'}); App.showToast(t("Action completed successfully")); } else { App.showToast(t("Please fill all required fields"), "error"); } },
-            join: function(id) { const c=db.carpools.find(x=>x.id===id); if(c && !c.passengers.includes(state.currentUser.id)){ let p = [...c.passengers]; p.push(state.currentUser.id); DB.update('carpools', id, {passengers: p}); App.showToast(t("Action completed successfully"));} },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-teal-50/50 border-teal-100"><h3 class="font-bold text-sm text-teal-800 flex items-center gap-2"><i class="ph-fill ph-car-profile text-teal-500"></i> Carpools</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-teal-600">${db.carpools.length} <span class="text-xs font-medium text-teal-700/60 uppercase tracking-wider block">Today</span></p></div></div>`; }
-        };
+                    <div class="flex gap-2 mb-4 bg-gray-200 p-1 rounded-lg border-2 border-gray-900 box-shadow: 2px 2px 0px #000;">
+                        <button onclick="setOwnerTab('logs')" class="flex-1 py-2 font-bold text-sm rounded-md transition-colors ${ownerTab === 'logs' ? 'bg-white shadow-sm border border-gray-300' : 'text-gray-500'}">ประวัติ</button>
+                        <button onclick="setOwnerTab('emps')" class="flex-1 py-2 font-bold text-sm rounded-md transition-colors ${ownerTab === 'emps' ? 'bg-white shadow-sm border border-gray-300' : 'text-gray-500'}">พนักงาน</button>
+                        <button onclick="setOwnerTab('settings')" class="flex-1 py-2 font-bold text-sm rounded-md transition-colors ${ownerTab === 'settings' ? 'bg-white shadow-sm border border-gray-300' : 'text-gray-500'}">ตั้งค่า</button>
+                    </div>
 
-        const SuggestionsModule = { 
-            id: 'suggestions', name: 'Ideas', category: 'Growth', description: 'Submit and vote on company improvements.', icon: 'ph-lightbulb', hasUserTab: true, 
-            renderUserView: function() { 
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Ideas")}</h2></div><div class="card-3d p-5 bg-white max-w-2xl"><input type="text" id="sg-t" placeholder="What's your idea?" class="w-full mb-3 p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm outline-none focus:border-yellow-400"><button onclick="SuggestionsModule.sub()" class="btn-sm-3d w-full py-3 bg-yellow-400 text-yellow-900 border-yellow-500 font-bold">Post Idea</button></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">`;
-                const sortedSg = [...db.suggestions].sort((a,b)=>b.votes.length - a.votes.length);
-                if(sortedSg.length === 0) html += `<p class="text-center text-gray-400 py-4 text-sm col-span-full">No ideas yet. Brainstorm!</p>`;
-                sortedSg.forEach(sg => { 
-                    const isVoted = sg.votes.includes(state.currentUser.id);
-                    html += `<div class="card-3d p-5 flex justify-between items-start bg-white mb-0"><div class="pr-4"><div class="font-bold text-base text-gray-800 leading-tight mb-2">${sg.title}</div></div><button onclick="SuggestionsModule.vote('${sg.id}')" class="btn-sm-3d px-3 py-2 flex flex-col items-center justify-center min-w-[50px] ${isVoted?'bg-yellow-100 text-yellow-700 border-yellow-300':'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'}"><i class="ph-bold ph-caret-up mb-1 text-lg"></i><span class="text-xs font-bold leading-none">${sg.votes.length}</span></button></div>`; 
-                });
-                return html + `</div></div>`; 
-            }, 
-            sub: function() { const t_input=document.getElementById('sg-t').value; if(t_input){ DB.add('suggestions', {userId:state.currentUser.id, title:t_input, description:'', votes:[state.currentUser.id], status:'open', date:new Date().toISOString()}); App.showToast(t("Action completed successfully")); } else { App.showToast(t("Please fill all required fields"), "error"); } },
-            vote: function(id) { const sg=db.suggestions.find(s=>s.id===id); if(sg){ let v=[...sg.votes]; if(v.includes(state.currentUser.id)) v=v.filter(x=>x!==state.currentUser.id); else v.push(state.currentUser.id); DB.update('suggestions', id, {votes: v}); } },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-yellow-50/50 border-yellow-100"><h3 class="font-bold text-sm text-yellow-800 flex items-center gap-2"><i class="ph-fill ph-lightbulb text-yellow-500"></i> Top Ideas</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-yellow-600">${db.suggestions.length} <span class="text-xs font-medium text-yellow-700/60 uppercase tracking-wider block">Pitched</span></p></div></div>`; } 
-        };
+                    <div class="flex-grow overflow-y-auto pb-6">
+                        ${tabContent}
+                    </div>
+                </div>
+            `;
+        }
 
-        const PollsModule = { 
-            id: 'polls', name: 'Polls', category: 'Growth', description: 'Create and vote on team surveys.', icon: 'ph-chart-bar', hasUserTab: true, 
-            renderUserView: function() { 
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Polls")}</h2></div><div class="grid grid-cols-1 md:grid-cols-2 gap-6">`;
-                if(db.polls.length === 0) html += `<p class="text-center text-gray-400 py-4 text-sm col-span-full">No active polls.</p>`;
-                db.polls.slice().reverse().forEach(p => { 
-                    const hasVoted = p.options.some(o=>o.votes.includes(state.currentUser.id));
-                    let totalVotes = 0; p.options.forEach(o=>totalVotes+=o.votes.length);
-                    html += `<div class="card-3d p-6 bg-white border border-indigo-100 mb-0 flex flex-col"><h3 class="font-bold text-lg text-gray-800 mb-5 leading-tight">${p.question}</h3><div class="space-y-3 flex-1">`; 
-                    p.options.forEach((opt,idx)=>{ 
-                        const pct = totalVotes > 0 ? Math.round((opt.votes.length/totalVotes)*100) : 0;
-                        const isMyVote = opt.votes.includes(state.currentUser.id);
-                        if(hasVoted) {
-                            html += `<div class="relative w-full h-11 bg-gray-50 rounded-xl overflow-hidden border border-gray-200 flex items-center px-4 z-0"><div class="absolute top-0 left-0 h-full ${isMyVote?'bg-indigo-100':'bg-gray-200'} transition-all duration-1000 -z-10" style="width: ${pct}%"></div><div class="flex justify-between w-full text-sm font-medium z-10 ${isMyVote?'text-indigo-800 font-bold':'text-gray-600'}"><span>${opt.text} ${isMyVote?'<i class="ph-bold ph-check ml-1"></i>':''}</span><span class="font-bold">${pct}%</span></div></div>`;
-                        } else {
-                            html+=`<button onclick="PollsModule.vote('${p.id}', ${idx})" class="btn-sm-3d w-full py-3 bg-white text-left px-5 text-sm font-medium border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50/30 transition-colors">${opt.text}</button>`; 
-                        }
-                    }); 
-                    html+=`</div><div class="text-[10px] text-gray-400 mt-4 font-bold uppercase tracking-wider">${totalVotes} votes total</div></div>`; 
-                });
-                return html + `</div></div>`; 
-            }, 
-            vote: function(pId, oId) { const p=db.polls.find(x=>x.id===pId); if(p && !p.options.some(o=>o.votes.includes(state.currentUser.id))) { let opts=[...p.options]; opts[oId].votes.push(state.currentUser.id); DB.update('polls', pId, {options: opts}); App.showToast("Voted!"); } },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-indigo-50/50 border-indigo-100"><h3 class="font-bold text-sm mb-3 flex items-center gap-2 text-indigo-800"><i class="ph-fill ph-chart-bar text-indigo-500"></i> Create Poll</h3><div class="flex flex-col h-full"><input type="text" id="pl-q" placeholder="Question" class="w-full mb-3 p-2.5 border border-indigo-200 rounded-xl bg-white text-sm outline-none focus:border-indigo-400"><input type="text" id="pl-o" placeholder="Options (comma separated)" class="w-full mb-3 p-2.5 border border-indigo-200 rounded-xl bg-white text-sm outline-none focus:border-indigo-400"><button onclick="PollsModule.add()" class="btn-sm-3d w-full py-2.5 bg-indigo-500 text-white border-indigo-600 mt-auto">Post Poll</button></div></div>`; },
-            add: function() { const q=document.getElementById('pl-q').value; const o=document.getElementById('pl-o').value; if(q&&o){ const opts=o.split(',').map(x=>({text:x.trim(), votes:[]})); DB.add('polls', {question:q, options:opts, status:'active', date:new Date().toISOString()}); App.showToast(t("Action completed successfully")); } else { App.showToast(t("Please fill all required fields"), "error"); } }
-        };
+        // --- Event Listeners Attachment ---
+        function attachEventListeners() {
+            // Navigation
+            document.querySelectorAll('[data-action="go-home"]').forEach(el => {
+                el.onclick = () => changeView('role-select');
+            });
+            document.querySelectorAll('[data-action="go-emp-login"]').forEach(el => {
+                el.onclick = () => changeView('emp-login');
+            });
+            document.querySelectorAll('[data-action="go-owner-login"]').forEach(el => {
+                el.onclick = () => changeView('owner-login');
+            });
+            document.querySelectorAll('[data-action="logout"]').forEach(el => {
+                el.onclick = () => changeView('role-select');
+            });
 
-        const GoalsModule = { 
-            id: 'goals', name: 'Goals', category: 'Growth', description: 'Track company-wide targets and milestones.', icon: 'ph-target', hasUserTab: true, 
-            renderUserView: function() { 
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Goals")}</h2></div><div class="grid grid-cols-1 md:grid-cols-2 gap-5">`;
-                if(db.goals.length === 0) html += `<p class="text-center text-gray-400 py-4 text-sm col-span-full">No active goals.</p>`;
-                db.goals.forEach(g => { 
-                    const pct=Math.min(100, Math.round((g.current/g.target)*100)); 
-                    html += `<div class="card-3d p-6 bg-white border border-gray-100 mb-0 flex flex-col justify-center"><div class="flex justify-between items-end mb-4"><div><h3 class="font-bold text-lg text-gray-800 leading-tight mb-1">${g.title}</h3><p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Target: ${g.prefix?g.unit:''}${g.target.toLocaleString()}${!g.prefix?g.unit:''}</p></div><span class="font-bold text-xl ${pct>=100?'text-emerald-500':'text-blue-500'}">${pct}%</span></div><div class="w-full bg-gray-100 rounded-full h-4 overflow-hidden shadow-inner"><div class="${g.color} h-full transition-all duration-1000 ease-out" style="width:${pct}%"></div></div></div>`; 
-                });
-                return html + `</div></div>`; 
-            }, 
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-purple-50/50 border-purple-100"><h3 class="font-bold text-sm text-purple-800 flex items-center gap-2"><i class="ph-fill ph-target text-purple-500"></i> ${t("Goals")}</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-purple-600">${db.goals.length} <span class="text-xs font-medium text-purple-700/60 uppercase tracking-wider block">Active</span></p></div></div>`; } 
-        };
+            // Emp Login
+            const btnEmpLogin = document.getElementById('btn-emp-login');
+            if (btnEmpLogin) {
+                btnEmpLogin.onclick = () => {
+                    const empId = document.getElementById('emp-select').value;
+                    const pin = document.getElementById('emp-pin').value;
+                    
+                    if (!empId) return showModal('แจ้งเตือน', 'กรุณาเลือกชื่อพนักงาน');
+                    if (!pin) return showModal('แจ้งเตือน', 'กรุณาระบุรหัส PIN');
 
-        const ResourcesModule = {
-            id: 'resources', name: 'Resources', category: 'HR & Ops', description: 'Access company policies and training materials.', icon: 'ph-folder-open', hasUserTab: true,
-            renderUserView: function() {
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Company Documents")}</h2></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
-                if(db.resources.length === 0) html += `<p class="text-center text-gray-400 py-4 text-sm col-span-full">No documents available.</p>`;
-                db.resources.forEach(res => { html += `<button onclick="App.showToast(t('Feature coming soon!'), 'info')" class="w-full card-3d p-5 flex items-center gap-4 bg-white hover:bg-gray-50 border border-gray-100 transition-colors mb-0"><div class="w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0"><i class="ph-fill ${res.icon} ${res.color} text-3xl"></i></div><div class="flex-1 text-left min-w-0"><div class="font-bold text-base text-gray-800 truncate">${res.title}</div><div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mt-1">${res.category}</div></div><i class="ph-bold ph-caret-right text-gray-300 text-lg"></i></button>`; });
-                return html + `</div></div>`;
-            },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-blue-50/50 border-blue-100"><h3 class="font-bold text-sm text-blue-800 flex items-center gap-2"><i class="ph-fill ph-folder-open text-blue-500"></i> ${t("Company Documents")}</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-blue-600">${db.resources.length} <span class="text-xs font-medium text-blue-700/60 uppercase tracking-wider block">Files</span></p></div></div>`; }
-        };
+                    const emp = employees.find(e => e.id === empId);
+                    if (emp && emp.pin === pin) {
+                        activeEmployee = emp;
+                        changeView('emp-dash');
+                        startClock();
+                    } else {
+                        showModal('รหัสผิดพลาด', 'รหัส PIN ไม่ถูกต้อง');
+                    }
+                };
+            }
 
-        const RewardsModule = {
-            id: 'rewards', name: 'Rewards', category: 'Culture', description: 'Redeem points for company perks.', icon: 'ph-gift', hasUserTab: true,
-            renderUserView: function() {
-                const ptsDoc = db.userPoints.find(p => p.userId === state.currentUser.id);
-                const pts = ptsDoc ? ptsDoc.points : 500; 
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Rewards")}</h2></div><div class="card-3d p-10 bg-gradient-to-br from-purple-500 to-indigo-600 text-white text-center shadow-lg border-none relative overflow-hidden max-w-2xl mx-auto"><i class="ph-fill ph-star absolute -right-4 -bottom-4 text-8xl text-white/10"></i><div class="text-[11px] font-bold uppercase tracking-widest text-purple-100 mb-3">${t("Points")} Balance</div><div class="text-6xl font-bold tracking-tight">${pts.toLocaleString()}</div></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
-                db.rewardItems.forEach(r => { html += `<div class="card-3d p-5 flex justify-between items-center bg-white border border-gray-100 mb-0"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center"><i class="ph-fill ${r.icon} text-xl"></i></div><div><div class="font-bold text-base text-gray-800">${r.name}</div><div class="text-xs font-bold text-purple-600 mt-1 flex items-center gap-1"><i class="ph-fill ph-star text-[10px]"></i> ${r.cost.toLocaleString()} pts</div></div></div><button onclick="RewardsModule.red(${r.id}, ${pts})" class="btn-sm-3d px-5 py-2.5 text-xs transition-opacity ${pts>=r.cost?'bg-purple-500 text-white border-purple-600':'bg-gray-100 text-gray-400 border-gray-200 pointer-events-none'}" ${pts<r.cost?'disabled':''}>Redeem</button></div>`; });
-                return html + `</div></div>`;
-            },
-            red: function(id, currentPts) { const it=db.rewardItems.find(x=>x.id===id); if(it && currentPts>=it.cost){ const ptsDoc = db.userPoints.find(p => p.userId === state.currentUser.id); if (ptsDoc) DB.update('userPoints', ptsDoc.id, {points: ptsDoc.points - it.cost}); else DB.add('userPoints', {userId: state.currentUser.id, points: 500 - it.cost}); DB.add('redemptions', {userId:state.currentUser.id, itemId:id, status:'pending', date:new Date().toISOString().split('T')[0]}); App.showToast(t("Action completed successfully")); } },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-purple-50/50 border-purple-100"><h3 class="font-bold text-sm text-purple-800 flex items-center gap-2"><i class="ph-fill ph-gift text-purple-500"></i> Rewards</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-purple-600">${db.redemptions.filter(x=>x.status==='pending').length} <span class="text-xs font-medium text-purple-700/60 uppercase tracking-wider block">Pending</span></p></div></div>`; }
-        };
+            // Emp Dash Actions
+            const btnIn = document.getElementById('btn-clock-in');
+            const btnOut = document.getElementById('btn-clock-out');
+            if (btnIn) btnIn.onclick = () => processTimeLog('IN');
+            if (btnOut) btnOut.onclick = () => processTimeLog('OUT');
 
-        const TrainingModule = {
-            id: 'training', name: 'Training', category: 'Growth', description: 'Complete mandatory training and courses.', icon: 'ph-graduation-cap', hasUserTab: true,
-            renderUserView: function() {
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Training")}</h2></div><div><h3 class="font-bold text-gray-400 uppercase tracking-wider text-[11px] mb-4 ml-1">${t("Assigned Courses")}</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">`;
-                db.courses.forEach(course => {
-                    const log = db.trainingLogs.find(l => l.courseId === course.id && l.userId === state.currentUser.id);
-                    const isDone = !!log;
-                    html += `<div class="card-3d p-6 bg-white border ${isDone?'border-emerald-100 bg-emerald-50/20':'border-gray-100'} flex flex-col gap-5 mb-0"><div class="flex justify-between items-start"><div class="pr-3"><div class="font-bold text-base text-gray-800 leading-tight mb-2">${course.title}</div><div class="text-xs text-gray-500 flex items-center gap-1.5 font-medium"><i class="ph-fill ph-clock text-blue-400 text-sm"></i> ${course.duration}</div></div><span class="px-2.5 py-1 rounded-md text-[10px] font-bold border uppercase tracking-wider whitespace-nowrap ${isDone ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-gray-100 text-gray-600 border-gray-200'}">${isDone ? t('Completed') : t('Pending')}</span></div><button onclick="TrainingModule.start(${course.id})" class="btn-sm-3d w-full py-3 flex items-center justify-center gap-2 text-sm font-bold transition-colors ${isDone ? 'bg-gray-50 text-gray-400 border-gray-200 pointer-events-none' : 'bg-blue-500 text-white border-blue-600'}" ${isDone ? 'disabled' : ''}><i class="ph-bold ${isDone ? 'ph-check' : 'ph-play'} text-lg"></i> ${isDone ? t("Completed") : t("Start Course")}</button></div>`;
-                });
-                return html + `</div></div></div>`;
-            },
-            start: async function(id) { await App.showLoader(800); DB.add('trainingLogs', {userId: state.currentUser.id, courseId: id, status: 'completed', date: new Date().toISOString()}); App.showToast("Course Completed!"); },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-blue-50/50 border-blue-100"><h3 class="font-bold text-sm text-blue-800 flex items-center gap-2"><i class="ph-fill ph-graduation-cap text-blue-500"></i> Training</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-blue-600">${db.courses.length} <span class="text-xs font-medium text-blue-700/60 uppercase tracking-wider block">Courses</span></p></div></div>`; }
-        };
+            // Owner Login
+            const btnOwnerLogin = document.getElementById('btn-owner-login');
+            if (btnOwnerLogin) {
+                btnOwnerLogin.onclick = () => {
+                    const pin = document.getElementById('owner-pin').value;
+                    if (pin === appSettings.ownerPin) {
+                        changeView('owner-dash');
+                    } else {
+                        showModal('ปฏิเสธการเข้าถึง', 'รหัสผ่านเจ้าของร้านไม่ถูกต้อง');
+                    }
+                };
+            }
 
-        const ReferralsModule = {
-            id: 'referrals', name: 'Referrals', category: 'Growth', description: 'Refer friends for open positions and earn bonuses.', icon: 'ph-handshake', hasUserTab: true,
-            renderUserView: function() {
-                const myRefs = db.referrals.filter(r => r.userId === state.currentUser.id).sort((a,b) => new Date(b.date) - new Date(a.date));
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Referrals")}</h2></div><div class="card-3d p-6 bg-white border border-gray-100 max-w-2xl"><h3 class="font-bold text-base mb-5 flex items-center gap-2 text-gray-800"><i class="ph-bold ph-user-plus text-emerald-500 text-xl"></i> ${t("Refer Someone")}</h3><div class="space-y-4"><select id="ref-role" class="w-full border border-gray-200 rounded-xl p-3.5 bg-gray-50 text-sm font-medium outline-none focus:border-emerald-400"><option value="" disabled selected>-- Select Role --</option>`;
-                db.openRoles.forEach(r => { html += `<option value="${r.id}">${r.title} (${r.bonus})</option>`; });
-                html += `</select><input type="text" id="ref-name" placeholder="${t("Candidate Name")}" class="w-full border border-gray-200 rounded-xl p-3.5 bg-gray-50 text-sm font-medium outline-none focus:border-emerald-400"><button onclick="ReferralsModule.submit()" class="btn-sm-3d w-full py-3.5 bg-emerald-500 text-white border-emerald-600 font-bold text-sm">${t("Refer Someone")}</button></div></div><div><h3 class="font-bold text-gray-400 uppercase tracking-wider text-[11px] mb-4 ml-1">${t("Open Positions")}</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
-                db.openRoles.forEach(role => { html += `<div class="card-3d p-5 bg-white border border-gray-100 flex justify-between items-center mb-0"><div><div class="font-bold text-base text-gray-800 leading-tight">${role.title}</div><div class="text-[11px] text-gray-500 uppercase tracking-wider font-bold mt-1.5">${role.dept}</div></div><div class="text-right"><div class="text-[10px] uppercase font-bold tracking-wider text-gray-400 mb-0.5">${t("Bonus")}</div><div class="font-bold text-emerald-600 text-base bg-emerald-50 px-2.5 py-1 rounded-md">${role.bonus}</div></div></div>`; });
-                html += `</div></div><div class="mt-8"><h3 class="font-bold text-gray-400 uppercase tracking-wider text-[11px] mb-4 ml-1">${t("My Referrals")}</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
-                if (myRefs.length === 0) html += `<p class="text-center text-gray-400 py-4 text-sm bg-white rounded-2xl border border-gray-100 border-dashed col-span-full">No referrals yet.</p>`;
-                myRefs.forEach(ref => {
-                    const role = db.openRoles.find(r => r.id === parseInt(ref.roleId));
-                    let statusColor = 'bg-gray-100 text-gray-600 border-gray-200';
-                    if (ref.status === 'Interviewing') statusColor = 'bg-blue-100 text-blue-700 border-blue-200';
-                    if (ref.status === 'Hired') statusColor = 'bg-emerald-100 text-emerald-700 border-emerald-200';
-                    html += `<div class="card-3d p-5 flex items-center justify-between mb-0 bg-white border border-gray-100"><div><div class="font-bold text-sm text-gray-800">${ref.candidateName}</div><div class="text-xs font-medium text-gray-500 mt-1">${role ? role.title : 'Unknown Role'}</div></div><div class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border ${statusColor}">${t(ref.status)}</div></div>`;
-                });
-                return html + `</div></div></div>`;
-            },
-            submit: function() { const roleId = document.getElementById('ref-role').value; const name = document.getElementById('ref-name').value.trim(); if (roleId && name) { DB.add('referrals', {userId: state.currentUser.id, candidateName: name, roleId: roleId, status: 'Pending', date: new Date().toISOString().split('T')[0]}); App.showToast(t("Action completed successfully")); } else { App.showToast(t("Please fill all required fields"), "error"); } },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-emerald-50/50 border-emerald-100"><h3 class="font-bold text-sm text-emerald-800 flex items-center gap-2"><i class="ph-fill ph-handshake text-emerald-500"></i> ${t("Referrals")}</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-emerald-600">${db.referrals.length} <span class="text-xs font-medium text-emerald-700/60 uppercase tracking-wider block">Active</span></p></div></div>`; }
-        };
+            // Owner Dash: Employees
+            const btnAddEmp = document.getElementById('btn-add-emp');
+            if (btnAddEmp) {
+                btnAddEmp.onclick = () => document.getElementById('add-emp-form').classList.remove('hidden');
+            }
+            const btnSaveEmp = document.getElementById('save-new-emp');
+            if (btnSaveEmp) {
+                btnSaveEmp.onclick = async () => {
+                    const name = document.getElementById('new-emp-name').value.trim();
+                    const pin = document.getElementById('new-emp-pin').value.trim();
+                    if (!name || !pin) return showModal('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบถ้วน');
+                    if (pin.length < 4) return showModal('แจ้งเตือน', 'PIN ต้องมี 4 หลัก');
 
-        const SkillExchangeModule = {
-            id: 'skillExchange', name: 'Skill Exchange', category: 'Growth', description: 'Teach or learn new skills with coworkers.', icon: 'ph-puzzle-piece', hasUserTab: true,
-            renderUserView: function() {
-                const listings = [...db.skills].sort((a,b) => new Date(b.date) - new Date(a.date));
-                let html = `
-                    <div class="space-y-6 pb-20 max-w-7xl mx-auto w-full">
-                        <div>
-                            <h2 class="text-2xl font-bold">${t("Skill Exchange")}</h2>
-                            <p class="text-gray-500 text-sm">${t("Teach or learn new skills with coworkers.")}</p>
-                        </div>
-                        <div class="card-3d p-6 bg-white border border-gray-100 max-w-2xl">
-                            <div class="flex gap-2 mb-5 p-1 bg-gray-50 rounded-xl border border-gray-200">
-                                <label class="flex-1 flex items-center justify-center py-2.5 rounded-lg cursor-pointer transition-colors relative">
-                                    <input type="radio" name="sk-type" value="teach" checked class="peer sr-only">
-                                    <div class="absolute inset-0 bg-white rounded-lg shadow-sm border border-gray-200 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
-                                    <span class="text-xs font-bold text-gray-500 peer-checked:text-indigo-600 relative z-10">${t("I want to teach")}</span>
-                                </label>
-                                <label class="flex-1 flex items-center justify-center py-2.5 rounded-lg cursor-pointer transition-colors relative">
-                                    <input type="radio" name="sk-type" value="learn" class="peer sr-only">
-                                    <div class="absolute inset-0 bg-white rounded-lg shadow-sm border border-gray-200 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
-                                    <span class="text-xs font-bold text-gray-500 peer-checked:text-rose-600 relative z-10">${t("I want to learn")}</span>
-                                </label>
-                            </div>
-                            <div class="space-y-4">
-                                <input type="text" id="sk-skill" placeholder="${t("Skill (e.g., Python, Public Speaking)")}" class="w-full border border-gray-200 rounded-xl p-3.5 bg-gray-50 text-sm font-bold outline-none focus:border-indigo-400">
-                                <button onclick="SkillExchangeModule.submit()" class="btn-sm-3d w-full py-3.5 bg-indigo-500 text-white border-indigo-600 font-bold flex items-center justify-center gap-2 text-sm">
-                                    <i class="ph-bold ph-puzzle-piece text-lg"></i> ${t("Post Skill")}
-                                </button>
-                            </div>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-gray-400 uppercase tracking-wider text-[11px] mb-4 ml-1">Active Listings</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                `;
-                if (listings.length === 0) { html += `<p class="text-center text-gray-400 py-4 text-sm bg-white rounded-2xl border border-gray-100 border-dashed col-span-full">No skills listed yet.</p>`; }
-                listings.forEach(item => {
-                    const user = db.users.find(u => u.id === item.userId);
-                    const isTeach = item.type === 'teach';
-                    const badgeColor = isTeach ? 'bg-indigo-50 text-indigo-600 border-indigo-200' : 'bg-rose-50 text-rose-600 border-rose-200';
-                    const badgeText = isTeach ? t('Teaching') : t('Learning');
-                    html += `
-                        <div class="card-3d p-6 bg-white border border-gray-100 mb-0 flex flex-col justify-between">
-                            <div>
-                                <div class="flex justify-between items-start mb-3">
-                                    <span class="px-2.5 py-1 rounded-md text-[10px] font-bold border uppercase tracking-wider ${badgeColor}">${badgeText}</span>
-                                </div>
-                                <h4 class="font-bold text-lg text-gray-800 leading-tight mb-5 mt-2">${item.skill}</h4>
-                            </div>
-                            <div class="flex items-center justify-between border-t border-gray-50 pt-4 mt-auto">
-                                <div class="flex items-center gap-2.5">
-                                    <div class="w-8 h-8 rounded-full ${user.color} flex items-center justify-center text-xs font-bold">${user.initials}</div>
-                                    <span class="text-xs font-medium text-gray-500">${user.name}</span>
-                                </div>
-                                <a href="mailto:${user.email}?subject=Skill Exchange: ${item.skill}" class="btn-sm-3d px-4 py-2 bg-indigo-50 text-indigo-700 border-indigo-200 text-xs flex items-center gap-1.5 hover:bg-indigo-100 transition-colors">
-                                    <i class="ph-bold ph-envelope-simple text-sm"></i> Connect
-                                </a>
-                            </div>
-                        </div>
-                    `;
-                });
-                html += `</div></div></div>`;
-                return html;
-            },
-            submit: function() { const type = document.querySelector('input[name="sk-type"]:checked').value; const skill = document.getElementById('sk-skill').value.trim(); if (skill) { DB.add('skills', {userId: state.currentUser.id, type: type, skill: skill, date: new Date().toISOString()}); App.showToast(t("Action completed successfully")); } else { App.showToast(t("Please fill all required fields"), "error"); } },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-indigo-50/50 border-indigo-100"><h3 class="font-bold text-sm text-indigo-800 flex items-center gap-2"><i class="ph-fill ph-puzzle-piece text-indigo-500"></i> Skill Exchange</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-indigo-600">${db.skills.length} <span class="text-xs font-medium text-indigo-700/60 uppercase tracking-wider block">Listings</span></p></div></div>`; }
-        };
+                    try {
+                        const basePath = `artifacts/${appId}/public/data`;
+                        await addDoc(collection(db, basePath, 'employees'), { name, pin });
+                        document.getElementById('new-emp-name').value = '';
+                        document.getElementById('new-emp-pin').value = '';
+                        document.getElementById('add-emp-form').classList.add('hidden');
+                        showModal('สำเร็จ', 'เพิ่มพนักงานเรียบร้อย');
+                    } catch (e) {
+                        showModal('ผิดพลาด', 'ไม่สามารถบันทึกได้');
+                    }
+                };
+            }
+            
+            // Delete Emp
+            document.querySelectorAll('[data-delete-emp]').forEach(btn => {
+                btn.onclick = (e) => {
+                    const id = e.currentTarget.getAttribute('data-delete-emp');
+                    showModal('ยืนยันการลบ', 'คุณต้องการลบพนักงานคนนี้ใช่หรือไม่?', [
+                        { text: 'ยกเลิก', type: 'white', action: closeModal },
+                        { text: 'ลบ', type: 'danger', action: async () => {
+                            try {
+                                const basePath = `artifacts/${appId}/public/data`;
+                                await deleteDoc(doc(db, basePath, 'employees', id));
+                                closeModal();
+                            } catch (error) {
+                                showModal('ผิดพลาด', 'ไม่สามารถลบได้');
+                            }
+                        }}
+                    ]);
+                };
+            });
 
-        const MoodTrackerModule = { 
-            id: 'moodTracker', name: 'Morale', category: 'Wellness', description: 'Track daily team wellbeing and mood.', icon: 'ph-smiley', hasUserTab: true, 
-            renderUserView: function() { 
-                let html = `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Morale")}</h2></div><div class="grid grid-cols-3 gap-3 max-w-2xl"><button onclick="MoodTrackerModule.sub('great')" class="btn-3d p-5 bg-white border border-gray-100 flex flex-col items-center gap-2 hover:bg-emerald-50 focus:bg-emerald-100"><span class="text-4xl">😁</span><span class="text-xs font-bold text-emerald-600">Great</span></button><button onclick="MoodTrackerModule.sub('okay')" class="btn-3d p-5 bg-white border border-gray-100 flex flex-col items-center gap-2 hover:bg-amber-50 focus:bg-amber-100"><span class="text-4xl">😐</span><span class="text-xs font-bold text-amber-600">Okay</span></button><button onclick="MoodTrackerModule.sub('rough')" class="btn-3d p-5 bg-white border border-gray-100 flex flex-col items-center gap-2 hover:bg-rose-50 focus:bg-rose-100"><span class="text-4xl">😫</span><span class="text-xs font-bold text-rose-600">Rough</span></button></div><div class="mt-8"><h3 class="font-bold text-xs uppercase tracking-wider text-gray-400 mb-3">History</h3><div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">`;
-                const myMoods = db.moods.filter(m=>m.userId===state.currentUser.id).sort((a,b)=>new Date(b.date)-new Date(a.date));
-                if(myMoods.length===0) html += `<p class="text-center text-gray-400 text-sm py-4 col-span-full">No mood logged yet.</p>`;
-                myMoods.forEach(m => { 
-                    let emoji = '😐', color = 'text-amber-500';
-                    if(m.type==='great') { emoji='😁'; color='text-emerald-500'; }
-                    if(m.type==='rough') { emoji='😫'; color='text-rose-500'; }
-                    html += `<div class="card-3d p-4 bg-white flex justify-between items-center mb-0"><span class="text-sm font-medium text-gray-600">${new Date(m.date).toLocaleDateString()}</span><span class="text-lg ${color} font-bold flex items-center gap-2 uppercase text-[10px] tracking-wider">${m.type} ${emoji}</span></div>`; 
-                });
-                return html + `</div></div></div>`; 
-            }, 
-            sub: function(t_type) { DB.add('moods', {userId:state.currentUser.id, type:t_type, date:new Date().toISOString()}); App.showToast(t("Action completed successfully")); },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-sky-50/50 border-sky-100"><h3 class="font-bold text-sm text-sky-800 flex items-center gap-2"><i class="ph-fill ph-smiley text-sky-500"></i> Team Morale</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-sky-600">${db.moods.length} <span class="text-xs font-medium text-sky-700/60 uppercase tracking-wider block">Logs</span></p></div></div>`; } 
-        };
+            // Owner Dash: Settings
+            const tglSelfie = document.getElementById('toggle-selfie');
+            const tglGps = document.getElementById('toggle-gps');
+            const saveSettings = async (updates) => {
+                try {
+                    const basePath = `artifacts/${appId}/public/data`;
+                    await updateDoc(doc(db, basePath, 'config', 'appSettings'), updates);
+                } catch(e) { console.error("Update setting failed", e); }
+            };
 
-        const WellnessModule = {
-            id: 'wellness', name: 'Wellness', category: 'Wellness', description: 'Track your daily water and steps.', icon: 'ph-heartbeat', hasUserTab: true,
-            renderUserView: function() {
-                const today = new Date().toISOString().split('T')[0];
-                let myWell = db.wellness.find(w => w.userId === state.currentUser.id && w.date === today);
-                if (!myWell) { myWell = { id: null, userId: state.currentUser.id, date: today, water: 0, steps: 0 }; }
-                return `<div class="space-y-6 pb-20 max-w-7xl mx-auto w-full"><div><h2 class="text-2xl font-bold">${t("Wellness")}</h2><p class="text-gray-500 text-sm">Stay healthy!</p></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl"><div class="card-3d p-8 bg-white border border-gray-100 text-center"><div class="w-14 h-14 mx-auto bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mb-4"><i class="ph-fill ph-drop text-3xl"></i></div><div class="text-5xl font-bold text-gray-800 mb-5">${myWell.water}</div><button onclick="WellnessModule.addWater('${myWell.id}')" class="btn-sm-3d w-full py-3 bg-blue-50 text-blue-600 border-blue-200 text-sm font-bold hover:bg-blue-100 transition-colors">${t("Add Glass")}</button></div><div class="card-3d p-8 bg-white border border-gray-100 text-center"><div class="w-14 h-14 mx-auto bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mb-4"><i class="ph-fill ph-sneaker text-3xl"></i></div><input type="number" id="well-steps" value="${myWell.steps}" class="w-full text-center text-4xl font-bold p-1 bg-transparent outline-none mb-5 text-gray-800"><button onclick="WellnessModule.updateSteps('${myWell.id}')" class="btn-sm-3d w-full py-3 bg-emerald-50 text-emerald-600 border-emerald-200 text-sm font-bold hover:bg-emerald-100 transition-colors">${t("Log Steps")}</button></div></div></div>`;
-            },
-            addWater: function(id) { 
-                const today = new Date().toISOString().split('T')[0];
-                if(id && id !== 'null') { const w = db.wellness.find(x => x.id === id); if(w) DB.update('wellness', id, {water: w.water + 1}); } 
-                else { DB.add('wellness', {userId: state.currentUser.id, date: today, water: 1, steps: 0}); } 
-            },
-            updateSteps: function(id) { 
-                const val = parseInt(document.getElementById('well-steps').value) || 0; 
-                const today = new Date().toISOString().split('T')[0];
-                if(id && id !== 'null') { DB.update('wellness', id, {steps: val}); App.showToast(t("Action completed successfully")); } 
-                else { DB.add('wellness', {userId: state.currentUser.id, date: today, water: 0, steps: val}); App.showToast(t("Action completed successfully")); } 
-            },
-            renderAdminWidget: function() { return `<div class="card-3d p-4 bg-rose-50/50 border-rose-100"><h3 class="font-bold text-sm text-rose-800 flex items-center gap-2"><i class="ph-fill ph-heartbeat text-rose-500"></i> Team Wellness</h3><div class="flex-1 flex items-center justify-center"><p class="text-2xl font-bold text-rose-600">Active</p></div></div>`; }
-        };
+            if (tglSelfie) tglSelfie.onchange = (e) => saveSettings({ requireSelfie: e.target.checked });
+            if (tglGps) tglGps.onchange = (e) => saveSettings({ requireGPS: e.target.checked });
 
-        // =========================================
-        // INITIALIZATION
-        // =========================================
-        App.registerModule(TimeTrackerModule);
-        App.registerModule(TaskManagerModule); 
-        App.registerModule(WorkLocationModule); 
-        App.registerModule(StandupsModule); 
-        App.registerModule(DirectoryModule); 
-        
-        App.registerModule(BookingsModule); 
-        App.registerModule(VisitorsModule); 
-        App.registerModule(CafeteriaModule); 
-        App.registerModule(EquipmentModule);
-        App.registerModule(LostFoundModule); 
-        
-        App.registerModule(TimeOffModule); 
-        App.registerModule(ExpensesModule);
-        App.registerModule(HelpDeskModule);
-        App.registerModule(ShiftSwapModule); 
-        
-        App.registerModule(AnnouncementsModule); 
-        App.registerModule(KudosModule); 
-        App.registerModule(EventsModule); 
-        App.registerModule(CelebrationsModule); 
-        App.registerModule(JukeboxModule);
-        App.registerModule(CoffeeChatsModule); 
-        App.registerModule(MarketplaceModule); 
-        App.registerModule(CarpoolModule);
-        
-        App.registerModule(SuggestionsModule); 
-        App.registerModule(PollsModule); 
-        App.registerModule(GoalsModule);
-        App.registerModule(ResourcesModule); 
-        App.registerModule(RewardsModule); 
-        App.registerModule(TrainingModule); 
-        App.registerModule(ReferralsModule);
-        App.registerModule(SkillExchangeModule);
-        
-        App.registerModule(MoodTrackerModule); 
-        App.registerModule(WellnessModule); 
-        
-        window.onload = () => App.init();
+            const btnSavePin = document.getElementById('btn-save-owner-pin');
+            if (btnSavePin) {
+                btnSavePin.onclick = () => {
+                    const newPin = document.getElementById('new-owner-pin').value.trim();
+                    if(!newPin) return showModal('แจ้งเตือน', 'กรุณากรอกรหัสผ่านใหม่');
+                    
+                    showModal('ยืนยัน', 'ต้องการเปลี่ยนรหัสผ่านเจ้าของร้านใช่หรือไม่?', [
+                        { text: 'ยกเลิก', type: 'white', action: closeModal },
+                        { text: 'ยืนยัน', type: 'danger', action: async () => {
+                            await saveSettings({ ownerPin: newPin });
+                            closeModal();
+                            document.getElementById('new-owner-pin').value = '';
+                            showModal('สำเร็จ', 'เปลี่ยนรหัสผ่านเรียบร้อยแล้ว');
+                        }}
+                    ]);
+                }
+            }
+        }
+
+        // Live Clock for Emp Dash
+        let clockInterval;
+        function startClock() {
+            if (clockInterval) clearInterval(clockInterval);
+            const updateClock = () => {
+                const el = document.getElementById('live-clock');
+                if (el) {
+                    const now = new Date();
+                    el.innerText = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                }
+            };
+            updateClock();
+            clockInterval = setInterval(updateClock, 1000);
+        }
 
     </script>
 </body>
