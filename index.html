@@ -158,12 +158,23 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, addDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Configuration & Initialization
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        // --- Firebase Configuration (อัปเดตเป็นของคุณแล้ว) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHuZGyY1F3v4rCrhrpt9YB90C0Ahh-stE",
+            authDomain: "my-company-time-tracking.firebaseapp.com",
+            projectId: "my-company-time-tracking",
+            storageBucket: "my-company-time-tracking.firebasestorage.app",
+            messagingSenderId: "758524847747",
+            appId: "1:758524847747:web:2e5a49e4064334f1265db6",
+            measurementId: "G-50SYJKTRT1"
+        };
+        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-time-app';
+        
+        // ใช้ชื่อโปรเจกต์ของคุณเป็น appId เพื่อจัดกลุ่มข้อมูลในฐานข้อมูลให้เป็นระเบียบ
+        const appId = 'my-company-time-tracking';
 
         // State Management
         let currentUser = null;
@@ -259,13 +270,15 @@
         // --- Authentication Init ---
         const initAuth = async () => {
             try {
+                // สำหรับการใช้งานทั่วไปและใช้งานบนโฮสติ้งของคุณ
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
             } catch (err) {
-                showModal('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อระบบได้ กรุณารีเฟรชหน้าจอ');
+                console.error("Auth Error: ", err);
+                showModal('ข้อผิดพลาดการเชื่อมต่อ', 'กรุณาตรวจสอบว่าเปิดใช้งาน Anonymous Authentication ใน Firebase หรือยัง');
             }
         };
 
@@ -287,12 +300,6 @@
             const d = new Date(timestamp);
             return d.toLocaleDateString('th-TH', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' + 
                    d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-        }
-
-        function calculateDistance(lat1, lon1, lat2, lon2) {
-            // Simple distance calculation (optional feature enhancement later)
-            // Currently just fetching GPS to prove presence
-            return 0;
         }
 
         // --- Camera & GPS Actions ---
@@ -367,7 +374,7 @@
                         });
                     },
                     (error) => {
-                        reject(new Error("ไม่สามารถระบุตำแหน่งได้ กรุณาเปิด GPS"));
+                        reject(new Error("ไม่สามารถระบุตำแหน่งได้ กรุณาอนุญาตการเข้าถึง GPS"));
                     },
                     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
