@@ -89,6 +89,12 @@
 </head>
 <body class="text-slate-800 antialiased h-screen overflow-hidden flex flex-col md:flex-row">
 
+    <!-- Offline Alert Banner -->
+    <div id="offlineBanner" class="fixed top-0 left-0 w-full bg-red-500 text-white text-center py-2 text-xs md:text-sm font-medium z-50 hidden shadow-md flex items-center justify-center gap-2 transition-transform transform -translate-y-full duration-300">
+        <i class="ph-bold ph-wifi-none text-lg"></i>
+        <span>ขาดการเชื่อมต่ออินเทอร์เน็ต ข้อมูลจะไม่ถูกบันทึกจนกว่าจะออนไลน์</span>
+    </div>
+
     <!-- Mobile Header -->
     <div class="md:hidden glass-panel border-b border-slate-200 p-4 flex justify-center items-center z-20 shadow-sm relative">
         <div class="flex items-center gap-2 text-brand-600 font-bold text-xl">
@@ -122,6 +128,11 @@
             <button onclick="switchView('logs')" id="nav-logs" class="nav-btn flex items-center gap-3 px-4 py-3.5 rounded-2xl text-left transition-all duration-200 text-slate-500 hover:bg-slate-100 hover:text-slate-800">
                 <i class="ph ph-list-dashes text-xl"></i>
                 <span>ประวัติการเข้า-ออก</span>
+            </button>
+            
+            <button onclick="switchView('salary')" id="nav-salary" class="nav-btn flex items-center gap-3 px-4 py-3.5 rounded-2xl text-left transition-all duration-200 text-slate-500 hover:bg-slate-100 hover:text-slate-800">
+                <i class="ph ph-calculator text-xl"></i>
+                <span>คำนวณเงินเดือน</span>
             </button>
         </div>
 
@@ -211,9 +222,14 @@
             <!-- View: Logs -->
             <div id="view-logs" class="view-section hidden fade-in">
                 <div class="bg-white rounded-2xl md:rounded-3xl shadow-soft border border-slate-100 overflow-hidden">
-                    <div class="p-4 md:p-6 border-b border-slate-100 flex flex-col gap-1">
-                        <h2 class="text-base md:text-lg font-semibold text-slate-800">ประวัติการลงเวลาล่าสุด</h2>
-                        <p class="text-xs md:text-sm text-slate-500">แสดงข้อมูลการเข้า-ออกงานเรียงตามเวลาล่าสุด</p>
+                    <div class="p-4 md:p-6 border-b border-slate-100 flex justify-between items-center gap-4">
+                        <div class="flex flex-col gap-1">
+                            <h2 class="text-base md:text-lg font-semibold text-slate-800">ประวัติการลงเวลาล่าสุด</h2>
+                            <p class="text-xs md:text-sm text-slate-500">แสดงข้อมูลการเข้า-ออกงานเรียงตามเวลาล่าสุด</p>
+                        </div>
+                        <button onclick="openAddPastLogModal()" class="bg-brand-50 hover:bg-brand-100 text-brand-600 px-3 py-2 md:px-4 md:py-2 rounded-xl text-xs md:text-sm font-medium transition-colors flex items-center gap-1 md:gap-2 shrink-0">
+                            <i class="ph-bold ph-clock-counter-clockwise text-base md:text-lg"></i> <span class="hidden sm:inline">เพิ่มย้อนหลัง</span><span class="sm:hidden">เพิ่ม</span>
+                        </button>
                     </div>
                     <div class="overflow-x-auto pb-2">
                         <table class="w-full text-left border-collapse min-w-[500px]">
@@ -227,6 +243,49 @@
                             </thead>
                             <tbody id="logsTableBody" class="divide-y divide-slate-100 text-xs md:text-sm">
                                 <!-- Logs rows here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View: Salary Calculation -->
+            <div id="view-salary" class="view-section hidden fade-in">
+                <div class="bg-white rounded-2xl md:rounded-3xl shadow-soft border border-slate-100 overflow-hidden">
+                    <div class="p-4 md:p-6 border-b border-slate-100">
+                        <div class="flex flex-col gap-1 mb-4 md:mb-6">
+                            <h2 class="text-base md:text-lg font-semibold text-slate-800">คำนวณเงินเดือนและ OT</h2>
+                            <p class="text-xs md:text-sm text-slate-500">เลือกช่วงเวลาเพื่อสรุปยอดเงินเดือนพนักงาน (*ฐานเงินเดือนคิดจาก: เงินเดือนรายสัปดาห์ / 6)</p>
+                        </div>
+                        
+                        <div class="flex flex-col md:flex-row gap-3 items-end bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                            <div class="w-full md:w-auto flex-1">
+                                <label class="block text-xs md:text-sm font-medium text-slate-700 mb-1">ตั้งแต่วันที่</label>
+                                <input type="date" id="salaryStartDate" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white text-sm md:text-base">
+                            </div>
+                            <div class="w-full md:w-auto flex-1">
+                                <label class="block text-xs md:text-sm font-medium text-slate-700 mb-1">ถึงวันที่</label>
+                                <input type="date" id="salaryEndDate" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white text-sm md:text-base">
+                            </div>
+                            <button onclick="calculateSalary()" class="w-full md:w-auto bg-slate-800 hover:bg-slate-700 text-white px-6 py-2.5 rounded-xl text-sm md:text-base font-medium transition-colors shadow-lg shadow-slate-800/20 flex items-center justify-center gap-2">
+                                <i class="ph-bold ph-calculator"></i> คำนวณยอด
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto pb-2">
+                        <table class="w-full text-left border-collapse min-w-[700px]">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-500 text-xs md:text-sm">
+                                    <th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap">ชื่อพนักงาน</th>
+                                    <th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap text-center">มาทำงาน (วัน)</th>
+                                    <th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap text-center">ชั่วโมงงาน / OT</th>
+                                    <th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap text-right">ค่าแรงพื้นฐาน</th>
+                                    <th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap text-right">ค่า OT</th>
+                                    <th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap text-right">รวมสุทธิ (บาท)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="salaryTableBody" class="divide-y divide-slate-100 text-xs md:text-sm">
+                                <tr><td colspan="6" class="px-4 py-8 text-center text-slate-400 text-sm">กรุณาเลือกช่วงวันที่และกด "คำนวณยอด"</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -249,6 +308,10 @@
         <button onclick="switchView('logs')" id="mobile-nav-logs" class="mobile-nav-btn flex-1 py-3 flex flex-col items-center gap-1 text-slate-400 transition-colors">
             <i class="ph-fill ph-list-dashes text-2xl"></i>
             <span class="text-[10px] font-medium">ประวัติ</span>
+        </button>
+        <button onclick="switchView('salary')" id="mobile-nav-salary" class="mobile-nav-btn flex-1 py-3 flex flex-col items-center gap-1 text-slate-400 transition-colors">
+            <i class="ph-fill ph-calculator text-2xl"></i>
+            <span class="text-[10px] font-medium">เงินเดือน</span>
         </button>
         <!-- Mobile Status Indicator -->
         <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-white px-3 py-0.5 rounded-full shadow-sm border border-slate-100 text-[9px] flex items-center gap-1 hidden" id="mobileConnectionStatus">
@@ -401,6 +464,61 @@
         </div>
     </div>
 
+    <!-- Add Past Log Modal -->
+    <div id="addPastLogModal" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm bg-white rounded-3xl shadow-2xl z-50 hidden opacity-0 scale-95 transition-all duration-300">
+        <div class="p-5 md:p-6 pb-safe">
+            <div class="flex justify-between items-center mb-4 md:mb-6">
+                <h3 class="text-lg md:text-xl font-bold text-slate-800">เพิ่มประวัติย้อนหลัง</h3>
+                <button onclick="closeModal('addPastLogModal')" class="text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-full p-1.5 transition-colors">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+            
+            <form id="addPastLogForm" onsubmit="handleAddPastLogSubmit(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs md:text-sm font-medium text-slate-700 mb-1">พนักงาน</label>
+                        <select id="pastLogEmployee" required class="w-full px-4 py-2.5 md:py-3 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-slate-50 focus:bg-white text-sm md:text-base appearance-none">
+                            <option value="">-- เลือกพนักงาน --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs md:text-sm font-medium text-slate-700 mb-1">ประเภท</label>
+                        <div class="flex gap-2">
+                            <label class="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 md:py-3 rounded-2xl border border-slate-200 cursor-pointer has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50 has-[:checked]:text-emerald-700 transition-colors text-sm md:text-base">
+                                <input type="radio" name="pastLogAction" value="in" required class="hidden">
+                                <i class="ph-bold ph-sign-in"></i> เข้างาน
+                            </label>
+                            <label class="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 md:py-3 rounded-2xl border border-slate-200 cursor-pointer has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 has-[:checked]:text-amber-700 transition-colors text-sm md:text-base">
+                                <input type="radio" name="pastLogAction" value="out" required class="hidden">
+                                <i class="ph-bold ph-sign-out"></i> ออกงาน
+                            </label>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs md:text-sm font-medium text-slate-700 mb-1">วันที่</label>
+                            <input type="date" id="pastLogDate" required class="w-full px-3 py-2.5 md:py-3 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-slate-50 focus:bg-white text-sm md:text-base">
+                        </div>
+                        <div>
+                            <label class="block text-xs md:text-sm font-medium text-slate-700 mb-1">เวลา</label>
+                            <input type="time" id="pastLogTime" required class="w-full px-3 py-2.5 md:py-3 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-slate-50 focus:bg-white text-sm md:text-base">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 md:mt-8 flex gap-2 md:gap-3">
+                    <button type="button" onclick="closeModal('addPastLogModal')" class="flex-1 px-4 py-2.5 md:py-3 rounded-2xl font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors text-sm md:text-base">
+                        ยกเลิก
+                    </button>
+                    <button type="submit" id="savePastLogBtn" class="flex-1 px-4 py-2.5 md:py-3 rounded-2xl font-medium text-white bg-brand-600 hover:bg-brand-700 shadow-lg shadow-brand-500/20 transition-all flex justify-center items-center gap-2 text-sm md:text-base">
+                        บันทึกข้อมูล
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
     <!-- ปรับตำแหน่ง Toast บนมือถือให้อยู่เหนือ Bottom Nav -->
     <div id="toastContainer" class="fixed bottom-20 md:bottom-6 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none w-[90%] md:w-auto items-center"></div>
@@ -410,7 +528,7 @@
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, serverTimestamp, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, serverTimestamp, getDocs, Timestamp, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // === USER PROVIDED FIREBASE CONFIG ===
         const firebaseConfig = {
@@ -668,9 +786,14 @@
                         <td class="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">${actionBadge}</td>
                         <td class="px-4 md:px-6 py-3 md:py-4 text-right whitespace-nowrap">
                             <!-- บนมือถือให้ปุ่มแสดงตลอดเวลา (opacity-100 md:opacity-0) -->
-                            <button onclick="editLogTime('${log.id}')" class="text-slate-400 hover:text-brand-600 p-2 rounded-lg hover:bg-brand-50 transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100" title="แก้ไขเวลา">
-                                <i class="ph-bold ph-pencil-simple text-base"></i>
-                            </button>
+                            <div class="flex justify-end gap-1">
+                                <button onclick="editLogTime('${log.id}')" class="text-slate-400 hover:text-brand-600 p-2 md:p-2 rounded-lg hover:bg-brand-50 transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100" title="แก้ไขเวลา">
+                                    <i class="ph-bold ph-pencil-simple text-base"></i>
+                                </button>
+                                <button onclick="deleteLog('${log.id}')" class="text-slate-400 hover:text-red-500 p-2 md:p-2 rounded-lg hover:bg-red-50 transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100" title="ลบประวัติ">
+                                    <i class="ph-bold ph-trash text-base"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -716,6 +839,14 @@
             if(!currentUser) return showToast('กรุณารอเชื่อมต่อฐานข้อมูลสักครู่', 'error');
 
             const btn = document.getElementById('saveEmpBtn');
+            const weeklySalary = Number(document.getElementById('empWeeklySalary').value);
+            const otRate = Number(document.getElementById('empOtRate').value);
+
+            // Validation: ป้องกันค่าติดลบ
+            if (weeklySalary < 0 || otRate < 0) {
+                showToast('จำนวนเงินไม่สามารถติดลบได้', 'error');
+                return;
+            }
 
             const data = {
                 name: document.getElementById('empName').value.trim(),
@@ -723,8 +854,8 @@
                 workStartTime: document.getElementById('empStartTime').value,
                 workEndTime: document.getElementById('empEndTime').value,
                 dayOff: document.getElementById('empDayOff').value,
-                weeklySalary: Number(document.getElementById('empWeeklySalary').value) || 0,
-                otRate: Number(document.getElementById('empOtRate').value) || 0,
+                weeklySalary: weeklySalary || 0,
+                otRate: otRate || 0,
             };
 
             if(!data.name || !data.position) return;
@@ -768,22 +899,27 @@
             const btnIn = document.getElementById('btnClockIn');
             const btnOut = document.getElementById('btnClockOut');
 
+            // รีเซ็ตคลาสพื้นฐานของปุ่ม
+            const baseBtnClass = "flex-1 py-3 rounded-2xl font-medium transition-all flex items-center justify-center gap-1.5 text-sm md:text-base";
+
             if (emp.status === 'in') {
-                btnIn.classList.replace('bg-emerald-500', 'bg-slate-200');
-                btnIn.classList.replace('text-white', 'text-slate-400');
-                btnIn.classList.remove('hover:bg-emerald-600', 'shadow-lg');
+                // เข้างานอยู่ -> ปุ่มเข้างานเป็นสีเทา(กดไม่ได้), ปุ่มออกงานเป็นสีส้ม(กดได้)
+                btnIn.className = `${baseBtnClass} bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200`;
+                btnIn.innerHTML = '<i class="ph-bold ph-check-circle text-lg"></i> เข้างานแล้ว';
+                btnIn.disabled = true;
                 
-                btnOut.classList.replace('bg-slate-200', 'bg-amber-500');
-                btnOut.classList.replace('text-slate-400', 'text-white');
-                btnOut.classList.add('hover:bg-amber-600', 'shadow-lg');
+                btnOut.className = `${baseBtnClass} bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/30 active:scale-95`;
+                btnOut.innerHTML = '<i class="ph-bold ph-sign-out text-lg"></i> กดออกงาน';
+                btnOut.disabled = false;
             } else {
-                btnIn.classList.replace('bg-slate-200', 'bg-emerald-500');
-                btnIn.classList.replace('text-slate-400', 'text-white');
-                btnIn.classList.add('hover:bg-emerald-600', 'shadow-lg');
+                // ออกงานแล้ว หรือ ยังไม่เคยลงเวลา -> ปุ่มเข้างานเป็นสีเขียว(กดได้), ปุ่มออกงานเป็นสีเทา(กดไม่ได้)
+                btnIn.className = `${baseBtnClass} bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/30 active:scale-95`;
+                btnIn.innerHTML = '<i class="ph-bold ph-sign-in text-lg"></i> กดเข้างาน';
+                btnIn.disabled = false;
                 
-                btnOut.classList.replace('bg-amber-500', 'bg-slate-200');
-                btnOut.classList.replace('text-white', 'text-slate-400');
-                btnOut.classList.remove('hover:bg-amber-600', 'shadow-lg');
+                btnOut.className = `${baseBtnClass} bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200`;
+                btnOut.innerHTML = '<i class="ph-bold ph-check-circle text-lg"></i> ออกงานแล้ว';
+                btnOut.disabled = true;
             }
 
             btnIn.onclick = () => recordTime('in');
@@ -796,12 +932,49 @@
         window.recordTime = async function(action) {
             if(!selectedEmployee || !currentUser) return;
             
+            if(!navigator.onLine) {
+                showToast('ไม่สามารถบันทึกได้ กรุณาตรวจสอบอินเทอร์เน็ต', 'error');
+                return;
+            }
+            
+            // UI level check
             if(selectedEmployee.status === action) {
                 showToast(action === 'in' ? 'พนักงานเข้างานอยู่แล้ว' : 'พนักงานออกงานไปแล้ว', 'error');
                 return;
             }
 
+            const btnIn = document.getElementById('btnClockIn');
+            const btnOut = document.getElementById('btnClockOut');
+            const originalInDisabled = btnIn.disabled;
+            const originalOutDisabled = btnOut.disabled;
+
             try {
+                // ป้องกันปัญหา Race Condition (เช่น กดพร้อมกัน 2 เครื่อง)
+                // ดึงข้อมูลล่าสุดจาก Server ก่อนเซฟเสมอ
+                const empRef = doc(db, 'employees', selectedEmployee.id);
+                const empSnap = await getDoc(empRef);
+                
+                if (!empSnap.exists()) {
+                    showToast('ไม่พบข้อมูลพนักงานนี้ (อาจถูกลบไปแล้ว)', 'error');
+                    closeModal('actionModal');
+                    return;
+                }
+
+                if (empSnap.data().status === action) {
+                    showToast('สถานะถูกอัปเดตไปแล้วจากอุปกรณ์อื่น', 'error');
+                    closeModal('actionModal');
+                    return;
+                }
+
+                // ปิดปุ่มระหว่างเซฟ
+                btnIn.disabled = true; 
+                btnOut.disabled = true;
+                
+                // เปลี่ยนข้อความปุ่มที่กำลังกดให้เป็นสถานะโหลด
+                const targetBtn = action === 'in' ? btnIn : btnOut;
+                const originalHtml = targetBtn.innerHTML;
+                targetBtn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-lg"></i> กำลังบันทึก...';
+
                 await addDoc(collection(db, 'time_logs'), {
                     employeeId: selectedEmployee.id,
                     employeeName: selectedEmployee.name,
@@ -809,7 +982,6 @@
                     timestamp: serverTimestamp()
                 });
 
-                const empRef = doc(db, 'employees', selectedEmployee.id);
                 await updateDoc(empRef, {
                     status: action,
                     lastActionTime: serverTimestamp()
@@ -818,10 +990,19 @@
                 const actionStr = action === 'in' ? 'เข้างาน' : 'ออกงาน';
                 showToast(`บันทึก${actionStr}สำเร็จ`);
                 closeModal('actionModal');
+                
+                // คืนค่าปุ่มกลับเผื่อกรณีหน้าต่างปิดไม่ทัน (UI จะได้ไม่ค้าง)
+                setTimeout(() => {
+                    targetBtn.innerHTML = originalHtml;
+                }, 300);
 
             } catch (error) {
                 console.error("Error updating time: ", error);
                 showToast('เกิดข้อผิดพลาด กรุณาลองใหม่', 'error');
+            } finally {
+                // คืนค่าสถานะปุ่มกลับไปเหมือนก่อนกดหากเกิด Error
+                btnIn.disabled = originalInDisabled;
+                btnOut.disabled = originalOutDisabled;
             }
         };
 
@@ -855,6 +1036,14 @@
 
             if(!dateStr || !timeStr) return;
 
+            const newDateObj = new Date(`${dateStr}T${timeStr}:00`);
+            
+            // Validation: ป้องกันกรอกเวลาในอนาคต
+            if (newDateObj > new Date()) {
+                showToast('ไม่สามารถระบุเวลาในอนาคตได้', 'error');
+                return;
+            }
+
             const btn = document.getElementById('saveLogBtn');
 
             try {
@@ -878,6 +1067,114 @@
             } finally {
                 btn.innerHTML = 'บันทึกเวลาใหม่';
                 btn.disabled = false;
+            }
+        };
+
+        // Open Add Past Log Modal
+        window.openAddPastLogModal = function() {
+            const select = document.getElementById('pastLogEmployee');
+            select.innerHTML = '<option value="">-- เลือกพนักงาน --</option>';
+            
+            employeesData.forEach(emp => {
+                const option = document.createElement('option');
+                option.value = emp.id;
+                option.textContent = emp.name;
+                select.appendChild(option);
+            });
+
+            // Set default date and time to current
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            document.getElementById('pastLogDate').value = `${year}-${month}-${day}`;
+            
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('pastLogTime').value = `${hours}:${minutes}`;
+
+            // Reset form (this clears the radio buttons too)
+            document.getElementById('addPastLogForm').reset();
+            // Re-apply default date/time because reset() clears them
+            document.getElementById('pastLogDate').value = `${year}-${month}-${day}`;
+            document.getElementById('pastLogTime').value = `${hours}:${minutes}`;
+
+            openModal('addPastLogModal');
+        };
+
+        // Save Past Log
+        window.handleAddPastLogSubmit = async function(e) {
+            e.preventDefault();
+            if(!currentUser) return;
+
+            const empId = document.getElementById('pastLogEmployee').value;
+            const action = document.querySelector('input[name="pastLogAction"]:checked')?.value;
+            const dateStr = document.getElementById('pastLogDate').value;
+            const timeStr = document.getElementById('pastLogTime').value;
+
+            if(!empId || !action || !dateStr || !timeStr) {
+                showToast('กรุณากรอกข้อมูลให้ครบถ้วน', 'error');
+                return;
+            }
+
+            const newDateObj = new Date(`${dateStr}T${timeStr}:00`);
+            
+            // Validation: ป้องกันกรอกเวลาในอนาคต
+            if (newDateObj > new Date()) {
+                showToast('ไม่สามารถระบุเวลาในอนาคตได้', 'error');
+                return;
+            }
+
+            const emp = employeesData.find(e => e.id === empId);
+            if(!emp) return;
+
+            const btn = document.getElementById('savePastLogBtn');
+
+            try {
+                btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> บันทึก...';
+                btn.disabled = true;
+
+                const newDateObj = new Date(`${dateStr}T${timeStr}:00`);
+                const newTimestamp = Timestamp.fromDate(newDateObj);
+
+                // Add to time_logs
+                await addDoc(collection(db, 'time_logs'), {
+                    employeeId: emp.id,
+                    employeeName: emp.name,
+                    action: action,
+                    timestamp: newTimestamp
+                });
+
+                // อัปเดตสถานะล่าสุดของพนักงานด้วย (เพื่อให้หน้าแดชบอร์ดแสดงสถานะตรงกัน)
+                const empRef = doc(db, 'employees', emp.id);
+                await updateDoc(empRef, {
+                    status: action,
+                    lastActionTime: newTimestamp
+                });
+
+                showToast('เพิ่มประวัติย้อนหลังสำเร็จ');
+                closeModal('addPastLogModal');
+
+            } catch (error) {
+                console.error("Error adding past log: ", error);
+                showToast('เกิดข้อผิดพลาดในการบันทึก', 'error');
+            } finally {
+                btn.innerHTML = 'บันทึกข้อมูล';
+                btn.disabled = false;
+            }
+        };
+
+        // Delete Log
+        window.deleteLog = async function(logId) {
+            if(confirm("คุณต้องการลบประวัติการลงเวลานี้ใช่หรือไม่? (การคำนวณเงินเดือนจะเปลี่ยนไปหากลบข้อมูลนี้)")) {
+                try {
+                    const { deleteDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+                    await deleteDoc(doc(db, 'time_logs', logId));
+                    showToast('ลบประวัติสำเร็จ');
+                } catch(e) {
+                    console.error("Error deleting log:", e);
+                    showToast('ไม่สามารถลบได้', 'error');
+                }
             }
         };
 
@@ -917,6 +1214,22 @@
         setInterval(updateClock, 1000);
         updateClock();
 
+        // Network Status Management (Online/Offline Detection)
+        function updateOnlineStatus() {
+            const offlineBanner = document.getElementById('offlineBanner');
+            if (navigator.onLine) {
+                offlineBanner.classList.add('-translate-y-full');
+                setTimeout(() => offlineBanner.classList.add('hidden'), 300);
+            } else {
+                offlineBanner.classList.remove('hidden');
+                setTimeout(() => offlineBanner.classList.remove('-translate-y-full'), 10);
+            }
+        }
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        // Initial check
+        if(!navigator.onLine) updateOnlineStatus();
+
         // View Navigation
         window.switchView = function(viewId) {
             // Update Desktop Nav Buttons
@@ -953,13 +1266,187 @@
             const titles = {
                 'dashboard': 'แดชบอร์ดลงเวลา',
                 'employees': 'จัดการพนักงาน',
-                'logs': 'ประวัติการลงเวลา'
+                'logs': 'ประวัติการลงเวลา',
+                'salary': 'คำนวณเงินเดือน'
             };
             document.getElementById('pageTitle').innerText = titles[viewId];
             
             // เลื่อนจอขึ้นบนสุดเมื่อเปลี่ยนหน้า
             document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
         };
+
+        // Salary Calculation Logic
+        window.calculateSalary = function() {
+            const startDateStr = document.getElementById('salaryStartDate').value;
+            const endDateStr = document.getElementById('salaryEndDate').value;
+
+            if (!startDateStr || !endDateStr) {
+                showToast('กรุณาเลือกช่วงวันที่ให้ครบถ้วน', 'error');
+                return;
+            }
+
+            const startDate = new Date(startDateStr);
+            startDate.setHours(0, 0, 0, 0);
+            const endDate = new Date(endDateStr);
+            endDate.setHours(23, 59, 59, 999);
+
+            if (startDate > endDate) {
+                showToast('วันที่สิ้นสุดต้องมากกว่าหรือเท่ากับวันที่เริ่มต้น', 'error');
+                return;
+            }
+
+            // กรองเฉพาะประวัติการลงเวลาในช่วงวันที่เลือก
+            const validLogs = logsData.filter(log => {
+                if (!log.timestamp) return false;
+                const logDate = log.timestamp.toDate();
+                return logDate >= startDate && logDate <= endDate;
+            });
+
+            // สร้างโครงสร้างข้อมูลสำหรับคำนวณแต่ละคน
+            const empStats = {};
+            employeesData.forEach(emp => {
+                empStats[emp.id] = {
+                    emp: emp,
+                    daysWorked: new Set(),
+                    totalWorkMinutes: 0,
+                    totalOtMinutes: 0,
+                    logsByDay: {}
+                };
+            });
+
+            // จัดกลุ่มประวัติการลงเวลาตามวันที่
+            validLogs.forEach(log => {
+                const empId = log.employeeId;
+                if (!empStats[empId]) return;
+
+                const logDateObj = log.timestamp.toDate();
+                // Format date as YYYY-MM-DD for grouping
+                const dateKey = `${logDateObj.getFullYear()}-${String(logDateObj.getMonth()+1).padStart(2,'0')}-${String(logDateObj.getDate()).padStart(2,'0')}`;
+
+                if (!empStats[empId].logsByDay[dateKey]) {
+                    empStats[empId].logsByDay[dateKey] = [];
+                }
+                empStats[empId].logsByDay[dateKey].push(log);
+                empStats[empId].daysWorked.add(dateKey);
+            });
+
+            // คำนวณชั่วโมงงานและ OT
+            Object.values(empStats).forEach(stat => {
+                const emp = stat.emp;
+                
+                // หาเวลาทำงานมาตรฐาน (นาที) ค่าเริ่มต้นคือ 8 ชั่วโมง (480 นาที)
+                let standardMinutes = 480; 
+                if (emp.workStartTime && emp.workEndTime) {
+                    const [sH, sM] = emp.workStartTime.split(':').map(Number);
+                    const [eH, eM] = emp.workEndTime.split(':').map(Number);
+                    let diff = (eH * 60 + eM) - (sH * 60 + sM);
+                    if (diff < 0) diff += 24 * 60; // กรณีข้ามคืน
+                    // สมมติให้หักพักเที่ยง 1 ชม. (60 นาที) หากทำงานเกิน 4 ชม.
+                    if (diff > 240) diff -= 60; 
+                    standardMinutes = diff;
+                }
+
+                // ประมวลผลรายวัน
+                for (const dateKey in stat.logsByDay) {
+                    const dayLogs = stat.logsByDay[dateKey].sort((a, b) => a.timestamp.toDate() - b.timestamp.toDate());
+                    
+                    const firstIn = dayLogs.find(l => l.action === 'in');
+                    const lastOut = [...dayLogs].reverse().find(l => l.action === 'out');
+
+                    if (firstIn && lastOut) {
+                        const inTime = firstIn.timestamp.toDate();
+                        const outTime = lastOut.timestamp.toDate();
+                        
+                        if (outTime > inTime) {
+                            // หักลบเวลาที่แท้จริง
+                            let workedMinutes = Math.floor((outTime - inTime) / (1000 * 60));
+                            // หักพักเที่ยง 1 ชม. (หากทำงานเกิน 4 ชม.)
+                            if (workedMinutes > 240) workedMinutes -= 60;
+
+                            stat.totalWorkMinutes += Math.max(0, workedMinutes);
+
+                            if (workedMinutes > standardMinutes) {
+                                stat.totalOtMinutes += (workedMinutes - standardMinutes);
+                            }
+                        }
+                    }
+                }
+
+                // คำนวณค่าแรง
+                // ฐานเงินเดือนรายวัน = รายสัปดาห์ / 6 (สมมติวันหยุด 1 วัน)
+                const dailyRate = (emp.weeklySalary || 0) / 6;
+                stat.basePay = stat.daysWorked.size * dailyRate;
+                
+                // ค่า OT = (นาที / 60) * อัตรา OT
+                stat.otPay = (stat.totalOtMinutes / 60) * (emp.otRate || 0);
+                
+                stat.totalPay = stat.basePay + stat.otPay;
+            });
+
+            renderSalaryTable(empStats);
+        };
+
+        function renderSalaryTable(empStats) {
+            const tbody = document.getElementById('salaryTableBody');
+            let html = '';
+            
+            const statsArray = Object.values(empStats).filter(stat => stat.daysWorked.size > 0);
+
+            if (statsArray.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400 text-sm">ไม่พบข้อมูลการทำงานในช่วงเวลาดังกล่าว</td></tr>`;
+                return;
+            }
+
+            statsArray.forEach(stat => {
+                const emp = stat.emp;
+                
+                const workHrs = Math.floor(stat.totalWorkMinutes / 60);
+                const workMins = stat.totalWorkMinutes % 60;
+                
+                const otHrs = Math.floor(stat.totalOtMinutes / 60);
+                const otMins = stat.totalOtMinutes % 60;
+
+                const formatCurrency = (num) => new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB' }).format(num);
+
+                html += `
+                    <tr class="hover:bg-slate-50 transition-colors border-b border-slate-50 md:border-none">
+                        <td class="px-4 md:px-6 py-3 md:py-4 font-medium text-slate-800 whitespace-nowrap">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-[10px] font-bold">
+                                    ${emp.name.substring(0,1)}
+                                </div>
+                                ${emp.name}
+                            </div>
+                        </td>
+                        <td class="px-4 md:px-6 py-3 md:py-4 text-center whitespace-nowrap">
+                            <span class="inline-flex items-center justify-center bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg text-xs font-semibold">
+                                ${stat.daysWorked.size} วัน
+                            </span>
+                        </td>
+                        <td class="px-4 md:px-6 py-3 md:py-4 text-center whitespace-nowrap">
+                            <div class="text-xs text-slate-600">${workHrs} ชม. ${workMins} น.</div>
+                            ${stat.totalOtMinutes > 0 ? `<div class="text-[10px] text-amber-600 mt-0.5">+ OT ${otHrs} ชม. ${otMins} น.</div>` : ''}
+                        </td>
+                        <td class="px-4 md:px-6 py-3 md:py-4 text-right text-slate-600 whitespace-nowrap">${formatCurrency(stat.basePay)}</td>
+                        <td class="px-4 md:px-6 py-3 md:py-4 text-right text-amber-600 whitespace-nowrap">${formatCurrency(stat.otPay)}</td>
+                        <td class="px-4 md:px-6 py-3 md:py-4 text-right font-bold text-brand-600 whitespace-nowrap">${formatCurrency(stat.totalPay)}</td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        // Set default dates for Salary View (Current Month)
+        window.addEventListener('DOMContentLoaded', () => {
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            
+            const formatDate = (date) => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+            
+            document.getElementById('salaryStartDate').value = formatDate(firstDay);
+            document.getElementById('salaryEndDate').value = formatDate(today);
+        });
 
         // Modal Controls
         window.openModal = function(modalId) {
