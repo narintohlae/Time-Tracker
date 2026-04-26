@@ -2,386 +2,202 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ระบบบันทึกเวลาทำงาน 2026</title>
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Phosphor Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
-    <!-- Tailwind CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ระบบจัดการพนักงาน - Time Tracking</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { prompt: ['Prompt', 'sans-serif'] },
-                    colors: {
-                        brand: { 50: '#f0fdfa', 100: '#ccfbf1', 500: '#14b8a6', 600: '#0d9488', 900: '#134e4a' }
-                    },
-                    boxShadow: {
-                        'glass': '0 10px 40px -10px rgba(0,0,0,0.08)',
-                        'soft': '0 20px 40px -15px rgba(0,0,0,0.05)',
-                        'nav': '0 -4px 20px -5px rgba(0,0,0,0.05)',
-                    }
-                }
-            }
-        }
-    </script>
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { font-family: 'Prompt', sans-serif; background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.5); }
-        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
-        .overflow-y-auto { -webkit-overflow-scrolling: touch; }
+        /* Flat 3D 2026 Design System */
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
 
-        /* ป้องกัน iOS Safari ซูมหน้าจออัตโนมัติเมื่อกด Input */
-        @media screen and (max-width: 768px) {
-            input, select, textarea {
-                font-size: 16px !important;
-            }
+        :root {
+            --bg-color: #f0f4f8;
+            --primary: #6366f1;
+            --primary-shadow: #4f46e5;
+            --secondary: #14b8a6;
+            --secondary-shadow: #0d9488;
+            --danger: #f43f5e;
+            --danger-shadow: #e11d48;
+            --warning: #f59e0b;
+            --warning-shadow: #d97706;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
         }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            position: relative;
+            padding-bottom: 80px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            overflow-x: hidden;
+        }
+
+        /* 3D Elements */
+        .card-3d {
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 8px 0 #e2e8f0, 0 15px 20px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-3d {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            border-radius: 16px;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.1s;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary { background-color: var(--primary); box-shadow: 0 6px 0 var(--primary-shadow); }
+        .btn-primary:active { transform: translateY(6px); box-shadow: 0 0 0 var(--primary-shadow); }
+
+        .btn-secondary { background-color: var(--secondary); box-shadow: 0 6px 0 var(--secondary-shadow); }
+        .btn-secondary:active { transform: translateY(6px); box-shadow: 0 0 0 var(--secondary-shadow); }
+
+        .btn-danger { background-color: var(--danger); box-shadow: 0 6px 0 var(--danger-shadow); }
+        .btn-danger:active { transform: translateY(6px); box-shadow: 0 0 0 var(--danger-shadow); }
+
+        .btn-warning { background-color: var(--warning); box-shadow: 0 6px 0 var(--warning-shadow); }
+        .btn-warning:active { transform: translateY(6px); box-shadow: 0 0 0 var(--warning-shadow); }
+
+        .input-3d {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            border: 2px solid #cbd5e1;
+            background: #f8fafc;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            font-family: inherit;
+            transition: all 0.2s;
+            outline: none;
+        }
+        .input-3d:focus { border-color: var(--primary); background: white; }
+
+        /* Bottom Navigation - Reduced to 3 items */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 1rem 0.5rem;
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+            z-index: 40;
+        }
+
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            color: #94a3b8; font-size: 0.75rem; font-weight: 500; cursor: pointer; transition: all 0.3s;
+        }
+        .nav-item i { font-size: 1.25rem; margin-bottom: 0.25rem; transition: all 0.3s; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item.active i { transform: translateY(-5px) scale(1.2); }
+
+        /* Toast & Loaders */
+        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 100; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; }
+        .toast { background: white; border-left: 5px solid var(--primary); padding: 1rem; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 10px; animation: slideDown 0.3s ease-out; }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .clock-display { font-size: 3rem; font-weight: 700; color: var(--primary); text-align: center; text-shadow: 2px 2px 0px #c7d2fe; margin: 0.5rem 0 1.5rem 0; letter-spacing: -1px; }
+        
+        #loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.8); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .hidden { display: none !important; }
+
+        /* Profile Card Hover */
+        .profile-card { transition: all 0.1s; cursor: pointer; border: 2px solid transparent; }
+        .profile-card:active { transform: scale(0.95); border-color: var(--primary); }
+
+        /* Bottom Modal */
+        #action-modal { transition: opacity 0.3s; }
+        #modal-content { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </head>
-<body class="text-slate-800 antialiased h-screen overflow-hidden flex flex-col md:flex-row">
+<body>
 
-    <!-- Offline Alert -->
-    <div id="offlineBanner" class="fixed top-0 left-0 w-full bg-red-500 text-white text-center py-2 text-base font-medium z-50 hidden shadow-md flex items-center justify-center gap-2 transition-transform transform -translate-y-full duration-300">
-        <i class="ph-bold ph-wifi-none text-lg"></i><span>ขาดการเชื่อมต่ออินเทอร์เน็ต ข้อมูลจะไม่ถูกบันทึกจนกว่าจะออนไลน์</span>
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p class="mt-4 font-semibold text-gray-600">กำลังโหลดระบบ...</p>
     </div>
 
-    <!-- Mobile Header -->
-    <div class="md:hidden glass-panel border-b border-slate-200 p-4 flex justify-center items-center z-20 shadow-sm relative shrink-0">
-        <div class="flex items-center gap-2 text-brand-600 font-bold text-xl">
-            <i class="ph-fill ph-clock-user text-2xl"></i><span>TimeFlow</span>
-        </div>
-    </div>
+    <div id="toast-container"></div>
 
-    <!-- Desktop Sidebar Navigation -->
-    <nav id="sidebar" class="hidden md:flex glass-panel w-72 h-full flex-shrink-0 border-r border-slate-200 flex-col z-10 shadow-none bg-white/70">
-        <div class="p-6 flex items-center gap-3 text-brand-600 font-bold text-2xl tracking-tight">
-            <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center shadow-lg shadow-brand-500/30">
-                <i class="ph-bold ph-clock-user text-xl"></i>
-            </div>
-            <span>TimeFlow</span>
-        </div>
-
-        <div class="flex-1 px-4 py-0 overflow-y-auto flex flex-col gap-2">
-            <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 mt-4">เมนูหลัก</p>
-            <button onclick="switchView('dashboard')" id="nav-dashboard" class="nav-btn flex items-center gap-3 px-4 py-3.5 rounded-2xl text-left transition-all duration-200 bg-brand-50 text-brand-600 font-medium">
-                <i class="ph ph-squares-four text-xl"></i><span>แดชบอร์ดลงเวลา</span>
-            </button>
-            <button onclick="switchView('employees')" id="nav-employees" class="nav-btn flex items-center gap-3 px-4 py-3.5 rounded-2xl text-left transition-all duration-200 text-slate-500 hover:bg-slate-100 hover:text-slate-800">
-                <i class="ph ph-users text-xl"></i><span>จัดการพนักงาน</span>
-            </button>
-            <button onclick="switchView('logs')" id="nav-logs" class="nav-btn flex items-center gap-3 px-4 py-3.5 rounded-2xl text-left transition-all duration-200 text-slate-500 hover:bg-slate-100 hover:text-slate-800">
-                <i class="ph ph-list-dashes text-xl"></i><span>ประวัติเข้า-ออก</span>
-            </button>
-            <button onclick="switchView('leaves')" id="nav-leaves" class="nav-btn flex items-center gap-3 px-4 py-3.5 rounded-2xl text-left transition-all duration-200 text-slate-500 hover:bg-slate-100 hover:text-slate-800">
-                <i class="ph ph-calendar-plus text-xl"></i><span>วันลา / สลับวัน</span>
-            </button>
-            <button onclick="switchView('holidays')" id="nav-holidays" class="nav-btn flex items-center gap-3 px-4 py-3.5 rounded-2xl text-left transition-all duration-200 text-slate-500 hover:bg-slate-100 hover:text-slate-800">
-                <i class="ph ph-calendar-star text-xl"></i><span>วันหยุดของร้าน</span>
-            </button>
-            <button onclick="switchView('salary')" id="nav-salary" class="nav-btn flex items-center gap-3 px-4 py-3.5 rounded-2xl text-left transition-all duration-200 text-slate-500 hover:bg-slate-100 hover:text-slate-800">
-                <i class="ph ph-calculator text-xl"></i><span>คำนวณเงินเดือน</span>
-            </button>
-        </div>
-
-        <div class="p-6 mt-auto">
-            <div class="bg-slate-100 rounded-2xl p-4 flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-slate-300 flex items-center justify-center text-slate-600"><i class="ph-fill ph-storefront text-xl"></i></div>
-                <div>
-                    <p class="text-sm font-semibold text-slate-800">บัญชีเจ้าของร้าน</p>
-                    <p class="text-xs text-slate-500" id="connectionStatusDesktop">กำลังเชื่อมต่อ...</p>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content Area -->
-    <main class="flex-1 h-full overflow-y-auto bg-slate-50/50 relative">
-        <div class="max-w-6xl mx-auto p-4 pb-24 md:p-8 md:pb-8">
-            
-            <!-- Header / Real-time Clock -->
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-4">
-                <div>
-                    <h1 class="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight" id="pageTitle">แดชบอร์ด</h1>
-                    <p class="text-base text-slate-500 mt-1" id="currentDateDisplay">กำลังโหลด...</p>
-                </div>
-                
-                <div class="glass-panel px-6 py-4 rounded-3xl shadow-soft flex items-center gap-4 w-full md:w-auto justify-center shrink-0">
-                    <i class="ph-duotone ph-clock text-3xl md:text-4xl text-brand-500"></i>
-                    <div class="text-3xl md:text-5xl font-bold text-slate-800 tracking-tighter" id="clockDisplay" style="font-variant-numeric: tabular-nums;">00:00:00</div>
-                </div>
-            </div>
-
-            <!-- Company Holiday Alert -->
-            <div id="todayHolidayAlert" class="hidden mb-6 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-3xl p-5 md:p-6 text-white shadow-lg shadow-purple-500/20 flex items-center gap-4 fade-in">
-                <div class="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md shrink-0">
-                    <i class="ph-fill ph-confetti text-xl md:text-2xl text-white"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-base md:text-lg">วันนี้เป็นวันหยุดของร้าน</h3>
-                    <p class="text-purple-100 text-sm mt-0.5" id="todayHolidayName">เนื่องในโอกาส...</p>
-                </div>
-            </div>
-
-            <!-- ================= VIEW: DASHBOARD ================= -->
-            <div id="view-dashboard" class="view-section fade-in">
-                <div class="mb-4 md:mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    <h2 class="text-base md:text-lg font-semibold text-slate-800">สถานะพนักงานวันนี้</h2>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="flex items-center gap-1 text-[10px] md:text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> ทำงาน (<span id="countIn">0</span>)</span>
-                        <span class="flex items-center gap-1 text-[10px] md:text-xs font-medium px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200"><span class="w-2 h-2 rounded-full bg-slate-400"></span> ออกงาน (<span id="countOut">0</span>)</span>
-                        <span class="flex items-center gap-1 text-[10px] md:text-xs font-medium px-2.5 py-1 rounded-full bg-rose-50 text-rose-600 border border-rose-100"><i class="ph-fill ph-bed"></i> ลา/หยุด (<span id="countLeave">0</span>)</span>
-                    </div>
-                </div>
-                <div id="employeeGrid" class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-                    <div class="col-span-full text-center py-12 text-slate-400"><i class="ph-duotone ph-spinner-gap animate-spin text-4xl mb-3"></i><p>กำลังโหลดข้อมูลพนักงาน...</p></div>
-                </div>
-            </div>
-
-            <!-- ================= VIEW: EMPLOYEES ================= -->
-            <div id="view-employees" class="view-section hidden fade-in">
-                <div class="bg-white rounded-2xl md:rounded-3xl shadow-soft border border-slate-100 overflow-hidden">
-                    <div class="p-4 md:p-6 border-b border-slate-100 flex justify-between items-center">
-                        <h2 class="text-base md:text-lg font-semibold text-slate-800">รายชื่อพนักงานทั้งหมด</h2>
-                        <button onclick="openEmployeeModal()" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-2 md:px-4 md:py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-1 md:gap-2 shrink-0"><i class="ph-bold ph-plus"></i> <span class="hidden sm:inline">เพิ่มพนักงาน</span><span class="sm:hidden">เพิ่ม</span></button>
-                    </div>
-                    <div class="overflow-x-auto pb-2">
-                        <table class="w-full text-left border-collapse min-w-[500px]">
-                            <thead><tr class="bg-slate-50 text-slate-500 text-sm"><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap">ชื่อ-นามสกุล</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap">ตำแหน่ง</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap">สถานะล่าสุด</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium text-right whitespace-nowrap">จัดการ</th></tr></thead>
-                            <tbody id="employeeTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ================= VIEW: LOGS ================= -->
-            <div id="view-logs" class="view-section hidden fade-in">
-                <div class="bg-white rounded-2xl md:rounded-3xl shadow-soft border border-slate-100 overflow-hidden">
-                    <div class="p-4 md:p-6 border-b border-slate-100 flex justify-between items-center gap-4">
-                        <div class="flex flex-col gap-1"><h2 class="text-base md:text-lg font-semibold text-slate-800">ประวัติการลงเวลาล่าสุด</h2><p class="text-sm text-slate-500">แสดงการเข้า-ออกงาน จัดกลุ่มสรุปตามรายวัน</p></div>
-                        <button onclick="openAddPastLogModal()" class="bg-brand-50 hover:bg-brand-100 text-brand-600 px-3 py-2 md:px-4 md:py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-1 md:gap-2 shrink-0"><i class="ph-bold ph-clock-counter-clockwise text-lg"></i> <span class="hidden sm:inline">เพิ่มย้อนหลัง</span><span class="sm:hidden">เพิ่ม</span></button>
-                    </div>
-                    <div class="overflow-x-auto pb-2">
-                        <table class="w-full text-left border-collapse min-w-[700px]">
-                            <thead><tr class="bg-slate-50 text-slate-500 text-sm"><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap">วันที่</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap">พนักงาน</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap">เวลาเข้า</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap">เวลาออก</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium text-right whitespace-nowrap">จัดการ</th></tr></thead>
-                            <tbody id="logsTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ================= VIEW: LEAVES & SWAPS ================= -->
-            <div id="view-leaves" class="view-section hidden fade-in space-y-6">
-                <div class="bg-white rounded-2xl md:rounded-3xl shadow-soft border border-slate-100 overflow-hidden">
-                    <div class="p-4 md:p-6 border-b border-slate-100 flex justify-between items-center gap-4">
-                        <div class="flex flex-col gap-1"><h2 class="text-base md:text-lg font-semibold text-slate-800 flex items-center gap-2"><i class="ph-fill ph-bed text-rose-500"></i> ประวัติการลางาน</h2></div>
-                        <button onclick="openLeaveModal()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-3 py-2 md:px-4 md:py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-1 shrink-0"><i class="ph-bold ph-plus text-base"></i> <span class="hidden sm:inline">เพิ่มวันลา</span><span class="sm:hidden">เพิ่ม</span></button>
-                    </div>
-                    <div class="overflow-x-auto pb-2">
-                        <table class="w-full text-left border-collapse min-w-[600px]">
-                            <thead><tr class="bg-slate-50 text-slate-500 text-sm"><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap">วันที่ลา</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap">พนักงาน</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap">ประเภท</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap">การจ่ายเงิน</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium text-right whitespace-nowrap">ลบ</th></tr></thead>
-                            <tbody id="leavesTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="bg-white rounded-2xl md:rounded-3xl shadow-soft border border-slate-100 overflow-hidden">
-                    <div class="p-4 md:p-6 border-b border-slate-100 flex justify-between items-center gap-4">
-                        <div class="flex flex-col gap-1"><h2 class="text-base md:text-lg font-semibold text-slate-800 flex items-center gap-2"><i class="ph-fill ph-arrows-left-right text-indigo-500"></i> ประวัติสลับวันหยุด</h2></div>
-                        <button onclick="openSwapModal()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-2 md:px-4 md:py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-1 shrink-0"><i class="ph-bold ph-plus text-base"></i> <span class="hidden sm:inline">สลับวันหยุด</span><span class="sm:hidden">สลับ</span></button>
-                    </div>
-                    <div class="overflow-x-auto pb-2">
-                        <table class="w-full text-left border-collapse min-w-[500px]">
-                            <thead><tr class="bg-slate-50 text-slate-500 text-sm"><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap">พนักงาน</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap">วันหยุดเดิม (วันที่มาทำแทน)</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap">วันหยุดใหม่ (วันที่ขอหยุด)</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium text-right whitespace-nowrap">ลบ</th></tr></thead>
-                            <tbody id="swapsTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ================= VIEW: HOLIDAYS ================= -->
-            <div id="view-holidays" class="view-section hidden fade-in">
-                <div class="bg-white rounded-2xl md:rounded-3xl shadow-soft border border-slate-100 overflow-hidden">
-                    <div class="p-4 md:p-6 border-b border-slate-100 flex justify-between items-center gap-4">
-                        <div class="flex flex-col gap-1"><h2 class="text-base md:text-lg font-semibold text-slate-800 flex items-center gap-2"><i class="ph-fill ph-calendar-star text-purple-500"></i> วันหยุดของร้าน</h2><p class="text-sm text-slate-500">ตั้งค่าวันหยุดเทศกาลล่วงหน้า</p></div>
-                        <button onclick="openHolidayModal()" class="bg-purple-50 hover:bg-purple-100 text-purple-600 px-3 py-2 md:px-4 md:py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-1 shrink-0"><i class="ph-bold ph-plus text-base"></i> <span class="hidden sm:inline">เพิ่มวันหยุดร้าน</span><span class="sm:hidden">เพิ่ม</span></button>
-                    </div>
-                    <div class="overflow-x-auto pb-2">
-                        <table class="w-full text-left border-collapse min-w-[600px]">
-                            <thead><tr class="bg-slate-50 text-slate-500 text-sm"><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap">วันที่หยุด</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap">ชื่อเทศกาล / เหตุผล</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap">การจ่ายเงิน</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium text-right whitespace-nowrap">จัดการ</th></tr></thead>
-                            <tbody id="holidaysTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ================= VIEW: SALARY ================= -->
-            <div id="view-salary" class="view-section hidden fade-in">
-                <div class="bg-white rounded-2xl md:rounded-3xl shadow-soft border border-slate-100 overflow-hidden">
-                    <div class="p-4 md:p-6 border-b border-slate-100">
-                        <div class="flex flex-col gap-1 mb-4 md:mb-6"><h2 class="text-base md:text-lg font-semibold text-slate-800">คำนวณเงินเดือนและ OT</h2><p class="text-[10px] md:text-xs text-slate-500">ระบบจะนำ <u>วันลารับเงิน</u> และ <u>วันหยุดของร้าน(ที่รับเงิน)</u> มาคิดเป็นวันทำงานให้อัตโนมัติ</p></div>
-                        <div class="flex flex-col md:flex-row gap-3 items-end bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                            <div class="w-full md:w-auto flex-1"><label class="block text-sm font-medium text-slate-700 mb-1">ตั้งแต่วันที่</label><input type="date" id="salaryStartDate" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 bg-white text-base"></div>
-                            <div class="w-full md:w-auto flex-1"><label class="block text-sm font-medium text-slate-700 mb-1">ถึงวันที่</label><input type="date" id="salaryEndDate" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 bg-white text-base"></div>
-                            <button onclick="calculateSalary()" class="w-full md:w-auto bg-slate-800 hover:bg-slate-700 text-white px-6 py-2.5 rounded-xl text-base font-medium shadow-lg shadow-slate-800/20 flex justify-center items-center gap-2 transition-transform active:scale-95"><i class="ph-bold ph-calculator"></i> คำนวณยอด</button>
-                        </div>
-                    </div>
-                    <div class="overflow-x-auto pb-2">
-                        <table class="w-full text-left border-collapse min-w-[900px]">
-                            <thead><tr class="bg-slate-50 text-slate-500 text-sm"><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap">ชื่อพนักงาน</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap text-center" title="วันที่สแกนนิ้วเข้างาน">มาทำงาน</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap text-center text-rose-600" title="ลาแบบได้รับค่าจ้าง">ลาได้เงิน</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap text-center text-purple-600" title="วันหยุดบริษัทที่ได้รับค่าจ้าง">วันหยุดร้าน</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap text-center">ชั่วโมงงาน / OT</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap text-right">ค่าแรงพื้นฐาน</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap text-right">ค่า OT</th><th class="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap text-right">รวมสุทธิ (บาท)</th></tr></thead>
-                            <tbody id="salaryTableBody" class="divide-y divide-slate-100 text-sm"><tr><td colspan="8" class="px-4 py-8 text-center text-slate-400 text-sm">กรุณาเลือกช่วงวันที่และกด "คำนวณยอด"</td></tr></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </main>
-
-    <!-- Mobile Bottom Navigation -->
-    <nav class="md:hidden fixed bottom-0 w-full bg-white/90 backdrop-blur-xl border-t border-slate-200 z-30 flex justify-around items-center pb-safe shadow-nav px-1">
-        <button onclick="switchView('dashboard')" id="mobile-nav-dashboard" class="mobile-nav-btn flex-1 py-3 flex flex-col items-center gap-1 text-brand-600"><i class="ph-fill ph-squares-four text-xl sm:text-2xl"></i><span class="text-[10px] font-medium">ลงเวลา</span></button>
-        <button onclick="switchView('employees')" id="mobile-nav-employees" class="mobile-nav-btn flex-1 py-3 flex flex-col items-center gap-1 text-slate-400"><i class="ph-fill ph-users text-xl sm:text-2xl"></i><span class="text-[10px] font-medium">พนักงาน</span></button>
-        <button onclick="switchView('leaves')" id="mobile-nav-leaves" class="mobile-nav-btn flex-1 py-3 flex flex-col items-center gap-1 text-slate-400"><i class="ph-fill ph-calendar-plus text-xl sm:text-2xl"></i><span class="text-[10px] font-medium">ลา/สลับ</span></button>
-        <button onclick="switchView('holidays')" id="mobile-nav-holidays" class="mobile-nav-btn flex-1 py-3 flex flex-col items-center gap-1 text-slate-400"><i class="ph-fill ph-calendar-star text-xl sm:text-2xl"></i><span class="text-[10px] font-medium">หยุดร้าน</span></button>
-        <button onclick="switchView('salary')" id="mobile-nav-salary" class="mobile-nav-btn flex-1 py-3 flex flex-col items-center gap-1 text-slate-400"><i class="ph-fill ph-calculator text-xl sm:text-2xl"></i><span class="text-[10px] font-medium">เงินเดือน</span></button>
-    </nav>
-
-    <!-- Modals Overlay -->
-    <div id="modalOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300"></div>
-
-    <!-- ================= MODAL: CLOCK ACTION ================= -->
-    <div id="actionModal" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm bg-white rounded-3xl shadow-2xl z-50 hidden opacity-0 scale-95 transition-all duration-300 overflow-hidden">
-        <div class="p-5 md:p-6 text-center relative">
-            <button onclick="closeModal('actionModal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-full p-1.5"><i class="ph-bold ph-x text-lg"></i></button>
-            <div class="w-16 h-16 md:w-20 md:h-20 mx-auto rounded-full bg-slate-100 border-4 border-white shadow-md flex items-center justify-center text-2xl md:text-3xl font-bold text-slate-400 mb-3" id="actionAvatar">A</div>
-            <h3 class="text-lg md:text-xl font-bold text-slate-800" id="actionName">ชื่อพนักงาน</h3>
-            <p class="text-slate-500 text-sm mb-5" id="actionPosition">ตำแหน่ง</p>
-            <div class="bg-slate-50 rounded-2xl p-3 md:p-4 mb-5"><p class="text-xs text-slate-500 mb-1">เวลาปัจจุบัน</p><p class="text-xl md:text-2xl font-bold text-brand-600 tabular-nums" id="actionClock">00:00:00</p></div>
-            <div class="flex gap-2 md:gap-3">
-                <button id="btnClockIn" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-2xl font-medium shadow-lg shadow-emerald-500/30 active:scale-95 flex items-center justify-center gap-1.5 text-base"><i class="ph-bold ph-sign-in text-lg"></i> เข้างาน</button>
-                <button id="btnClockOut" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white py-3 rounded-2xl font-medium shadow-lg shadow-amber-500/30 active:scale-95 flex items-center justify-center gap-1.5 text-base"><i class="ph-bold ph-sign-out text-lg"></i> ออกงาน</button>
-            </div>
+    <!-- Quick Action Modal -->
+    <div id="action-modal" class="fixed inset-0 bg-slate-900/40 z-50 hidden flex-col justify-end backdrop-blur-sm">
+        <div class="bg-white rounded-t-[32px] p-6 transform translate-y-full w-full max-w-[480px] mx-auto shadow-[0_-10px_40px_rgba(0,0,0,0.1)]" id="modal-content">
+            <!-- Content injected via JS -->
         </div>
     </div>
 
-    <!-- ================= MODAL: ADD/EDIT EMPLOYEE ================= -->
-    <div id="addEmployeeModal" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-lg bg-white rounded-3xl shadow-2xl z-50 hidden opacity-0 scale-95 transition-all duration-300 max-h-[85vh] overflow-y-auto">
-        <div class="p-5 md:p-6 pb-safe">
-            <div class="flex justify-between items-center mb-4 md:mb-6"><h3 class="text-lg md:text-xl font-bold text-slate-800" id="employeeModalTitle">เพิ่มพนักงานใหม่</h3><button onclick="closeModal('addEmployeeModal')" class="text-slate-400 hover:bg-slate-100 rounded-full p-1.5"><i class="ph-bold ph-x text-lg"></i></button></div>
-            <form id="addEmployeeForm" onsubmit="handleFormSubmit(event)">
-                <div class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4"><input type="text" id="empName" required class="w-full px-4 py-2.5 md:py-3 rounded-2xl border bg-slate-50 text-base" placeholder="ชื่อ-นามสกุล"><input type="text" id="empPosition" required class="w-full px-4 py-2.5 md:py-3 rounded-2xl border bg-slate-50 text-base" placeholder="ตำแหน่ง"></div>
-                    <div class="bg-slate-50 p-3 md:p-4 rounded-2xl border space-y-3"><h4 class="text-sm font-bold flex items-center gap-2"><i class="ph-fill ph-clock-user"></i> เวลาทำงาน & วันหยุด</h4><div class="grid grid-cols-2 gap-3"><input type="time" id="empStartTime" class="w-full px-3 py-2 md:py-2.5 rounded-xl border text-base"><input type="time" id="empEndTime" class="w-full px-3 py-2 md:py-2.5 rounded-xl border text-base"></div><select id="empDayOff" class="w-full px-3 py-2 md:py-2.5 rounded-xl border text-base appearance-none"><option value="">ไม่มีวันหยุดประจำสัปดาห์</option><option value="1">วันจันทร์</option><option value="2">วันอังคาร</option><option value="3">วันพุธ</option><option value="4">วันพฤหัสบดี</option><option value="5">วันศุกร์</option><option value="6">วันเสาร์</option><option value="0">วันอาทิตย์</option></select></div>
-                    <div class="bg-slate-50 p-3 md:p-4 rounded-2xl border space-y-3"><h4 class="text-sm font-bold flex items-center gap-2"><i class="ph-fill ph-money"></i> ผลตอบแทน</h4><div class="grid grid-cols-2 gap-3"><input type="number" id="empWeeklySalary" min="0" class="w-full px-3 py-2 md:py-2.5 rounded-xl border text-base" placeholder="เงินเดือนรายสัปดาห์"><input type="number" id="empOtRate" min="0" class="w-full px-3 py-2 md:py-2.5 rounded-xl border text-base" placeholder="เรท OT / ชั่วโมง"></div></div>
-                </div>
-                <div class="mt-6 md:mt-8 flex gap-2 md:gap-3"><button type="button" onclick="closeModal('addEmployeeModal')" class="flex-1 py-2.5 md:py-3 rounded-2xl bg-slate-100 text-base font-medium">ยกเลิก</button><button type="submit" id="saveEmpBtn" class="flex-1 py-2.5 md:py-3 rounded-2xl bg-slate-800 text-white text-base font-medium shadow-lg">บันทึกข้อมูล</button></div>
-            </form>
-        </div>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="pt-8 pb-4 px-6 sticky top-0 bg-[var(--bg-color)]/90 backdrop-blur-md z-30 flex justify-between items-end">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800" id="header-title">หน้าแรก</h1>
+                <p class="text-sm text-slate-500" id="header-subtitle">บันทึกเวลาและจัดการงาน</p>
+            </div>
+            <div id="header-user-action" class="hidden">
+                <button onclick="clearEmployee()" class="text-sm font-semibold text-red-500 bg-red-50 px-3 py-1.5 rounded-full hover:bg-red-100 transition">
+                    <i class="fa-solid fa-right-from-bracket mr-1"></i> เปลี่ยนคน
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="px-6" id="main-content">
+            <!-- Content injected here -->
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="nav-item active" data-tab="home" onclick="switchTab('home')">
+                <i class="fa-solid fa-house"></i>
+                <span>หน้าแรก</span>
+            </div>
+            <div class="nav-item" data-tab="salary" onclick="switchTab('salary')">
+                <i class="fa-solid fa-wallet"></i>
+                <span>เงินเดือน</span>
+            </div>
+            <div class="nav-item" data-tab="settings" onclick="switchTab('settings')">
+                <i class="fa-solid fa-gear"></i>
+                <span>ตั้งค่า</span>
+            </div>
+        </nav>
     </div>
 
-    <!-- ================= MODAL: ADD PAST LOG ================= -->
-    <div id="addPastLogModal" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm bg-white rounded-3xl shadow-2xl z-50 hidden opacity-0 scale-95 transition-all duration-300">
-        <div class="p-5 md:p-6 pb-safe">
-            <div class="flex justify-between items-center mb-4 md:mb-6"><h3 class="text-lg font-bold">เพิ่มประวัติย้อนหลัง</h3><button onclick="closeModal('addPastLogModal')" class="p-1.5"><i class="ph-bold ph-x text-lg"></i></button></div>
-            <form id="addPastLogForm" onsubmit="handleAddPastLogSubmit(event)">
-                <div class="space-y-4">
-                    <select id="pastLogEmployee" required class="w-full px-4 py-2.5 rounded-2xl border bg-slate-50 text-base appearance-none"></select>
-                    <div class="flex gap-2"><label class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border cursor-pointer has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50 text-base"><input type="radio" name="pastLogAction" value="in" required class="hidden"><i class="ph-bold ph-sign-in"></i> เข้างาน</label><label class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border cursor-pointer has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 text-base"><input type="radio" name="pastLogAction" value="out" required class="hidden"><i class="ph-bold ph-sign-out"></i> ออกงาน</label></div>
-                    <div class="grid grid-cols-2 gap-3"><input type="date" id="pastLogDate" required class="w-full px-3 py-2.5 rounded-xl border text-base"><input type="time" id="pastLogTime" required class="w-full px-3 py-2.5 rounded-xl border text-base"></div>
-                </div>
-                <div class="mt-6 flex gap-2"><button type="button" onclick="closeModal('addPastLogModal')" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-base">ยกเลิก</button><button type="submit" id="savePastLogBtn" class="flex-1 py-2.5 rounded-xl bg-brand-600 text-white text-base">บันทึก</button></div>
-            </form>
-        </div>
-    </div>
-    
-    <!-- ================= MODAL: EDIT LOG ================= -->
-    <div id="editLogModal" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm bg-white rounded-3xl shadow-2xl z-50 hidden opacity-0 scale-95 transition-all duration-300">
-        <div class="p-5 md:p-6 pb-safe">
-            <div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold">แก้ไขเวลาลงงาน</h3><button onclick="closeModal('editLogModal')" class="p-1.5"><i class="ph-bold ph-x text-lg"></i></button></div>
-            <form id="editLogForm" onsubmit="handleEditLogSubmit(event)">
-                <div class="space-y-4"><input type="date" id="editLogDate" required class="w-full px-4 py-2.5 rounded-2xl border text-base"><input type="time" id="editLogTime" required class="w-full px-4 py-2.5 rounded-2xl border text-base"></div>
-                <div class="mt-6 flex gap-2"><button type="button" onclick="closeModal('editLogModal')" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-base">ยกเลิก</button><button type="submit" id="saveLogBtn" class="flex-1 py-2.5 rounded-xl bg-brand-600 text-white text-base">บันทึก</button></div>
-            </form>
-        </div>
-    </div>
-
-    <!-- ================= MODAL: ADD LEAVE ================= -->
-    <div id="addLeaveModal" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm bg-white rounded-3xl shadow-2xl z-50 hidden opacity-0 scale-95 transition-all duration-300">
-        <div class="p-5 md:p-6 pb-safe">
-            <div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold text-slate-800">บันทึกการลางาน</h3><button onclick="closeModal('addLeaveModal')" class="p-1.5"><i class="ph-bold ph-x text-lg"></i></button></div>
-            <form id="addLeaveForm" onsubmit="handleLeaveSubmit(event)">
-                <div class="space-y-4">
-                    <div><label class="text-sm text-slate-500 mb-1 block">พนักงาน</label><select id="leaveEmployee" required class="w-full px-4 py-2.5 rounded-xl border bg-slate-50 text-base appearance-none"></select></div>
-                    <div><label class="text-sm text-slate-500 mb-1 block">วันที่ลา</label><input type="date" id="leaveDate" required class="w-full px-4 py-2.5 rounded-xl border bg-slate-50 text-base"></div>
-                    <div><label class="text-sm text-slate-500 mb-1 block">ประเภท</label><select id="leaveType" required class="w-full px-4 py-2.5 rounded-xl border bg-slate-50 text-base appearance-none"><option value="sick">ลาป่วย</option><option value="personal">ลากิจ</option><option value="vacation">ลาพักร้อน</option></select></div>
-                    <div class="bg-rose-50 p-3 rounded-xl border flex justify-between items-center">
-                        <div><p class="text-base font-semibold text-rose-800">ได้เงินเดือน?</p><p class="text-[10px] text-rose-600">บวกค่าแรงวันนี้ให้ตอนคำนวณ</p></div>
-                        <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="leaveIsPaid" class="sr-only peer" checked><div class="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:bg-emerald-500 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div></label>
-                    </div>
-                </div>
-                <div class="mt-6 flex gap-2"><button type="button" onclick="closeModal('addLeaveModal')" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-base">ยกเลิก</button><button type="submit" id="saveLeaveBtn" class="flex-1 py-2.5 rounded-xl bg-rose-600 text-white text-base">บันทึกวันลา</button></div>
-            </form>
-        </div>
-    </div>
-
-    <!-- ================= MODAL: ADD SWAP ================= -->
-    <div id="addSwapModal" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm bg-white rounded-3xl shadow-2xl z-50 hidden opacity-0 scale-95 transition-all duration-300">
-        <div class="p-5 md:p-6 pb-safe">
-            <div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold">สลับวันหยุด</h3><button onclick="closeModal('addSwapModal')" class="p-1.5"><i class="ph-bold ph-x text-lg"></i></button></div>
-            <form id="addSwapForm" onsubmit="handleSwapSubmit(event)">
-                <div class="space-y-4">
-                    <select id="swapEmployee" required class="w-full px-4 py-2.5 rounded-xl border bg-slate-50 text-base appearance-none"></select>
-                    <div><label class="text-sm text-slate-500 mb-1 block">วันหยุดเดิม (วันที่ต้องมาทำงานแทน)</label><input type="date" id="swapOriginalDate" required class="w-full px-4 py-2.5 rounded-xl border text-base"></div>
-                    <div class="text-center text-slate-300"><i class="ph-bold ph-arrow-down"></i></div>
-                    <div><label class="text-sm text-slate-500 mb-1 block">วันหยุดใหม่ (วันที่ขอหยุดงาน)</label><input type="date" id="swapNewDate" required class="w-full px-4 py-2.5 rounded-xl border text-base"></div>
-                </div>
-                <div class="mt-6 flex gap-2"><button type="button" onclick="closeModal('addSwapModal')" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-base">ยกเลิก</button><button type="submit" id="saveSwapBtn" class="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white text-base">บันทึกสลับวัน</button></div>
-            </form>
-        </div>
-    </div>
-
-    <!-- ================= MODAL: ADD/EDIT HOLIDAY ================= -->
-    <div id="addHolidayModal" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm bg-white rounded-3xl shadow-2xl z-50 hidden opacity-0 scale-95 transition-all duration-300">
-        <div class="p-5 md:p-6 pb-safe">
-            <div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold" id="holidayModalTitle">เพิ่มวันหยุดร้าน</h3><button onclick="closeModal('addHolidayModal')" class="p-1.5"><i class="ph-bold ph-x text-lg"></i></button></div>
-            <form id="addHolidayForm" onsubmit="handleHolidaySubmit(event)">
-                <div class="space-y-4">
-                    <div><label class="text-sm text-slate-500 mb-1 block">วันที่หยุดร้าน</label><input type="date" id="holidayDate" required class="w-full px-4 py-2.5 rounded-xl border text-base"></div>
-                    <div><label class="text-sm text-slate-500 mb-1 block">ชื่อเทศกาล / เหตุผล</label><input type="text" id="holidayName" required class="w-full px-4 py-2.5 rounded-xl border text-base" placeholder="เช่น วันขึ้นปีใหม่"></div>
-                    <div class="bg-purple-50 p-3 rounded-xl border flex justify-between items-center">
-                        <div><p class="text-base font-semibold text-purple-800">จ่ายค่าจ้างปกติ?</p><p class="text-[10px] text-purple-600">พนักงานจะได้ค่าแรงแม้หยุด</p></div>
-                        <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="holidayIsPaid" class="sr-only peer" checked><div class="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:bg-emerald-500 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div></label>
-                    </div>
-                </div>
-                <div class="mt-6 flex gap-2"><button type="button" onclick="closeModal('addHolidayModal')" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-base">ยกเลิก</button><button type="submit" id="saveHolidayBtn" class="flex-1 py-2.5 rounded-xl bg-purple-600 text-white text-base">บันทึก</button></div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Toast Notification Container -->
-    <div id="toastContainer" class="fixed bottom-24 md:bottom-6 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none w-[90%] md:w-auto items-center"></div>
-
-    <!-- Firebase Scripts -->
+    <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, getDoc, Timestamp, serverTimestamp, query, where, getDocs, writeBatch, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // === FIREBASE CONFIGURATION ===
         const firebaseConfig = {
             apiKey: "AIzaSyBHuZGyY1F3v4rCrhrpt9YB90C0Ahh-stE",
             authDomain: "my-company-time-tracking.firebaseapp.com",
@@ -396,722 +212,462 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- GLOBAL STATE ---
-        let currentUser = null;
-        let employeesData = [];
-        let logsData = [];
-        let leavesData = [];
-        let swapsData = [];
-        let holidaysData = [];
-        let selectedEmployee = null;
-        let editingEmployeeId = null;
-        let editingLogId = null;
-        let editingHolidayId = null; 
-
-        // --- UTILITY FUNCTIONS ---
-        window.showToast = function(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            const bgColor = type === 'success' ? 'bg-emerald-500' : 'bg-red-500';
-            const icon = type === 'success' ? 'ph-check-circle' : 'ph-warning-circle';
-            toast.className = `${bgColor} text-white px-4 py-2.5 md:px-6 md:py-3 rounded-2xl shadow-lg flex items-center justify-center gap-2 transform translate-y-10 opacity-0 transition-all duration-300 w-full md:w-max text-base`;
-            toast.innerHTML = `<i class="ph-bold ${icon} text-lg"></i><span class="font-medium">${message}</span>`;
-            container.appendChild(toast);
-            requestAnimationFrame(() => toast.classList.remove('translate-y-10', 'opacity-0'));
-            setTimeout(() => { toast.classList.add('translate-y-10', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 3000);
+        // State Management - Uses LocalStorage for seamless flow
+        const state = {
+            employees: [],
+            settings: { otRatePerHour: 50 },
+            logs: [],
+            currentTab: 'home',
+            selectedEmployeeId: localStorage.getItem('trackedEmpId') || '',
         };
 
-        const formatDateStr = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-        const formatThaiDate = (dateString) => { const d = new Date(dateString); return isNaN(d) ? dateString : d.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }); };
+        window.showToast = (message, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast border-l-4 ${type === 'error' ? 'border-red-500' : 'border-indigo-500'}`;
+            toast.innerHTML = `<i class="${type === 'error' ? 'fa-solid fa-circle-exclamation text-red-500' : 'fa-solid fa-circle-check text-indigo-500'}"></i> <span class="text-sm font-medium text-slate-700">${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0'; toast.style.transform = 'translateY(-20px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        };
 
-        // --- AUTHENTICATION ---
-        async function initAuth() {
-            try { await signInAnonymously(auth); } 
-            catch (error) { 
-                showToast("เชื่อมต่อระบบล้มเหลว", "error"); 
-                document.getElementById('connectionStatusDesktop').innerHTML = '<span class="text-red-500">เชื่อมต่อล้มเหลว</span>'; 
-            }
-        }
+        const hideLoading = () => document.getElementById('loading-overlay').classList.add('hidden');
+        const showLoading = () => document.getElementById('loading-overlay').classList.remove('hidden');
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                document.getElementById('connectionStatusDesktop').innerHTML = '<span class="flex items-center gap-1 text-emerald-600"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> เชื่อมต่อแล้ว</span>';
-                setupRealtimeListeners();
-            }
-        });
-
-        // --- FIRESTORE LISTENERS ---
-        function setupRealtimeListeners() {
-            if (!currentUser) return;
-
-            onSnapshot(collection(db, 'employees'), (snapshot) => {
-                employeesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => a.name.localeCompare(b.name, 'th'));
-                renderDashboard(); renderEmployeeTable(); populateAllSelects();
+        // Init Listeners
+        const initDataListeners = () => {
+            onSnapshot(collection(db, "employees"), (snapshot) => {
+                state.employees = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                // Cleanup invalid localStorage
+                if (state.selectedEmployeeId && !state.employees.find(e => e.id === state.selectedEmployeeId)) {
+                    state.selectedEmployeeId = '';
+                    localStorage.removeItem('trackedEmpId');
+                }
+                renderCurrentTab();
             });
 
-            onSnapshot(collection(db, 'time_logs'), (snapshot) => {
-                logsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => (b.timestamp?.toMillis() || 0) - (a.timestamp?.toMillis() || 0));
-                renderLogsTable();
+            onSnapshot(collection(db, "settings"), (snapshot) => {
+                if (!snapshot.empty) state.settings = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
             });
 
-            onSnapshot(collection(db, 'leave_records'), (snapshot) => {
-                leavesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => new Date(b.date) - new Date(a.date));
-                renderLeavesTable(); renderDashboard();
+            onSnapshot(collection(db, "time_logs"), (snapshot) => {
+                state.logs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderCurrentTab();
             });
+        };
 
-            onSnapshot(collection(db, 'day_off_swaps'), (snapshot) => {
-                swapsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
-                renderSwapsTable(); renderDashboard();
-            });
+        signInAnonymously(auth).then(() => {
+            initDataListeners();
+            hideLoading();
+            startClock();
+        }).catch(() => { showToast("เชื่อมต่อฐานข้อมูลล้มเหลว", "error"); hideLoading(); });
 
-            onSnapshot(collection(db, 'company_holidays'), (snapshot) => {
-                holidaysData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => new Date(b.date) - new Date(a.date));
-                renderHolidaysTable(); renderDashboard();
-            });
-        }
+        // --- Core UI Logic ---
 
-        function populateAllSelects() {
-            const selects = ['pastLogEmployee', 'leaveEmployee', 'swapEmployee'];
-            selects.forEach(id => {
-                const el = document.getElementById(id);
-                if(!el) return;
-                const currentVal = el.value;
-                el.innerHTML = '<option value="">-- เลือกพนักงาน --</option>';
-                employeesData.forEach(emp => { const opt = document.createElement('option'); opt.value = emp.id; opt.textContent = emp.name; el.appendChild(opt); });
-                el.value = currentVal;
-            });
-        }
+        window.switchTab = (tab) => {
+            state.currentTab = tab;
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.querySelector(`.nav-item[data-tab="${tab}"]`).classList.add('active');
+            
+            const titles = {
+                home: { title: "หน้าแรก", sub: "บันทึกเวลาและจัดการงาน" },
+                salary: { title: "เงินเดือน", sub: "สรุปรายได้ของคุณ" },
+                settings: { title: "ตั้งค่าระบบ", sub: "จัดการข้อมูลร้านและพนักงาน" }
+            };
+            document.getElementById('header-title').innerText = titles[tab].title;
+            document.getElementById('header-subtitle').innerText = titles[tab].sub;
 
-        // --- RENDER FUNCTIONS ---
-        function renderDashboard() {
-            const container = document.getElementById('employeeGrid');
-            if (employeesData.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 bg-white rounded-3xl border border-slate-100 border-dashed"><div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">👻</div><p class="font-medium text-slate-600">ไม่มีพนักงานในระบบ</p></div>`;
+            // Show/Hide "Switch User" button only on home tab if user is selected
+            const headerAction = document.getElementById('header-user-action');
+            if (tab === 'home' && state.selectedEmployeeId) headerAction.classList.remove('hidden');
+            else headerAction.classList.add('hidden');
+
+            renderCurrentTab();
+        };
+
+        const renderCurrentTab = () => {
+            if (state.employees.length === 0 && state.currentTab !== 'settings') {
+                document.getElementById('main-content').innerHTML = `<div class="text-center mt-10 text-slate-400"><i class="fa-solid fa-users-slash text-4xl mb-3"></i><p>ยังไม่มีข้อมูลพนักงาน<br>กรุณาเพิ่มพนักงานในหน้าตั้งค่า</p></div>`;
                 return;
             }
 
-            const today = new Date(); const todayStr = formatDateStr(today);
-            const todayHoliday = holidaysData.find(h => h.date === todayStr);
-            
-            const alertDiv = document.getElementById('todayHolidayAlert');
-            if (todayHoliday) { alertDiv.classList.remove('hidden'); document.getElementById('todayHolidayName').innerText = todayHoliday.name; } 
-            else { alertDiv.classList.add('hidden'); }
+            const main = document.getElementById('main-content');
+            switch(state.currentTab) {
+                case 'home': main.innerHTML = renderHome(); break;
+                case 'salary': main.innerHTML = renderSalary(); break;
+                case 'settings': main.innerHTML = renderSettings(); break;
+            }
+        };
 
-            let html = ''; let inCount = 0; let outCount = 0; let leaveCount = 0;
+        // --- View 1 & 2: Home (Select Profile & Dashboard) ---
+        const renderHome = () => {
+            const headerAction = document.getElementById('header-user-action');
 
-            employeesData.forEach(emp => {
-                const isWorking = emp.status === 'in';
-                let specialStatusHTML = ''; let isAbsence = false;
-
-                if (!isWorking) {
-                    const todayLeave = leavesData.find(l => l.employeeId === emp.id && l.date === todayStr);
-                    const todayDayOfWeek = today.getDay().toString();
-                    let isRegularDayOff = emp.dayOff === todayDayOfWeek;
-                    
-                    const swapToWork = swapsData.find(s => s.employeeId === emp.id && s.originalDate === todayStr);
-                    const swapToOff = swapsData.find(s => s.employeeId === emp.id && s.newDate === todayStr);
-                    
-                    if (swapToWork) isRegularDayOff = false;
-                    if (swapToOff) isRegularDayOff = true;
-
-                    if (todayLeave) {
-                        isAbsence = true; const tMap = {'sick':'ลาป่วย','personal':'ลากิจ','vacation':'ลาพักร้อน'};
-                        specialStatusHTML = `<i class="ph-fill ph-bed text-rose-500"></i> <span class="text-rose-600 font-medium">${tMap[todayLeave.type]}</span>`;
-                    } else if (todayHoliday) {
-                        isAbsence = true; specialStatusHTML = `<i class="ph-fill ph-calendar-star text-purple-500"></i> <span class="text-purple-600 font-medium">วันหยุดร้าน</span>`;
-                    } else if (isRegularDayOff) {
-                        isAbsence = true; specialStatusHTML = `<i class="ph-fill ph-calendar text-indigo-500"></i> <span class="text-indigo-600 font-medium">วันหยุดประจำ</span>`;
-                    }
-                }
-
-                if(isWorking) inCount++; else if (isAbsence) leaveCount++; else outCount++;
-
-                const initials = emp.name.substring(0, 1);
-                let cardClass = "bg-white border-slate-100 shadow-soft";
-                let statusDot = '<span class="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-slate-300"></span>';
-                let avatarClass = "bg-slate-100 text-slate-500";
-                let statusText = `<i class="ph-fill ph-house text-slate-400"></i> <span class="text-slate-500">ออกงานแล้ว</span>`;
-
-                if (isWorking) {
-                    cardClass = "bg-white border-brand-200 shadow-lg ring-1 ring-brand-100";
-                    statusDot = '<span class="absolute top-3 right-3 w-3 h-3 rounded-full bg-emerald-500 ring-4 ring-emerald-50 animate-pulse"></span>';
-                    avatarClass = "bg-gradient-to-br from-brand-400 to-brand-600 text-white shadow-md shadow-brand-500/30";
-                    statusText = `<i class="ph-fill ph-briefcase text-emerald-500"></i> <span class="text-emerald-600 font-bold">กำลังทำงาน</span>`;
-                } else if (isAbsence) {
-                    cardClass = specialStatusHTML.includes('rose') ? "bg-rose-50/50 border-rose-100" : specialStatusHTML.includes('purple') ? "bg-purple-50/50 border-purple-100" : "bg-indigo-50/50 border-indigo-100";
-                    avatarClass = specialStatusHTML.includes('rose') ? "bg-rose-100 text-rose-500" : specialStatusHTML.includes('purple') ? "bg-purple-100 text-purple-500" : "bg-indigo-100 text-indigo-500";
-                    statusDot = `<span class="absolute top-3 right-3 w-2.5 h-2.5 rounded-full ${specialStatusHTML.includes('rose')?'bg-rose-400':specialStatusHTML.includes('purple')?'bg-purple-400':'bg-indigo-400'}"></span>`;
-                    statusText = specialStatusHTML;
-                }
-
-                html += `
-                    <div onclick="openActionModal('${emp.id}')" class="${cardClass} rounded-2xl md:rounded-3xl p-4 md:p-5 cursor-pointer transition-all duration-300 transform hover:-translate-y-1 relative group">
-                        ${statusDot}
-                        <div class="w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl ${avatarClass} flex items-center justify-center text-xl md:text-2xl font-bold mb-3 mx-auto md:mx-0 transition-transform group-hover:scale-105">${initials}</div>
-                        <div class="text-center md:text-left">
-                            <h3 class="font-bold text-slate-800 text-sm md:text-base truncate">${emp.name}</h3>
-                            <p class="text-[10px] md:text-xs text-slate-500 truncate mt-0.5">${emp.position}</p>
-                            <div class="mt-3 flex items-center justify-center md:justify-start gap-1.5 text-[10px] md:text-xs">${statusText}</div>
-                        </div>
-                    </div>`;
-            });
-            
-            container.innerHTML = html; 
-            document.getElementById('countIn').innerText = inCount; document.getElementById('countOut').innerText = outCount; document.getElementById('countLeave').innerText = leaveCount;
-        }
-
-        function renderEmployeeTable() {
-            const tbody = document.getElementById('employeeTableBody'); let html = '';
-            
-            const today = new Date(); const todayStr = formatDateStr(today);
-            const todayHoliday = holidaysData.find(h => h.date === todayStr);
-
-            employeesData.forEach(emp => {
-                const isWorking = emp.status === 'in';
-                let sBadge = '';
-
-                if (isWorking) {
-                    sBadge = '<span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[10px] md:text-xs font-medium border border-emerald-100">ทำงาน</span>';
-                } else {
-                    const todayLeave = leavesData.find(l => l.employeeId === emp.id && l.date === todayStr);
-                    const todayDayOfWeek = today.getDay().toString();
-                    let isRegularDayOff = emp.dayOff === todayDayOfWeek;
-                    
-                    const swapToWork = swapsData.find(s => s.employeeId === emp.id && s.originalDate === todayStr);
-                    const swapToOff = swapsData.find(s => s.employeeId === emp.id && s.newDate === todayStr);
-                    
-                    if (swapToWork) isRegularDayOff = false;
-                    if (swapToOff) isRegularDayOff = true;
-
-                    if (todayLeave) {
-                        const tMap = {'sick':'ลาป่วย','personal':'ลากิจ','vacation':'ลาพักร้อน'};
-                        sBadge = `<span class="px-2.5 py-1 rounded-full bg-rose-50 text-rose-600 text-[10px] md:text-xs font-medium border border-rose-100">${tMap[todayLeave.type]}</span>`;
-                    } else if (todayHoliday) {
-                        sBadge = `<span class="px-2.5 py-1 rounded-full bg-purple-50 text-purple-600 text-[10px] md:text-xs font-medium border border-purple-100">วันหยุดร้าน</span>`;
-                    } else if (isRegularDayOff) {
-                        sBadge = `<span class="px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-600 text-[10px] md:text-xs font-medium border border-indigo-100">วันหยุดประจำ</span>`;
-                    } else {
-                        sBadge = '<span class="px-2.5 py-1 rounded-full bg-slate-50 text-slate-500 text-[10px] md:text-xs font-medium border border-slate-200">ออกงาน</span>';
-                    }
-                }
-
-                const wt = (emp.workStartTime && emp.workEndTime) ? `${emp.workStartTime}-${emp.workEndTime}` : 'ไม่ได้ตั้งเวลา';
-                html += `
-                    <tr class="hover:bg-slate-50 border-b border-slate-50 md:border-none group">
-                        <td class="px-4 py-3 md:py-4 whitespace-nowrap"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex justify-center items-center font-bold text-xs shrink-0">${emp.name.substring(0,1)}</div><div><p class="font-medium text-slate-800 text-xs md:text-sm">${emp.name}</p><p class="text-[10px] text-slate-400 mt-0.5"><i class="ph-fill ph-clock"></i> ${wt}</p></div></div></td>
-                        <td class="px-4 py-3 md:py-4 text-xs md:text-sm text-slate-600 whitespace-nowrap">${emp.position}</td>
-                        <td class="px-4 py-3 md:py-4 whitespace-nowrap">${sBadge}</td>
-                        <td class="px-4 py-3 md:py-4 text-right whitespace-nowrap"><button onclick="editEmployee('${emp.id}')" class="text-slate-400 hover:text-brand-600 p-2 rounded-lg opacity-100 md:opacity-0 md:group-hover:opacity-100"><i class="ph-bold ph-pencil-simple text-base"></i></button><button onclick="deleteEmployee('${emp.id}')" class="text-slate-400 hover:text-red-500 p-2 rounded-lg opacity-100 md:opacity-0 md:group-hover:opacity-100"><i class="ph-bold ph-trash text-base"></i></button></td>
-                    </tr>`;
-            });
-            tbody.innerHTML = html || `<tr><td colspan="4" class="py-8 text-center text-slate-400 text-sm">ไม่มีข้อมูล</td></tr>`;
-        }
-
-        function renderLogsTable() {
-            const tbody = document.getElementById('logsTableBody'); let html = '';
-            
-            // จัดกลุ่มข้อมูลประวัติ (เข้าและออก) ให้อยู่ในแถวเดียวกันตามวันที่และพนักงาน
-            const groupedLogs = {};
-            logsData.forEach(log => {
-                if (!log.timestamp) return;
-                const d = log.timestamp.toDate();
-                const dateStr = d.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
-                const key = `${dateStr}_${log.employeeId}`;
-
-                if (!groupedLogs[key]) {
-                    groupedLogs[key] = {
-                        dateStr: dateStr,
-                        rawDate: new Date(d.getFullYear(), d.getMonth(), d.getDate()), // สำหรับเรียงลำดับ
-                        employeeName: log.employeeName,
-                        employeeId: log.employeeId,
-                        inLog: null,
-                        outLog: null,
-                        allIds: []
-                    };
-                }
-
-                // เก็บ ID ทั้งหมดในกลุ่ม เผื่อใช้สำหรับลบข้อมูลของวันนั้นๆ
-                groupedLogs[key].allIds.push(log.id);
-
-                // ค้นหาเวลาเข้าที่ "เช้าที่สุด" และ เวลาออกที่ "ดึกที่สุด" ของวัน
-                if (log.action === 'in') {
-                    if (!groupedLogs[key].inLog || d < groupedLogs[key].inLog.timestamp.toDate()) {
-                        groupedLogs[key].inLog = log;
-                    }
-                } else if (log.action === 'out') {
-                    if (!groupedLogs[key].outLog || d > groupedLogs[key].outLog.timestamp.toDate()) {
-                        groupedLogs[key].outLog = log;
-                    }
-                }
-            });
-
-            // แปลง Object เป็น Array แล้วเรียงวันที่ล่าสุดขึ้นก่อน
-            const displayLogs = Object.values(groupedLogs).sort((a, b) => b.rawDate - a.rawDate);
-
-            displayLogs.slice(0, 50).forEach(group => {
-                const inTime = group.inLog ? group.inLog.timestamp.toDate().toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}) : '-';
-                const outTime = group.outLog ? group.outLog.timestamp.toDate().toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}) : '-';
-                
-                // คำนวณเวลาทำงานรวม
-                let durationHtml = '';
-                if (group.inLog && group.outLog) {
-                    const diffMins = Math.floor((group.outLog.timestamp.toDate() - group.inLog.timestamp.toDate()) / 60000);
-                    if (diffMins > 0) {
-                        const hrs = Math.floor(diffMins / 60);
-                        const mins = diffMins % 60;
-                        durationHtml = `<div class="text-[10px] text-slate-500 mt-0.5 font-medium bg-slate-100 px-2 py-0.5 rounded-md w-fit"><i class="ph-fill ph-clock text-brand-500"></i> ทำงาน ${hrs} ชม. ${mins} นาที</div>`;
-                    }
-                }
-
-                // สร้างบล็อกของเวลาเข้า (พร้อมปุ่มแก้ไขเวลาเข้านั้นๆ)
-                let inHtml = '<span class="text-slate-300">-</span>';
-                if (group.inLog) {
-                    inHtml = `
-                    <div class="flex items-center gap-2">
-                        <span class="text-emerald-600 font-semibold bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100">${inTime} น.</span>
-                        <button onclick="editLogTime('${group.inLog.id}')" class="text-slate-400 hover:text-emerald-600 transition-colors p-1" title="แก้ไขเวลาเข้า"><i class="ph-bold ph-pencil-simple text-base"></i></button>
-                    </div>`;
-                }
-
-                // สร้างบล็อกของเวลาออก (พร้อมปุ่มแก้ไขเวลาออกนั้นๆ)
-                let outHtml = '<span class="text-slate-300">-</span>';
-                if (group.outLog) {
-                    outHtml = `
-                    <div class="flex items-center gap-2">
-                        <span class="text-amber-600 font-semibold bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-100">${outTime} น.</span>
-                        <button onclick="editLogTime('${group.outLog.id}')" class="text-slate-400 hover:text-amber-600 transition-colors p-1" title="แก้ไขเวลาออก"><i class="ph-bold ph-pencil-simple text-base"></i></button>
-                    </div>`;
-                }
-
-                const initials = group.employeeName.substring(0,1);
-                const idsJoined = group.allIds.join(',');
-
-                html += `
-                    <tr class="hover:bg-slate-50 border-b border-slate-50 md:border-none group transition-colors">
-                        <td class="px-4 md:px-6 py-3 md:py-4 text-slate-600 font-medium text-xs md:text-sm whitespace-nowrap">${group.dateStr}</td>
-                        <td class="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex justify-center items-center font-bold text-xs shrink-0 shadow-inner">${initials}</div>
-                                <div class="flex flex-col gap-0.5">
-                                    <span class="font-medium text-slate-800 text-xs md:text-sm">${group.employeeName}</span>
-                                    ${durationHtml}
+            // 1. If No User Selected -> Show Profile Grid
+            if (!state.selectedEmployeeId) {
+                headerAction.classList.add('hidden');
+                return `
+                    <div class="mb-4">
+                        <h3 class="text-lg font-bold text-slate-700 mb-1">เลือกโปรไฟล์เพื่อเข้างาน</h3>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        ${state.employees.map(emp => `
+                            <div class="bg-white rounded-2xl p-4 text-center shadow-[0_5px_15px_rgba(0,0,0,0.03)] profile-card" onclick="selectEmployee('${emp.id}')">
+                                <div class="w-14 h-14 bg-indigo-50 text-indigo-500 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
+                                    <i class="fa-solid fa-user"></i>
                                 </div>
+                                <div class="font-bold text-slate-800">${emp.name}</div>
+                                <div class="text-xs text-slate-400 mt-1">${emp.role}</div>
                             </div>
-                        </td>
-                        <td class="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">${inHtml}</td>
-                        <td class="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">${outHtml}</td>
-                        <td class="px-4 md:px-6 py-3 md:py-4 text-right whitespace-nowrap">
-                            <button onclick="deleteDailyLogs('${idsJoined}')" class="text-slate-400 hover:text-red-500 p-2 rounded-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all" title="ลบประวัติของวันนี้"><i class="ph-bold ph-trash text-base"></i></button>
-                        </td>
-                    </tr>`;
-            });
-            
-            tbody.innerHTML = html || `<tr><td colspan="5" class="py-8 text-center text-slate-400 text-sm">ไม่มีประวัติการลงเวลา</td></tr>`;
-        }
+                        `).join('')}
+                    </div>
+                `;
+            }
 
-        function renderLeavesTable() {
-            const tbody = document.getElementById('leavesTableBody'); let html = '';
-            const tMap = { 'sick': 'ลาป่วย', 'personal': 'ลากิจ', 'vacation': 'ลาพักร้อน' };
-            const cMap = { 'sick': 'text-amber-600 bg-amber-50 border-amber-100', 'personal': 'text-blue-600 bg-blue-50 border-blue-100', 'vacation': 'text-purple-600 bg-purple-50 border-purple-100' };
-            leavesData.forEach(l => {
-                const pBadge = l.isPaid ? '<span class="text-emerald-600 flex items-center gap-1 text-[10px] md:text-xs font-medium"><i class="ph-fill ph-check-circle"></i> ได้เงิน</span>' : '<span class="text-slate-400 flex items-center gap-1 text-[10px] md:text-xs font-medium"><i class="ph-fill ph-x-circle"></i> ไม่ได้</span>';
-                html += `<tr class="hover:bg-slate-50 border-b border-slate-50 md:border-none group"><td class="px-4 py-3 text-slate-800 text-[10px] md:text-sm font-medium whitespace-nowrap">${formatThaiDate(l.date)}</td><td class="px-4 py-3 font-medium text-slate-600 text-xs md:text-sm whitespace-nowrap">${l.employeeName}</td><td class="px-4 py-3 whitespace-nowrap"><span class="px-2 py-0.5 rounded-full border text-[10px] font-medium ${cMap[l.type]}">${tMap[l.type]}</span></td><td class="px-4 py-3 whitespace-nowrap">${pBadge}</td><td class="px-4 py-3 text-right"><button onclick="deleteRecord('leave_records', '${l.id}')" class="text-slate-400 hover:text-red-500 p-2"><i class="ph-bold ph-trash text-base"></i></button></td></tr>`;
-            });
-            tbody.innerHTML = html || `<tr><td colspan="5" class="py-8 text-center text-slate-400 text-sm">ไม่มีประวัติการลา</td></tr>`;
-        }
+            // 2. If User Selected -> Show Dashboard (Clock in/out + Quick Actions)
+            headerAction.classList.remove('hidden');
+            const emp = state.employees.find(e => e.id === state.selectedEmployeeId);
+            const todayStr = new Date().toISOString().split('T')[0];
+            const todayLog = state.logs.find(l => l.empId === state.selectedEmployeeId && l.date === todayStr && l.type === 'attendance');
 
-        function renderSwapsTable() {
-            const tbody = document.getElementById('swapsTableBody'); let html = '';
-            swapsData.forEach(s => {
-                html += `<tr class="hover:bg-slate-50 border-b border-slate-50 md:border-none group"><td class="px-4 py-3 font-medium text-slate-800 text-xs md:text-sm whitespace-nowrap">${s.employeeName}</td><td class="px-4 py-3 text-slate-500 text-[10px] md:text-sm whitespace-nowrap"><i class="ph-fill ph-briefcase text-brand-500"></i> ${formatThaiDate(s.originalDate)}</td><td class="px-4 py-3 text-slate-500 text-[10px] md:text-sm whitespace-nowrap"><i class="ph-fill ph-house text-rose-500"></i> ${formatThaiDate(s.newDate)}</td><td class="px-4 py-3 text-right"><button onclick="deleteRecord('day_off_swaps', '${s.id}')" class="text-slate-400 hover:text-red-500 p-2"><i class="ph-bold ph-trash text-base"></i></button></td></tr>`;
-            });
-            tbody.innerHTML = html || `<tr><td colspan="4" class="py-8 text-center text-slate-400 text-sm">ไม่มีประวัติสลับวันหยุด</td></tr>`;
-        }
+            let clockButton = '';
+            if (!todayLog) {
+                clockButton = `<button class="btn-3d btn-primary w-full text-xl py-5" onclick="handleClockIn()"><i class="fa-solid fa-fingerprint mr-2"></i> กดเพื่อเข้างาน</button>`;
+            } else if (!todayLog.checkOut) {
+                clockButton = `
+                    <div class="text-center mb-4 font-semibold bg-green-50 text-green-600 py-2 rounded-lg">เข้างานเวลา: ${todayLog.checkIn}</div>
+                    <button class="btn-3d btn-danger w-full text-xl py-5" onclick="handleClockOut('${todayLog.id}')"><i class="fa-solid fa-door-open mr-2"></i> กดเพื่อออกงาน</button>
+                `;
+            } else {
+                clockButton = `
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-center">
+                        <div class="text-slate-500 mb-2">เวลาทำงานวันนี้</div>
+                        <div class="flex justify-around font-bold text-lg">
+                            <span class="text-green-500">${todayLog.checkIn}</span>
+                            <span class="text-slate-300">-</span>
+                            <span class="text-red-500">${todayLog.checkOut}</span>
+                        </div>
+                        <div class="text-sm text-indigo-500 mt-3 font-medium"><i class="fa-solid fa-check-circle mr-1"></i>บันทึกเวลาเรียบร้อยแล้ว</div>
+                    </div>
+                `;
+            }
 
-        function renderHolidaysTable() {
-            const tbody = document.getElementById('holidaysTableBody'); let html = '';
-            holidaysData.forEach(h => {
-                const pBadge = h.isPaid ? '<span class="text-emerald-600 text-[10px] md:text-xs font-medium"><i class="ph-fill ph-check-circle"></i> จ่ายปกติ</span>' : '<span class="text-slate-400 text-[10px] md:text-xs font-medium"><i class="ph-fill ph-x-circle"></i> ไม่จ่าย</span>';
-                html += `
-                    <tr class="hover:bg-slate-50 border-b border-slate-50 md:border-none group">
-                        <td class="px-4 py-3 text-slate-800 text-[10px] md:text-sm font-medium whitespace-nowrap">${formatThaiDate(h.date)}</td>
-                        <td class="px-4 py-3 font-medium text-slate-600 text-xs md:text-sm whitespace-nowrap">${h.name}</td>
-                        <td class="px-4 py-3 whitespace-nowrap">${pBadge}</td>
-                        <td class="px-4 py-3 text-right whitespace-nowrap">
-                            <button onclick="editHoliday('${h.id}')" class="text-slate-400 hover:text-brand-600 p-2 opacity-100 md:opacity-0 md:group-hover:opacity-100"><i class="ph-bold ph-pencil-simple text-base"></i></button>
-                            <button onclick="deleteRecord('company_holidays', '${h.id}')" class="text-slate-400 hover:text-red-500 p-2 opacity-100 md:opacity-0 md:group-hover:opacity-100"><i class="ph-bold ph-trash text-base"></i></button>
-                        </td>
-                    </tr>`;
-            });
-            tbody.innerHTML = html || `<tr><td colspan="4" class="py-8 text-center text-slate-400 text-sm">ไม่มีข้อมูลวันหยุดร้าน</td></tr>`;
-        }
+            return `
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-user"></i></div>
+                    <div>
+                        <div class="text-sm text-slate-500">สวัสดี, คุณกำลังใช้งานในชื่อ</div>
+                        <div class="font-bold text-slate-800 text-lg">${emp.name}</div>
+                    </div>
+                </div>
 
+                <div class="card-3d !pt-2">
+                    <div id="live-clock" class="clock-display">00:00:00</div>
+                    ${clockButton}
+                </div>
 
-        // --- FORM HANDLERS & ACTIONS ---
-
-        window.openEmployeeModal = function() { editingEmployeeId = null; document.getElementById('employeeModalTitle').innerText = 'เพิ่มพนักงานใหม่'; document.getElementById('addEmployeeForm').reset(); openModal('addEmployeeModal'); };
-        window.editEmployee = function(id) {
-            const emp = employeesData.find(e => e.id === id); if(!emp) return;
-            editingEmployeeId = id; document.getElementById('employeeModalTitle').innerText = 'แก้ไขข้อมูลพนักงาน';
-            document.getElementById('empName').value = emp.name; document.getElementById('empPosition').value = emp.position; document.getElementById('empStartTime').value = emp.workStartTime||''; document.getElementById('empEndTime').value = emp.workEndTime||''; document.getElementById('empDayOff').value = emp.dayOff||''; document.getElementById('empWeeklySalary').value = emp.weeklySalary||''; document.getElementById('empOtRate').value = emp.otRate||'';
-            openModal('addEmployeeModal');
+                <h3 class="font-bold text-slate-700 mb-3 text-sm">เมนูด่วน (จัดการเวลา)</h3>
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <button class="btn-3d btn-warning shadow-[0_6px_0_var(--warning-shadow)] !text-sm !py-3" onclick="openModal('ot')">
+                        <i class="fa-solid fa-clock-rotate-left mr-2"></i> แจ้งทำโอที
+                    </button>
+                    <button class="btn-3d btn-secondary !text-sm !py-3" onclick="openModal('leave')">
+                        <i class="fa-solid fa-calendar-minus mr-2"></i> ลา/หยุด
+                    </button>
+                </div>
+            `;
         };
-        window.handleFormSubmit = async function(e) {
-            e.preventDefault(); if(!currentUser) return;
-            const btn = document.getElementById('saveEmpBtn'); const wSal = Number(document.getElementById('empWeeklySalary').value); const oRate = Number(document.getElementById('empOtRate').value);
-            if (wSal < 0 || oRate < 0) return showToast('เงินติดลบไม่ได้', 'error');
-            const data = { name: document.getElementById('empName').value, position: document.getElementById('empPosition').value, workStartTime: document.getElementById('empStartTime').value, workEndTime: document.getElementById('empEndTime').value, dayOff: document.getElementById('empDayOff').value, weeklySalary: wSal||0, otRate: oRate||0 };
+
+        window.selectEmployee = (id) => {
+            state.selectedEmployeeId = id;
+            localStorage.setItem('trackedEmpId', id);
+            renderCurrentTab();
+        };
+
+        window.clearEmployee = () => {
+            state.selectedEmployeeId = '';
+            localStorage.removeItem('trackedEmpId');
+            renderCurrentTab();
+        };
+
+        // --- Modals (Replaces the "Request" tab) ---
+        window.openModal = (type) => {
+            const modal = document.getElementById('action-modal');
+            const content = document.getElementById('modal-content');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            // Allow display block to render, then trigger animation
+            requestAnimationFrame(() => {
+                content.classList.remove('translate-y-full');
+            });
+
+            const today = new Date().toISOString().split('T')[0];
+
+            if(type === 'ot') {
+                content.innerHTML = `
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-bold text-xl text-slate-800">แจ้งทำโอที</h3>
+                        <button onclick="closeModal()" class="w-8 h-8 bg-slate-100 rounded-full text-slate-500"><i class="fa-solid fa-times"></i></button>
+                    </div>
+                    <label class="text-xs text-slate-500 mb-1 block">วันที่ทำโอที</label>
+                    <input type="date" id="quick-date" class="input-3d mb-4" value="${today}">
+                    <label class="text-xs text-slate-500 mb-1 block">จำนวนชั่วโมง</label>
+                    <input type="number" id="quick-hours" class="input-3d mb-4" placeholder="เช่น 2">
+                    <label class="text-xs text-slate-500 mb-1 block">รายละเอียดงาน</label>
+                    <input type="text" id="quick-note" class="input-3d mb-6" placeholder="เช่น จัดของเข้าร้าน...">
+                    <button class="btn-3d btn-primary w-full py-3" onclick="submitQuickRequest('ot')">บันทึกข้อมูลโอที</button>
+                `;
+            } else {
+                content.innerHTML = `
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-bold text-xl text-slate-800">แจ้งลา / วันหยุด</h3>
+                        <button onclick="closeModal()" class="w-8 h-8 bg-slate-100 rounded-full text-slate-500"><i class="fa-solid fa-times"></i></button>
+                    </div>
+                    <label class="text-xs text-slate-500 mb-1 block">ประเภท</label>
+                    <select id="quick-leave-type" class="input-3d mb-4">
+                        <option value="leave">ลาป่วย / ลากิจ</option>
+                        <option value="swap">สลับวันหยุด</option>
+                    </select>
+                    <label class="text-xs text-slate-500 mb-1 block">วันที่</label>
+                    <input type="date" id="quick-date" class="input-3d mb-4" value="${today}">
+                    <label class="text-xs text-slate-500 mb-1 block">หมายเหตุ</label>
+                    <input type="text" id="quick-note" class="input-3d mb-6" placeholder="เช่น ไม่สบาย, ไปธุระ...">
+                    <button class="btn-3d btn-secondary w-full py-3" onclick="submitQuickRequest('leave')">บันทึกวันลา</button>
+                `;
+            }
+        };
+
+        window.closeModal = () => {
+            const modal = document.getElementById('action-modal');
+            const content = document.getElementById('modal-content');
+            content.classList.add('translate-y-full');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 300);
+        };
+
+        window.submitQuickRequest = async (type) => {
+            const date = document.getElementById('quick-date').value;
+            const note = document.getElementById('quick-note').value;
+            let otHours = 0;
+            let reqType = type;
+
+            if (type === 'ot') {
+                otHours = document.getElementById('quick-hours').value;
+                if (!otHours) return showToast("กรุณาระบุชั่วโมงโอที", "error");
+            } else {
+                reqType = document.getElementById('quick-leave-type').value;
+            }
+
+            showLoading();
             try {
-                btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-lg"></i>'; btn.disabled = true;
-                if (editingEmployeeId) { await updateDoc(doc(db, 'employees', editingEmployeeId), data); showToast('อัปเดตพนักงานสำเร็จ'); } 
-                else { data.status = 'out'; await addDoc(collection(db, 'employees'), data); showToast('เพิ่มพนักงานสำเร็จ'); }
-                closeModal('addEmployeeModal'); editingEmployeeId = null;
-            } catch(e){ showToast('Error', 'error'); } finally { btn.innerHTML = 'บันทึกข้อมูล'; btn.disabled = false; }
-        };
-
-        window.openActionModal = function(id) {
-            const emp = employeesData.find(e => e.id === id); if(!emp) return; selectedEmployee = emp;
-            document.getElementById('actionName').innerText = emp.name; document.getElementById('actionPosition').innerText = emp.position; document.getElementById('actionAvatar').innerText = emp.name.substring(0,1);
-            const inB = document.getElementById('btnClockIn'); const outB = document.getElementById('btnClockOut');
-            const bC = "flex-1 py-3 rounded-2xl font-medium transition-all flex justify-center items-center gap-1.5 text-base";
-            if(emp.status === 'in') { inB.className=`${bC} bg-slate-100 text-slate-400 cursor-not-allowed border`; inB.innerHTML='<i class="ph-bold ph-check-circle text-lg"></i> เข้างานแล้ว'; inB.disabled=true; outB.className=`${bC} bg-amber-500 text-white shadow-lg shadow-amber-500/30`; outB.innerHTML='<i class="ph-bold ph-sign-out text-lg"></i> กดออกงาน'; outB.disabled=false; }
-            else { inB.className=`${bC} bg-emerald-500 text-white shadow-lg shadow-emerald-500/30`; inB.innerHTML='<i class="ph-bold ph-sign-in text-lg"></i> กดเข้างาน'; inB.disabled=false; outB.className=`${bC} bg-slate-100 text-slate-400 cursor-not-allowed border`; outB.innerHTML='<i class="ph-bold ph-check-circle text-lg"></i> ออกงานแล้ว'; outB.disabled=true; }
-            inB.onclick = () => recordTime('in'); outB.onclick = () => recordTime('out'); openModal('actionModal');
-        };
-
-        window.recordTime = async function(act) {
-            if(!navigator.onLine) return showToast('ตรวจสอบอินเทอร์เน็ต', 'error');
-            const inB = document.getElementById('btnClockIn'); const outB = document.getElementById('btnClockOut');
-            try {
-                const s = await getDoc(doc(db, 'employees', selectedEmployee.id)); if (!s.exists() || s.data().status === act) { closeModal('actionModal'); return showToast('ข้อมูลขัดแย้ง', 'error'); }
-                inB.disabled=true; outB.disabled=true;
-                const tb = act === 'in' ? inB : outB; const oh = tb.innerHTML; tb.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-lg"></i> บันทึก...';
-                await addDoc(collection(db, 'time_logs'), { employeeId: selectedEmployee.id, employeeName: selectedEmployee.name, action: act, timestamp: serverTimestamp() });
-                await updateDoc(doc(db, 'employees', selectedEmployee.id), { status: act, lastActionTime: serverTimestamp() });
-                showToast(`บันทึก${act==='in'?'เข้างาน':'ออกงาน'}สำเร็จ`); closeModal('actionModal'); setTimeout(()=>tb.innerHTML=oh, 300);
-            } catch(e) { showToast('Error','error'); inB.disabled=false; outB.disabled=false; }
-        };
-
-        window.openAddPastLogModal = function() { document.getElementById('addPastLogForm').reset(); const n = new Date(); document.getElementById('pastLogDate').value = formatDateStr(n); document.getElementById('pastLogTime').value = `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`; openModal('addPastLogModal'); };
-        window.handleAddPastLogSubmit = async function(e) {
-            e.preventDefault(); const empId = document.getElementById('pastLogEmployee').value; const act = document.querySelector('input[name="pastLogAction"]:checked')?.value; const ds = document.getElementById('pastLogDate').value; const ts = document.getElementById('pastLogTime').value;
-            if(!empId || !act || !ds || !ts) return showToast('กรอกให้ครบ', 'error');
-            const dObj = new Date(`${ds}T${ts}:00`); if (dObj > new Date()) return showToast('ระบุเวลาอนาคตไม่ได้', 'error');
-            const emp = employeesData.find(e => e.id === empId); const btn = document.getElementById('savePastLogBtn');
-            try { btn.disabled=true; btn.innerHTML='<i class="ph-bold ph-spinner animate-spin"></i>'; await addDoc(collection(db, 'time_logs'), { employeeId: emp.id, employeeName: emp.name, action: act, timestamp: Timestamp.fromDate(dObj) }); await updateDoc(doc(db, 'employees', emp.id), { status: act, lastActionTime: Timestamp.fromDate(dObj) }); showToast('เพิ่มประวัติสำเร็จ'); closeModal('addPastLogModal'); } catch(e){showToast('Error','error');} finally{btn.disabled=false; btn.innerHTML='บันทึก';}
-        };
-
-        window.editLogTime = function(id) { const l = logsData.find(x => x.id === id); if(!l||!l.timestamp) return; editingLogId = id; const d = l.timestamp.toDate(); document.getElementById('editLogDate').value = formatDateStr(d); document.getElementById('editLogTime').value = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; openModal('editLogModal'); };
-        window.handleEditLogSubmit = async function(e) {
-            e.preventDefault(); const ds = document.getElementById('editLogDate').value; const ts = document.getElementById('editLogTime').value; const dObj = new Date(`${ds}T${ts}:00`); if (dObj > new Date()) return showToast('ระบุเวลาอนาคตไม่ได้', 'error');
-            const btn = document.getElementById('saveLogBtn');
-            try { btn.disabled=true; btn.innerHTML='<i class="ph-bold ph-spinner animate-spin"></i>'; await updateDoc(doc(db, 'time_logs', editingLogId), { timestamp: Timestamp.fromDate(dObj) }); showToast('แก้ไขเวลาสำเร็จ'); closeModal('editLogModal'); editingLogId=null; } catch(e){showToast('Error','error');} finally{btn.disabled=false; btn.innerHTML='บันทึก';}
-        };
-
-        // --- LEAVES SYSTEM (WITH ADVANCED VALIDATION) ---
-        window.openLeaveModal = function() { document.getElementById('addLeaveForm').reset(); document.getElementById('leaveDate').value = formatDateStr(new Date()); openModal('addLeaveModal'); };
-        
-        window.handleLeaveSubmit = async function(e) {
-            e.preventDefault(); const btn = document.getElementById('saveLeaveBtn'); 
-            const empId = document.getElementById('leaveEmployee').value; 
-            const leaveDateVal = document.getElementById('leaveDate').value;
-            const emp = employeesData.find(x=>x.id===empId);
-
-            if(!emp || !leaveDateVal) return showToast('กรุณากรอกข้อมูลให้ครบถ้วน', 'error');
-
-            // 1. Validation: วันนี้เป็นวันหยุดของร้านอยู่แล้วหรือไม่
-            if (holidaysData.some(h => h.date === leaveDateVal)) {
-                return showToast('ไม่สามารถลางานในวันหยุดของร้านได้', 'error');
+                await addDoc(collection(db, "time_logs"), {
+                    empId: state.selectedEmployeeId,
+                    date: date,
+                    type: reqType,
+                    note: note,
+                    otHours: Number(otHours),
+                    timestamp: new Date().getTime()
+                });
+                showToast("บันทึกข้อมูลเรียบร้อย");
+                closeModal();
+            } catch (e) {
+                showToast("เกิดข้อผิดพลาด", "error");
             }
+            hideLoading();
+        };
 
-            // 2. Validation: วันนี้เป็นวันหยุดของพนักงานอยู่แล้วหรือไม่ (วันหยุดประจำ + สลับวันหยุด)
-            const leaveDateObj = new Date(leaveDateVal);
-            const dayOfWeek = leaveDateObj.getDay().toString();
-            let isOffDay = (emp.dayOff === dayOfWeek);
-            if (swapsData.find(s => s.employeeId === empId && s.originalDate === leaveDateVal)) isOffDay = false; // สลับมาทำงาน
-            if (swapsData.find(s => s.employeeId === empId && s.newDate === leaveDateVal)) isOffDay = true; // สลับไปหยุด
-            
-            if (isOffDay) {
-                return showToast('ไม่สามารถลางานซ้ำซ้อนในวันหยุดของคุณได้', 'error');
-            }
-
-            // 3. Validation: ป้องกันการลาซ้ำ
-            if (leavesData.find(l => l.employeeId === empId && l.date === leaveDateVal)) {
-                return showToast('มีการบันทึกวันลาในวันนี้ไปแล้ว', 'error');
-            }
-
-            // 4. Validation: เช็คว่าถ้ายอมให้ลา จะเหลือคนทำงานในร้านหรือไม่? (ป้องกันร้านร้าง)
-            let staffAvailable = 0;
-            employeesData.forEach(e => {
-                if (e.id === empId) return; // ไม่นับคนที่กำลังทำเรื่องขอลา
-                
-                let eIsOff = (e.dayOff === dayOfWeek);
-                if (swapsData.find(s => s.employeeId === e.id && s.originalDate === leaveDateVal)) eIsOff = false;
-                if (swapsData.find(s => s.employeeId === e.id && s.newDate === leaveDateVal)) eIsOff = true;
-                
-                const eHasLeave = leavesData.find(l => l.employeeId === e.id && l.date === leaveDateVal);
-                
-                if (!eIsOff && !eHasLeave) {
-                    staffAvailable++;
-                }
+        // --- Salary Calculation Logic (Auto-selected user) ---
+        const renderSalary = () => {
+            let employeeOptions = '<option value="">-- เลือกพนักงาน --</option>';
+            state.employees.forEach(emp => {
+                employeeOptions += `<option value="${emp.id}" ${state.selectedEmployeeId === emp.id ? 'selected' : ''}>${emp.name}</option>`;
             });
 
-            // ถ้าพนักงานในระบบมีมากกว่า 1 คน แต่เหลือคนเข้างาน 0 คน ให้บล็อก
-            if (staffAvailable === 0 && employeesData.length > 1) {
-                return showToast('ไม่อนุญาตให้ลา เนื่องจากจะไม่มีพนักงานอยู่ในร้านเลย', 'error');
-            }
+            // Auto calculate if user is selected
+            setTimeout(() => { if(state.selectedEmployeeId) window.calculateSalaryView(); }, 50);
 
-            try { 
-                btn.disabled=true; btn.innerHTML='<i class="ph-bold ph-spinner animate-spin"></i>'; 
-                await addDoc(collection(db, 'leave_records'), { employeeId: emp.id, employeeName: emp.name, date: leaveDateVal, type: document.getElementById('leaveType').value, isPaid: document.getElementById('leaveIsPaid').checked }); 
-                showToast('บันทึกวันลาสำเร็จ'); closeModal('addLeaveModal'); 
-            } catch(err) { showToast('Error','error'); } finally { btn.disabled=false; btn.innerHTML='บันทึกวันลา'; }
+            const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            return `
+                <div class="card-3d mb-4">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs text-slate-500 mb-1 block">เลือกพนักงาน (ค่าเริ่มต้นคือคุณ)</label>
+                            <select id="sal-emp" class="input-3d" onchange="window.calculateSalaryView()">
+                                ${employeeOptions}
+                            </select>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="flex-1">
+                                <label class="text-xs text-slate-500 mb-1 block">ตั้งแต่วันที่</label>
+                                <input type="date" id="sal-start" class="input-3d text-sm" value="${startOfMonth}" onchange="window.calculateSalaryView()">
+                            </div>
+                            <div class="flex-1">
+                                <label class="text-xs text-slate-500 mb-1 block">ถึงวันที่</label>
+                                <input type="date" id="sal-end" class="input-3d text-sm" value="${todayStr}" onchange="window.calculateSalaryView()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="salary-result" class="card-3d bg-gradient-to-br from-slate-800 to-slate-900 text-white border-none shadow-2xl hidden">
+                    <!-- Result injected here -->
+                </div>
+            `;
         };
 
-        // --- SWAPS SYSTEM (WITH ADVANCED VALIDATION) ---
-        window.openSwapModal = function() { document.getElementById('addSwapForm').reset(); openModal('addSwapModal'); };
-        
-        window.handleSwapSubmit = async function(e) {
-            e.preventDefault(); const btn = document.getElementById('saveSwapBtn'); 
-            const empId = document.getElementById('swapEmployee').value; 
-            const originalDateVal = document.getElementById('swapOriginalDate').value;
-            const newDateVal = document.getElementById('swapNewDate').value;
-            const emp = employeesData.find(x=>x.id===empId);
+        window.calculateSalaryView = () => {
+            const empId = document.getElementById('sal-emp').value;
+            const start = document.getElementById('sal-start').value;
+            const end = document.getElementById('sal-end').value;
+            const resDiv = document.getElementById('salary-result');
 
-            if(!emp || !originalDateVal || !newDateVal) return showToast('กรุณากรอกข้อมูลให้ครบถ้วน', 'error');
+            if(!empId || !start || !end) { resDiv.classList.add('hidden'); return; }
 
-            if (originalDateVal === newDateVal) {
-                return showToast('วันหยุดเดิมและวันใหม่ต้องไม่ใช่วันเดียวกัน', 'error');
-            }
+            const emp = state.employees.find(e => e.id === empId);
+            if(!emp) return;
 
-            // 1. Validation: ป้องกันสลับในวันหยุดของร้าน
-            if (holidaysData.some(h => h.date === newDateVal)) {
-                return showToast('ไม่สามารถสลับไปหยุดซ้ำในวันหยุดของร้านได้', 'error');
-            }
+            const empLogs = state.logs.filter(l => l.empId === empId && l.date >= start && l.date <= end);
+            let totalWorkingDays = 0, totalOTHours = 0, leaveDays = 0;
 
-            // 2. Validation: ป้องกันการสลับวันซ้ำซ้อนในตาราง
-            const existingSwap = swapsData.find(s => s.employeeId === empId && 
-                (s.originalDate === originalDateVal || s.newDate === newDateVal || s.originalDate === newDateVal || s.newDate === originalDateVal));
-            if (existingSwap) {
-                return showToast('มีการบันทึกสลับวันหยุดที่พัวพันกับวันที่เลือกไปแล้ว', 'error');
-            }
-
-            // 3. Validation: เช็คว่าวันที่ "ขอหยุดใหม่" เป็นวันหยุดตัวเองอยู่แล้วหรือไม่
-            const newDateObj = new Date(newDateVal);
-            let isAlreadyOff = (emp.dayOff === newDateObj.getDay().toString());
-            if (isAlreadyOff) {
-                return showToast('วันที่ขอหยุดใหม่ เป็นวันหยุดของคุณอยู่แล้ว', 'error');
-            }
-
-            // 4. Validation: เช็คว่าถ้าย้ายไปหยุดวันใหม่ จะทำให้ร้านไม่มีคนหรือไม่?
-            let staffAvailableOnNewDate = 0;
-            employeesData.forEach(e => {
-                if (e.id === empId) return; // ไม่นับคนที่ขอย้ายไปหยุด
-                let eIsOff = (e.dayOff === newDateObj.getDay().toString());
-                if (swapsData.find(s => s.employeeId === e.id && s.originalDate === newDateVal)) eIsOff = false;
-                if (swapsData.find(s => s.employeeId === e.id && s.newDate === newDateVal)) eIsOff = true;
-                const eHasLeave = leavesData.find(l => l.employeeId === e.id && l.date === newDateVal);
-                
-                if (!eIsOff && !eHasLeave) staffAvailableOnNewDate++;
+            empLogs.forEach(log => {
+                if(log.type === 'attendance' && log.checkIn) totalWorkingDays++;
+                if(log.type === 'leave') leaveDays++;
+                if(log.type === 'ot') totalOTHours += (log.otHours || 0);
             });
 
-            if (staffAvailableOnNewDate === 0 && employeesData.length > 1) {
-                return showToast('สลับไม่ได้ เนื่องจากจะทำให้วันนั้นไม่มีพนักงานในร้านเลย', 'error');
-            }
+            const dailyRate = Number(emp.dailyRate) || 0;
+            const otRate = Number(state.settings.otRatePerHour) || 0;
+            const baseSalary = totalWorkingDays * dailyRate;
+            const otPay = totalOTHours * otRate;
+            const netSalary = baseSalary + otPay;
 
-            try { 
-                btn.disabled=true; btn.innerHTML='<i class="ph-bold ph-spinner animate-spin"></i>'; 
-                await addDoc(collection(db, 'day_off_swaps'), { employeeId: emp.id, employeeName: emp.name, originalDate: originalDateVal, newDate: newDateVal, createdAt: serverTimestamp() }); 
-                showToast('บันทึกสลับวันหยุดสำเร็จ'); closeModal('addSwapModal'); 
-            } catch(err) { showToast('Error','error'); } finally { btn.disabled=false; btn.innerHTML='บันทึกสลับวัน'; }
+            resDiv.innerHTML = `
+                <div class="text-center border-b border-slate-700 pb-4 mb-4">
+                    <div class="text-slate-400 text-sm">ยอดเงินสุทธิ</div>
+                    <div class="text-4xl font-bold text-teal-400 mt-1">${netSalary.toLocaleString()} ฿</div>
+                </div>
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">ค่าแรง (${totalWorkingDays} วัน)</span>
+                        <span>${baseSalary.toLocaleString()} ฿</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">โอที (${totalOTHours} ชม.)</span>
+                        <span class="text-green-400">+${otPay.toLocaleString()} ฿</span>
+                    </div>
+                    <div class="flex justify-between text-red-400">
+                        <span>วันลา/ขาด</span>
+                        <span>${leaveDays} วัน</span>
+                    </div>
+                </div>
+            `;
+            resDiv.classList.remove('hidden');
         };
 
-        window.openHolidayModal = function() { editingHolidayId = null; document.getElementById('holidayModalTitle').innerText = 'เพิ่มวันหยุดร้าน'; document.getElementById('addHolidayForm').reset(); openModal('addHolidayModal'); };
-        window.editHoliday = function(id) {
-            const h = holidaysData.find(x => x.id === id); if(!h) return;
-            editingHolidayId = id; document.getElementById('holidayModalTitle').innerText = 'แก้ไขวันหยุดร้าน';
-            document.getElementById('holidayDate').value = h.date; document.getElementById('holidayName').value = h.name; document.getElementById('holidayIsPaid').checked = h.isPaid;
-            openModal('addHolidayModal');
-        };
-        window.handleHolidaySubmit = async function(e) {
-            e.preventDefault(); const btn = document.getElementById('saveHolidayBtn');
-            const data = { date: document.getElementById('holidayDate').value, name: document.getElementById('holidayName').value, isPaid: document.getElementById('holidayIsPaid').checked };
-            try { 
-                btn.disabled=true; btn.innerHTML='<i class="ph-bold ph-spinner animate-spin text-lg"></i>'; 
-                if (editingHolidayId) { await updateDoc(doc(db, 'company_holidays', editingHolidayId), data); showToast('แก้ไขวันหยุดร้านสำเร็จ'); } 
-                else { await addDoc(collection(db, 'company_holidays'), data); showToast('เพิ่มวันหยุดร้านสำเร็จ'); }
-                closeModal('addHolidayModal'); editingHolidayId = null;
-            } catch(e){showToast('Error','error');} finally{btn.disabled=false; btn.innerHTML='บันทึก';}
-        };
 
-        // --- STATIC DELETES ---
-        window.deleteRecord = async function(col, id) { 
-            if(confirm("ยืนยันการลบข้อมูล? (มีผลกับการคำนวณเงินเดือน)")) { 
-                try { await deleteDoc(doc(db, col, id)); showToast('ลบข้อมูลสำเร็จ'); } 
-                catch(e){ console.error(e); showToast('ไม่สามารถลบข้อมูลได้', 'error'); } 
-            } 
-        };
-
-        window.deleteDailyLogs = async function(idsStr) {
-            if(confirm("ยืนยันการลบประวัติการลงเวลาของวันนี้? (ข้อมูลเข้า-ออกทั้งหมดของพนักงานคนนี้ในวันที่เลือกจะถูกลบทิ้ง)")) {
-                try {
-                    const ids = idsStr.split(',');
-                    const { deleteDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
-                    for (let id of ids) {
-                        if(id) await deleteDoc(doc(db, 'time_logs', id));
-                    }
-                    showToast('ลบประวัติสำเร็จ');
-                } catch(e) {
-                    console.error(e);
-                    showToast('ไม่สามารถลบข้อมูลได้', 'error');
-                }
-            }
-        };
-
-        // CASCADING DELETE EMPLOYEE
-        window.deleteEmployee = async function(empId) {
-            if(confirm("คำเตือน: การลบพนักงานจะลบข้อมูลประวัติทั้งหมดด้วย! ดำเนินการต่อหรือไม่?")) {
-                showToast('กำลังลบข้อมูลที่เกี่ยวข้อง...', 'success');
-                try {
-                    await deleteDoc(doc(db, 'employees', empId));
-                    const logsSnap = await getDocs(query(collection(db, 'time_logs'), where("employeeId", "==", empId)));
-                    logsSnap.forEach(async (docSnap) => { await deleteDoc(doc(db, 'time_logs', docSnap.id)); });
-                    const leavesSnap = await getDocs(query(collection(db, 'leave_records'), where("employeeId", "==", empId)));
-                    leavesSnap.forEach(async (docSnap) => { await deleteDoc(doc(db, 'leave_records', docSnap.id)); });
-                    const swapsSnap = await getDocs(query(collection(db, 'day_off_swaps'), where("employeeId", "==", empId)));
-                    swapsSnap.forEach(async (docSnap) => { await deleteDoc(doc(db, 'day_off_swaps', docSnap.id)); });
-                    showToast('ลบพนักงานและข้อมูลทั้งหมดแล้ว');
-                } catch(e) { console.error("Delete Employee Error:", e); showToast('เกิดข้อผิดพลาดในการลบข้อมูล', 'error'); }
-            }
-        };
-
-        // --- SALARY CALCULATION ENGINE ---
-        window.calculateSalary = function() {
-            const sdStr = document.getElementById('salaryStartDate').value; const edStr = document.getElementById('salaryEndDate').value;
-            if (!sdStr || !edStr) return showToast('เลือกช่วงวันที่ให้ครบ', 'error');
-            const sd = new Date(sdStr); sd.setHours(0,0,0,0); const ed = new Date(edStr); ed.setHours(23,59,59,999);
-            if (sd > ed) return showToast('วันที่สิ้นสุดต้องมากกว่าวันที่เริ่มต้น', 'error');
-
-            const vLogs = logsData.filter(l => l.timestamp && l.timestamp.toDate() >= sd && l.timestamp.toDate() <= ed);
-            const vLeaves = leavesData.filter(l => new Date(l.date) >= sd && new Date(l.date) <= ed);
-            const vHolidays = holidaysData.filter(h => new Date(h.date) >= sd && new Date(h.date) <= ed && h.isPaid);
-
-            const stats = {};
-            employeesData.forEach(e => { stats[e.id] = { emp: e, daysWorked: new Set(), logObj: {}, workMin: 0, otMin: 0, paidLeaveDays: 0, paidHolidayDays: 0 }; });
-
-            // 1. Group actual worked days & calculate Minutes
-            vLogs.forEach(l => {
-                if(!stats[l.employeeId]) return;
-                const dStr = formatDateStr(l.timestamp.toDate());
-                if (!stats[l.employeeId].logObj[dStr]) stats[l.employeeId].logObj[dStr] = [];
-                stats[l.employeeId].logObj[dStr].push(l);
-                stats[l.employeeId].daysWorked.add(dStr);
-            });
-
-            Object.values(stats).forEach(s => {
-                const emp = s.emp;
-                let stdMin = 480; // Default 8 hrs
-                if (emp.workStartTime && emp.workEndTime) {
-                    const [sH, sM] = emp.workStartTime.split(':').map(Number); const [eH, eM] = emp.workEndTime.split(':').map(Number);
-                    let diff = (eH*60+eM) - (sH*60+sM); if (diff < 0) diff += 1440; if (diff > 240) diff -= 60; // Lunch break
-                    stdMin = diff;
-                }
-
-                for (const ds in s.logObj) {
-                    const arr = s.logObj[ds].sort((a,b) => a.timestamp.toDate() - b.timestamp.toDate());
-                    const fIn = arr.find(x => x.action === 'in'); const lOut = [...arr].reverse().find(x => x.action === 'out');
-                    if (fIn && lOut) {
-                        const inT = fIn.timestamp.toDate(); const outT = lOut.timestamp.toDate();
-                        if (outT > inT) {
-                            let wm = Math.floor((outT - inT)/60000); if (wm > 240) wm -= 60;
-                            s.workMin += Math.max(0, wm);
-                            if (wm > stdMin) s.otMin += (wm - stdMin);
-                        }
-                    }
-                }
-
-                // 2. Add Paid Leaves
-                vLeaves.forEach(lv => { if (lv.employeeId === emp.id && lv.isPaid && !s.daysWorked.has(lv.date)) s.paidLeaveDays++; });
-
-                // 3. Add Paid Holidays
-                vHolidays.forEach(h => { if (!s.daysWorked.has(h.date)) s.paidHolidayDays++; });
-
-                // 4. Calculate Money
-                const dRate = (emp.weeklySalary || 0) / 6;
-                s.basePay = (s.daysWorked.size + s.paidLeaveDays + s.paidHolidayDays) * dRate;
-                s.otPay = (s.otMin / 60) * (emp.otRate || 0);
-                s.totalPay = s.basePay + s.otPay;
-            });
-
-            // Render
-            const tbody = document.getElementById('salaryTableBody');
-            const arr = Object.values(stats).filter(s => s.daysWorked.size > 0 || s.paidLeaveDays > 0 || s.paidHolidayDays > 0);
-            
-            if(arr.length === 0) { tbody.innerHTML = `<tr><td colspan="8" class="px-4 py-8 text-center text-slate-400 text-sm">ไม่พบข้อมูลในช่วงเวลาดังกล่าว</td></tr>`; return; }
-
-            const fc = (n) => new Intl.NumberFormat('th-TH', { style: 'decimal', minimumFractionDigits: 2 }).format(n);
-            let html = '';
-            arr.forEach(s => {
-                const wh = Math.floor(s.workMin/60); const wm = s.workMin%60;
-                html += `
-                    <tr class="hover:bg-slate-50 border-b border-slate-50 md:border-none">
-                        <td class="px-4 md:px-6 py-3 md:py-4 font-medium text-slate-800 whitespace-nowrap"><div class="flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-brand-100 text-brand-600 flex justify-center items-center text-[10px] font-bold shrink-0">${s.emp.name.substring(0,1)}</div>${s.emp.name}</div></td>
-                        <td class="px-4 md:px-6 py-3 md:py-4 text-center whitespace-nowrap"><span class="inline-flex bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-sm font-semibold">${s.daysWorked.size}</span></td>
-                        <td class="px-4 md:px-6 py-3 md:py-4 text-center whitespace-nowrap"><span class="inline-flex bg-rose-50 text-rose-600 px-2 py-0.5 rounded text-sm font-semibold">${s.paidLeaveDays>0?'+'+s.paidLeaveDays:'-'}</span></td>
-                        <td class="px-4 md:px-6 py-3 md:py-4 text-center whitespace-nowrap"><span class="inline-flex bg-purple-50 text-purple-600 px-2 py-0.5 rounded text-sm font-semibold">${s.paidHolidayDays>0?'+'+s.paidHolidayDays:'-'}</span></td>
-                        <td class="px-4 md:px-6 py-3 md:py-4 text-center whitespace-nowrap"><div class="text-sm text-slate-600">${wh}h ${wm}m</div>${s.otMin>0?`<div class="text-[10px] text-amber-600 mt-0.5">+ OT ${Math.floor(s.otMin/60)}h ${s.otMin%60}m</div>`:''}</td>
-                        <td class="px-4 md:px-6 py-3 md:py-4 text-right text-slate-600 whitespace-nowrap text-sm md:text-base">฿${fc(s.basePay)}</td>
-                        <td class="px-4 md:px-6 py-3 md:py-4 text-right text-amber-600 whitespace-nowrap text-sm md:text-base">฿${fc(s.otPay)}</td>
-                        <td class="px-4 md:px-6 py-3 md:py-4 text-right font-bold text-brand-600 whitespace-nowrap text-base md:text-lg">฿${fc(s.totalPay)}</td>
-                    </tr>`;
-            });
-            tbody.innerHTML = html;
-        };
-
-        // --- GLOBAL INITIALIZATION ---
-        function updateClocks() {
+        // --- Actions (Clock In/Out) ---
+        window.handleClockIn = async () => {
+            showLoading();
             const now = new Date();
-            const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            document.getElementById('clockDisplay').innerText = timeStr;
-            const ac = document.getElementById('actionClock'); if(ac) ac.innerText = timeStr;
-            document.getElementById('currentDateDisplay').innerText = now.toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        }
-        setInterval(updateClocks, 1000); updateClocks();
-
-        function updateOnlineStatus() {
-            const ob = document.getElementById('offlineBanner');
-            if (navigator.onLine) { ob.classList.add('-translate-y-full'); setTimeout(() => ob.classList.add('hidden'), 300); } 
-            else { ob.classList.remove('hidden'); setTimeout(() => ob.classList.remove('-translate-y-full'), 10); }
-        }
-        window.addEventListener('online', updateOnlineStatus); window.addEventListener('offline', updateOnlineStatus);
-        if(!navigator.onLine) updateOnlineStatus();
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const today = new Date();
-            document.getElementById('salaryStartDate').value = formatDateStr(new Date(today.getFullYear(), today.getMonth(), 1));
-            document.getElementById('salaryEndDate').value = formatDateStr(today);
-        });
-
-        window.switchView = function(viewId) {
-            document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden')); 
-            document.getElementById(`view-${viewId}`).classList.remove('hidden'); 
-            
-            document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('text-brand-600','bg-brand-50'); b.classList.add('text-slate-500'); }); 
-            const db=document.getElementById(`nav-${viewId}`); if(db) db.classList.add('text-brand-600','bg-brand-50'); 
-            
-            document.querySelectorAll('.mobile-nav-btn').forEach(b => { b.classList.remove('text-brand-600'); b.classList.add('text-slate-400');}); 
-            const mb=document.getElementById(`mobile-nav-${viewId}`); if(mb) mb.classList.add('text-brand-600'); 
-            
-            const titles = {'dashboard':'แดชบอร์ดลงเวลา', 'employees':'จัดการพนักงาน', 'logs':'ประวัติเข้า-ออก', 'leaves':'วันลา / สลับวัน', 'holidays':'วันหยุดของร้าน', 'salary':'คำนวณเงินเดือน'};
-            document.getElementById('pageTitle').innerText = titles[viewId] || 'TimeFlow';
-            document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+            const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+            try {
+                await addDoc(collection(db, "time_logs"), {
+                    empId: state.selectedEmployeeId, date: now.toISOString().split('T')[0],
+                    checkIn: timeStr, checkOut: null, type: 'attendance', timestamp: now.getTime()
+                });
+                showToast(`เข้างานสำเร็จเวลา ${timeStr}`);
+            } catch (e) { showToast("เกิดข้อผิดพลาด", "error"); }
+            hideLoading();
         };
-        
-        window.openModal = function(id) { const m = document.getElementById(id); const o = document.getElementById('modalOverlay'); o.classList.remove('hidden'); m.classList.remove('hidden'); void m.offsetWidth; o.classList.remove('opacity-0'); m.classList.remove('opacity-0', 'scale-95'); };
-        window.closeModal = function(id) { const m = document.getElementById(id); const o = document.getElementById('modalOverlay'); o.classList.add('opacity-0'); m.classList.add('opacity-0', 'scale-95'); setTimeout(() => { o.classList.add('hidden'); m.classList.add('hidden'); }, 300); };
 
-        initAuth();
+        window.handleClockOut = async (logId) => {
+            showLoading();
+            const timeStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+            try {
+                await updateDoc(doc(db, "time_logs", logId), { checkOut: timeStr });
+                showToast(`ออกงานสำเร็จเวลา ${timeStr}`);
+            } catch (e) { showToast("เกิดข้อผิดพลาด", "error"); }
+            hideLoading();
+        };
+
+        // --- Settings / Admin ---
+        const renderSettings = () => `
+            <div class="card-3d mb-6">
+                <h3 class="font-bold text-lg mb-4 border-b pb-2 text-slate-800">ตั้งค่าระบบร้าน</h3>
+                <label class="text-sm font-medium text-slate-600 block mb-1">เรท OT ต่อชั่วโมง (บาท)</label>
+                <input type="number" id="set-ot-rate" class="input-3d mb-4" value="${state.settings.otRatePerHour || 0}">
+                <button class="btn-3d bg-slate-800 text-white shadow-[0_6px_0_#0f172a] w-full text-sm" onclick="saveSettings()">บันทึกการตั้งค่า</button>
+            </div>
+
+            <div class="card-3d">
+                <h3 class="font-bold text-lg mb-4 border-b pb-2 text-slate-800">จัดการพนักงาน</h3>
+                <div class="bg-indigo-50/50 p-4 rounded-xl mb-5 border border-indigo-100">
+                    <h4 class="text-sm font-bold text-indigo-800 mb-3"><i class="fa-solid fa-plus-circle mr-1"></i> เพิ่มพนักงานใหม่</h4>
+                    <input type="text" id="new-emp-name" class="input-3d text-sm mb-3 bg-white" placeholder="ชื่อ - นามสกุล">
+                    <div class="flex gap-2 mb-3">
+                        <input type="text" id="new-emp-role" class="input-3d text-sm flex-1 bg-white" placeholder="ตำแหน่ง">
+                        <input type="number" id="new-emp-rate" class="input-3d text-sm flex-1 bg-white" placeholder="ค่าจ้าง/วัน">
+                    </div>
+                    <button class="btn-3d btn-primary w-full text-sm" onclick="addEmployee()">เพิ่มรายชื่อ</button>
+                </div>
+                <div class="space-y-2">
+                    ${state.employees.map(emp => `
+                        <div class="flex items-center p-3 bg-white border border-slate-200 rounded-xl shadow-sm">
+                            <div class="w-10 h-10 bg-slate-100 text-slate-500 rounded-full flex items-center justify-center mr-3"><i class="fa-solid fa-user"></i></div>
+                            <div class="flex-1">
+                                <div class="font-semibold text-sm text-slate-800">${emp.name}</div>
+                                <div class="text-xs text-slate-500">${emp.role} • ${emp.dailyRate} บ./วัน</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        window.addEmployee = async () => {
+            const name = document.getElementById('new-emp-name').value;
+            const rate = document.getElementById('new-emp-rate').value;
+            if(!name || !rate) return showToast("ระบุชื่อและค่าจ้าง", "error");
+            showLoading();
+            try {
+                await addDoc(collection(db, "employees"), { name, role: document.getElementById('new-emp-role').value || 'พนักงาน', dailyRate: Number(rate), createdAt: new Date().getTime() });
+                showToast("เพิ่มสำเร็จ");
+                document.getElementById('new-emp-name').value = '';
+                document.getElementById('new-emp-rate').value = '';
+                document.getElementById('new-emp-role').value = '';
+            } catch (e) { showToast("เกิดข้อผิดพลาด", "error"); }
+            hideLoading();
+        };
+
+        window.saveSettings = async () => {
+            showLoading();
+            try {
+                const val = { otRatePerHour: Number(document.getElementById('set-ot-rate').value) };
+                if(state.settings.id) await updateDoc(doc(db, "settings", state.settings.id), val);
+                else await addDoc(collection(db, "settings"), val);
+                showToast("บันทึกแล้ว");
+            } catch (e) { showToast("เกิดข้อผิดพลาด", "error"); }
+            hideLoading();
+        };
+
+        const startClock = () => {
+            setInterval(() => {
+                const clockEl = document.getElementById('live-clock');
+                if(clockEl) clockEl.innerText = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            }, 1000);
+        };
+
+        // Close modal when clicking outside
+        document.getElementById('action-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'action-modal') closeModal();
+        });
 
     </script>
 </body>
