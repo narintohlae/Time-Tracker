@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TimeTrack (Thumb Zone Ultimate)</title>
+    <title>TimeTrack (Premium UI)</title>
     <style>
         /* --- Modern Variables 2025 --- */
         :root {
@@ -23,11 +23,11 @@
             --text-muted: #64748b;
             --tab-bar-bg: rgba(255, 255, 255, 0.95);
             
-            --radius-xl: 28px;
+            --radius-xl: 32px;
             --radius-lg: 16px;
             --radius-pill: 999px;
             
-            --shadow-glass: 0 -10px 30px rgba(0,0,0,0.05);
+            --shadow-glass: 0 -10px 30px rgba(0,0,0,0.04);
             --shadow-glow: 0 8px 25px -6px rgba(99, 102, 241, 0.5);
         }
 
@@ -39,162 +39,160 @@
             touch-action: manipulation;
         }
 
-        /* โครงสร้างหลักแบบ Flex Stacking (เพื่อให้ Thumb Zone อยู่ด้านล่างเสมอ) */
         #app-container {
-            width: 100%; max-width: 414px; height: 100vh; max-height: 896px;
+            width: 100%; max-width: 414px; height: 100dvh; max-height: 896px;
             background-color: var(--bg-app); position: relative; overflow: hidden;
             display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
+        @media (max-width: 414px) {
+            #app-container { max-height: 100dvh; box-shadow: none; border-radius: 0; }
+        }
+
         /* Modern Background Orbs */
         .bg-orb {
-            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6;
+            position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.6;
             z-index: 0; pointer-events: none; animation: floatOrb 12s ease-in-out infinite alternate;
         }
-        .orb-1 { top: -50px; right: -50px; width: 250px; height: 250px; background: #e0e7ff; }
-        .orb-2 { bottom: 100px; left: -100px; width: 300px; height: 300px; background: #fce7f3; }
-        .orb-3 { top: 30%; right: -150px; width: 200px; height: 200px; background: #dcfce7; }
+        .orb-1 { top: -5%; right: -10%; width: 60vmin; height: 60vmin; background: #e0e7ff; }
+        .orb-2 { bottom: 10%; left: -10%; width: 70vmin; height: 70vmin; background: #fce7f3; }
+        .orb-3 { top: 30%; right: -20%; width: 50vmin; height: 50vmin; background: #dcfce7; }
 
         @keyframes floatOrb {
             0% { transform: translateY(0) scale(1); }
-            100% { transform: translateY(30px) scale(1.1); }
-        }
-
-        @media (max-width: 414px) {
-            #app-container { max-height: 100vh; box-shadow: none; border-radius: 0; }
+            100% { transform: translateY(20px) scale(1.05); }
         }
 
         /* --- 1. Top Bar (Header) --- */
         header {
-            flex-shrink: 0; /* ป้องกันการหดตัว */
-            padding: 1.5rem; position: relative; z-index: 10;
+            flex: 0 0 auto; padding: clamp(1rem, 4vw, 1.5rem); position: relative; z-index: 10;
             display: flex; justify-content: space-between; align-items: center;
         }
-        .logo { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .header-actions { display: flex; gap: 0.75rem; align-items: center; }
-        .user-role-badge { font-size: 0.75rem; padding: 0.4rem 1rem; border-radius: var(--radius-pill); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .logo { font-size: clamp(1.2rem, 5vw, 1.4rem); font-weight: 800; letter-spacing: -0.5px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header-actions { display: flex; gap: 0.5rem; align-items: center; }
+        .user-role-badge { font-size: 0.7rem; padding: 0.3rem 0.8rem; border-radius: var(--radius-pill); font-weight: 700; text-transform: uppercase; }
         .role-admin { background-color: rgba(99, 102, 241, 0.15); color: var(--primary); }
         .role-emp { background-color: rgba(16, 185, 129, 0.15); color: #059669; }
         
         .btn-logout {
             background: rgba(244, 63, 94, 0.1); border: none; color: #f43f5e;
-            font-size: 0.8rem; font-weight: 700; cursor: pointer; padding: 0.4rem 1rem; border-radius: var(--radius-pill);
+            font-size: 0.75rem; font-weight: 700; cursor: pointer; padding: 0.4rem 0.8rem; border-radius: var(--radius-pill);
             transition: 0.2s; display: none;
         }
         .btn-logout:active { transform: scale(0.95); }
 
-        /* --- 2. Scrollable Content (พื้นที่ดูข้อมูล) --- */
+        /* --- 2. Scrollable Content (พื้นที่ดูข้อมูลหลัก) --- */
         main {
-            flex: 1; /* ขยายเต็มพื้นที่ที่เหลือ */
-            overflow-y: auto; -webkit-overflow-scrolling: touch; 
-            padding: 0 1.5rem 1.5rem 1.5rem; box-sizing: border-box; position: relative; z-index: 10;
-            /* ซ่อน Scrollbar เพื่อความสวยงามแบบ Native */
+            flex: 1 1 auto; overflow-y: auto; -webkit-overflow-scrolling: touch; 
+            padding: 0 clamp(1rem, 4vw, 1.5rem); padding-bottom: 1.5rem; 
+            box-sizing: border-box; position: relative; z-index: 10;
             -ms-overflow-style: none; scrollbar-width: none;
+            display: flex; flex-direction: column;
         }
         main::-webkit-scrollbar { display: none; }
 
-        /* --- 3. Thumb Zone Actions (พื้นที่สั่งการด้วยนิ้วโป้ง) --- */
+        /* --- 3. Thumb Zone Actions --- */
         #thumb-actions-container {
-            flex-shrink: 0; /* ล็อคติดขอบล่าง */
-            z-index: 40;
-            background: var(--glass-bg);
+            flex: 0 0 auto; z-index: 40; background: var(--glass-bg);
             backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
             border-top: 1px solid var(--glass-border);
             border-radius: var(--radius-xl) var(--radius-xl) 0 0;
             box-shadow: var(--shadow-glass);
-            /* padding จะถูกจัดการข้างในตอน render */
         }
-
         .thumb-actions {
-            padding: 1.5rem; 
+            padding: clamp(1.2rem, 5vw, 1.5rem); 
+            padding-bottom: max(1.2rem, env(safe-area-inset-bottom));
             display: flex; flex-direction: column; gap: 0.75rem;
             animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- 4. Bottom Tab Bar --- */
         #bottomNav {
-            flex-shrink: 0; /* ล็อคติดล่างสุด */
-            display: flex;
-            background-color: var(--tab-bar-bg);
-            border-top: 1px solid var(--glass-border);
-            padding: 0.5rem 1rem; 
-            padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
-            z-index: 50;
+            flex: 0 0 auto; display: flex; background-color: var(--tab-bar-bg); border-top: 1px solid var(--glass-border);
+            padding: 0.5rem 0.5rem; padding-bottom: max(0.5rem, env(safe-area-inset-bottom)); z-index: 50;
         }
         .nav-item {
             flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 0.6rem 0; color: var(--text-muted); text-decoration: none; font-size: 0.65rem;
-            font-weight: 600; cursor: pointer; transition: all 0.3s; border-radius: var(--radius-lg);
+            padding: 0.4rem 0; color: var(--text-muted); text-decoration: none; font-size: 0.65rem;
+            font-weight: 600; cursor: pointer; transition: all 0.2s; border-radius: var(--radius-lg);
         }
-        .nav-item svg { width: 24px; height: 24px; margin-bottom: 4px; stroke-width: 2px; transition: transform 0.2s; }
+        .nav-item svg { width: clamp(20px, 6vw, 24px); height: clamp(20px, 6vw, 24px); margin-bottom: 2px; transition: transform 0.2s; }
         .nav-item.active { background: var(--text-main); color: white; }
-        .nav-item.active svg { transform: translateY(-2px); stroke-width: 2.5px; }
+        .nav-item.active svg { transform: translateY(-2px); }
 
         /* --- UI Components พื้นฐาน --- */
         .card {
-            background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-            border: 1px solid var(--glass-border); border-radius: var(--radius-xl); 
-            padding: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.03); text-align: center; margin-bottom: 1.5rem;
+            background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-radius: var(--radius-lg); 
+            padding: clamp(1rem, 4vw, 1.5rem); box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
+            text-align: center; margin-bottom: 1rem;
         }
-        .section-title { font-size: 1.1rem; font-weight: 800; text-align: left; margin: 1rem 0 0.5rem 0; color: var(--text-main); letter-spacing: -0.3px; }
+        .section-title { font-size: clamp(1rem, 4vw, 1.1rem); font-weight: 800; text-align: left; margin: 1rem 0 0.5rem 0; color: var(--text-main); letter-spacing: -0.3px; }
 
-        /* ปรับ Input ให้เหมาะกับนิ้วโป้ง (ขนาดใหญ่ แตะง่าย) */
-        .native-input, .native-select {
-            width: 100%; padding: 1.1rem 1.2rem; border-radius: var(--radius-lg); border: 2px solid transparent;
-            background-color: rgba(255, 255, 255, 0.9); font-size: 1rem; font-family: inherit; font-weight: 600;
-            color: var(--text-main); outline: none; box-sizing: border-box; transition: all 0.2s;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); margin: 0; /* ลบ margin ภายนอกเพื่อจัดด้วย Flex Gap */
+        .native-input, .native-select, .native-textarea {
+            width: 100%; padding: 1rem 1.2rem; border-radius: var(--radius-lg); border: 1px solid var(--glass-border);
+            background-color: rgba(255, 255, 255, 0.9); font-size: clamp(0.9rem, 4vw, 1rem); font-family: inherit; font-weight: 500;
+            color: var(--text-main); outline: none; box-sizing: border-box; transition: all 0.2s; margin: 0;
         }
-        .native-input:focus, .native-select:focus { border-color: var(--primary); background-color: #fff; box-shadow: var(--shadow-glow); }
+        .native-textarea { resize: vertical; min-height: 80px; }
+        .native-input:focus, .native-select:focus, .native-textarea:focus { border-color: var(--primary); background-color: #fff; box-shadow: var(--shadow-glow); }
 
         .btn {
-            width: 100%; border: none; padding: 1.2rem; font-size: 1.1rem; font-weight: 700; letter-spacing: 0.5px;
+            width: 100%; border: none; padding: 1rem; font-size: clamp(0.95rem, 4vw, 1.1rem); font-weight: 700;
             border-radius: var(--radius-lg); cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
             display: flex; justify-content: center; align-items: center; gap: 0.5rem;
         }
-        .btn:active { transform: scale(0.95); opacity: 0.9; }
+        .btn:active { transform: scale(0.96); opacity: 0.9; }
         .btn-primary { background: var(--primary-gradient); color: white; box-shadow: var(--shadow-glow); }
-        .btn-success { background: var(--success-gradient); color: white; box-shadow: 0 8px 25px -6px rgba(16, 185, 129, 0.5); }
-        .btn-danger { background: var(--danger-gradient); color: white; box-shadow: 0 8px 25px -6px rgba(244, 63, 94, 0.5); }
-        .btn-outline { background: rgba(255, 255, 255, 0.6); color: var(--text-main); border: 1px solid var(--glass-border); }
+        .btn-success { background: var(--success-gradient); color: white; box-shadow: 0 6px 20px -6px rgba(16, 185, 129, 0.5); }
+        .btn-danger { background: var(--danger-gradient); color: white; box-shadow: 0 6px 20px -6px rgba(244, 63, 94, 0.5); }
+        .btn-outline { background: rgba(255, 255, 255, 0.5); color: var(--text-main); border: 1px solid var(--glass-border); }
 
         /* Typography */
-        .live-clock { font-size: 4rem; font-weight: 800; margin: 0.5rem 0 0 0; font-variant-numeric: tabular-nums; letter-spacing: -2px; color: var(--text-main); }
-        .live-date { color: var(--text-muted); font-size: 1rem; font-weight: 600; }
-        .status-badge { display: inline-flex; align-items: center; gap: 8px; padding: 0.5rem 1.2rem; border-radius: var(--radius-pill); font-size: 0.85rem; font-weight: 700; background: var(--glass-bg); border: 1px solid var(--glass-border); }
+        .live-clock { font-size: clamp(4rem, 16vw, 5.5rem); font-weight: 800; margin: 0; font-variant-numeric: tabular-nums; letter-spacing: -3px; line-height: 1; color: var(--text-main); }
+        .live-date { color: var(--primary); font-size: clamp(1rem, 4vw, 1.1rem); font-weight: 700; margin-top: 0.5rem; letter-spacing: -0.5px; }
+        .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 0.4rem 1rem; border-radius: var(--radius-pill); font-size: 0.8rem; font-weight: 700; background: var(--glass-bg); border: 1px solid var(--glass-border); }
         
-        /* List View (รายการประวัติ) */
-        .list-group { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
-        .list-item { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 1.2rem; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); 
-            border: 1px solid var(--glass-border); border-radius: var(--radius-lg); 
-        }
+        .list-group { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); }
         .item-main { display: flex; flex-direction: column; text-align: left; }
-        .item-title { font-weight: 700; font-size: 1.05rem; margin-bottom: 4px; color: var(--text-main); }
-        .item-subtitle { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+        .item-title { font-weight: 700; font-size: clamp(0.9rem, 4vw, 1rem); margin-bottom: 2px; color: var(--text-main); }
+        .item-subtitle { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
         
-        .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: 0.95rem; font-weight: 500;}
-        .icon-circle { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #e0e7ff, #f3e8ff); display: flex; align-items: center; justify-content: center; margin-right: 1rem; color: var(--primary); }
+        .empty-state { text-align: center; padding: 2rem 1rem; color: var(--text-muted); font-size: 0.9rem; font-weight: 500;}
 
-        /* Custom Numpad */
-        .pin-dots { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1.5rem; }
-        .pin-dot { width: 18px; height: 18px; border-radius: 50%; border: 3px solid var(--primary); transition: all 0.2s; }
-        .pin-dot.filled { background: var(--primary); transform: scale(1.1); box-shadow: 0 0 15px rgba(99, 102, 241, 0.4); }
-        .pin-dot.error { border-color: #f43f5e; background: #f43f5e; box-shadow: 0 0 15px rgba(244, 63, 94, 0.4); }
+        /* --- Numpad & PIN Dots (ปรับโฉมใหม่ให้นูน กดสนุก) --- */
+        .pin-dots { display: flex; justify-content: center; gap: 1.25rem; margin-bottom: 1.5rem; margin-top: 0.5rem; }
+        .pin-dot { width: clamp(16px, 5vw, 22px); height: clamp(16px, 5vw, 22px); border-radius: 50%; border: 2.5px solid var(--glass-border); transition: all 0.2s; background: rgba(255,255,255,0.5);}
+        .pin-dot.filled { background: var(--primary); border-color: var(--primary); transform: scale(1.15); box-shadow: 0 0 15px rgba(99, 102, 241, 0.5); }
+        .pin-dot.error { border-color: #f43f5e; background: #f43f5e; box-shadow: 0 0 15px rgba(244, 63, 94, 0.5); }
+        
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
         .shake-animation { animation: shake 0.4s ease-in-out; }
         
-        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 320px; margin: 0 auto; }
-        .numpad-btn { background: rgba(255,255,255,0.6); border: 1px solid var(--glass-border); border-radius: 50%; aspect-ratio: 1/1; font-size: 1.8rem; font-weight: 600; color: var(--text-main); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.1s; box-shadow: 0 4px 10px rgba(0,0,0,0.03); user-select: none; }
-        .numpad-btn:active { transform: scale(0.9); background: #fff; }
-        .numpad-btn.control { font-size: 1.2rem; background: transparent; border: none; box-shadow: none; color: var(--text-muted); }
+        .numpad { 
+            display: grid; grid-template-columns: repeat(3, 1fr); 
+            gap: clamp(0.6rem, 2.5vw, 1.2rem); 
+            max-width: 320px; width: 100%; margin: 0 auto; 
+        }
+        .numpad-btn { 
+            background: #ffffff; /* สีทึบเต็มร้อยให้ปุ่มดูลอยขึ้นมา */
+            border: 1px solid var(--glass-border); border-radius: 50%; 
+            aspect-ratio: 1/1; 
+            font-size: clamp(1.6rem, 7vw, 2rem); 
+            font-weight: 700; color: var(--text-main); 
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1); 
+            /* เพิ่มเงาแบบปุ่มนูน (Tactile) */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06), inset 0 -3px 0 rgba(0,0,0,0.03); 
+            user-select: none; -webkit-tap-highlight-color: transparent;
+            max-height: 80px;
+        }
+        .numpad-btn:active { transform: scale(0.92); background: #f8fafc; box-shadow: 0 1px 3px rgba(0,0,0,0.05), inset 0 2px 4px rgba(0,0,0,0.05);}
+        .numpad-btn.control { font-size: clamp(1rem, 4vw, 1.2rem); font-weight: 700; background: transparent; border: none; box-shadow: none; color: var(--text-muted); }
         
-        .req-badge { font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-pill); }
+        .req-badge { font-size: 0.7rem; font-weight: 700; padding: 4px 8px; border-radius: var(--radius-pill); white-space: nowrap; }
         .badge-pending { background: rgba(245, 158, 11, 0.1); color: #d97706; }
         .badge-approved { background: rgba(16, 185, 129, 0.1); color: #059669; }
         .badge-rejected { background: rgba(244, 63, 94, 0.1); color: #e11d48; }
@@ -221,10 +219,10 @@
         <!-- 2. Scrollable Content Zone -->
         <main id="app-content"></main>
 
-        <!-- 3. Thumb Action Zone (Sticky Bottom) -->
+        <!-- 3. Thumb Action Zone -->
         <div id="thumb-actions-container"></div>
 
-        <!-- 4. Bottom Tab Bar (Sticky Bottom) -->
+        <!-- 4. Bottom Tab Bar -->
         <nav class="bottom-nav" id="bottomNav" style="display: none;"></nav>
     </div>
 
@@ -248,7 +246,7 @@
         const db = getFirestore(app);
 
         /* =========================================
-           ส่วนที่ 1: การจัดการข้อมูลและสถานะ
+           ส่วนที่ 1: การจัดการข้อมูล
            ========================================= */
         let records = [];
         let employees = [];
@@ -312,7 +310,7 @@
         }
 
         /* =========================================
-           ส่วนส่งออกฟังก์ชัน Global (กดปุ่มทำงานต่างๆ)
+           ส่วน Numpad Global
            ========================================= */
         window.pressNumpad = function(val) {
             if (val === 'C') currentPin = "";
@@ -338,7 +336,7 @@
             if(!dotsContainer) return;
             dotsContainer.innerHTML = `<div class="pin-dot error"></div><div class="pin-dot error"></div><div class="pin-dot error"></div><div class="pin-dot error"></div>`;
             dotsContainer.classList.add('shake-animation');
-            setTimeout(() => { dotsContainer.classList.remove('shake-animation'); currentPin = ""; updatePinUI(); }, 500);
+            setTimeout(() => { dotsContainer.classList.remove('shake-animation'); currentPin = ""; updatePinUI(); }, 400);
         }
 
         function verifyPinSubmit() {
@@ -359,20 +357,21 @@
             }
         }
 
+        /* =========================================
+           การทำงานฝั่งข้อมูล
+           ========================================= */
         window.recordTime = async function(type) {
             if (!currentUser || currentUser.role !== 'emp') return;
             const emp = employees.find(e => e.id === currentUser.id);
             if (!emp) return;
 
             const now = new Date();
-            const recordData = {
+            await addDoc(collection(db, "timeRecords"), {
                 empId: emp.id, empName: emp.name, type: type,
                 timestamp: now.toISOString(),
                 timeString: now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
                 dateString: now.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' })
-            };
-            
-            await addDoc(collection(db, "timeRecords"), recordData);
+            });
             alert(`บันทึกเวลา${type === 'IN' ? 'เข้า' : 'ออก'}งาน สำเร็จ!`);
         };
 
@@ -382,10 +381,9 @@
             const reason = document.getElementById('leaveReason').value;
             if(!type || !date) return alert('กรุณากรอกข้อมูลให้ครบถ้วน');
 
-            const now = new Date();
             await addDoc(collection(db, "requests"), {
                 empId: currentUser.id, empName: currentUser.name, reqType: 'LEAVE',
-                leaveType: type, date: date, reason: reason, status: 'PENDING', timestamp: now.toISOString()
+                leaveType: type, date: date, reason: reason, status: 'PENDING', timestamp: new Date().toISOString()
             });
             document.getElementById('leaveDate').value = ''; document.getElementById('leaveReason').value = '';
             alert('ส่งคำขอสำเร็จ');
@@ -398,11 +396,10 @@
             if(!targetEmpId || !date) return alert('กรุณาระบุคนที่จะสลับและวันที่');
             
             const targetEmp = employees.find(e => e.id === targetEmpId);
-            const now = new Date();
             await addDoc(collection(db, "requests"), {
                 empId: currentUser.id, empName: currentUser.name, reqType: 'SWAP',
                 targetEmpId: targetEmp.id, targetEmpName: targetEmp.name,
-                date: date, reason: reason, status: 'PENDING', timestamp: now.toISOString()
+                date: date, reason: reason, status: 'PENDING', timestamp: new Date().toISOString()
             });
             document.getElementById('swapDate').value = ''; document.getElementById('swapReason').value = '';
             alert('ส่งคำขอสลับวันหยุดสำเร็จ');
@@ -434,7 +431,6 @@
         };
 
         window.navigateTo = navigateTo;
-        window.renderLogin = renderLogin;
 
         /* =========================================
            ส่วนที่ 2: การควบคุม UI แกนหลัก
@@ -469,7 +465,9 @@
             const tick = () => {
                 const now = new Date();
                 const clockEl = document.getElementById('clockDisplay');
+                const dateEl = document.getElementById('dateDisplay');
                 if(clockEl) clockEl.textContent = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }); 
+                if(dateEl) dateEl.textContent = now.toLocaleDateString('th-TH', { weekday: 'long', day: 'numeric', month: 'long' });
             };
             tick();
             clockInterval = setInterval(tick, 1000);
@@ -505,19 +503,21 @@
         }
 
         /* =========================================
-           ส่วนที่ 3: ระบบ Kiosk Login
+           ส่วนที่ 3: ระบบ Kiosk Login (จัดศูนย์กลางหน้าจอ)
            ========================================= */
         function renderSetup() {
             currentPin = ""; pinTargetId = 'setup'; thumbDiv.innerHTML = '';
             contentDiv.innerHTML = `
-                <div style="text-align:center; padding-top:2rem;">
-                    <h2 style="font-size:2rem; font-weight:800; margin:0;">ตั้งค่าระบบ</h2>
-                    <p style="color:var(--text-muted); margin-top:0.5rem;">กำหนด PIN 4 หลักสำหรับเจ้าของร้าน</p>
+                <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                    <div style="width: 70px; height: 70px; border-radius: 50%; background: var(--primary-gradient); color: white; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; box-shadow: var(--shadow-glow);">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="36" height="36"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    </div>
+                    <h2 style="margin: 0; font-size: clamp(1.8rem, 6vw, 2rem); font-weight: 800; letter-spacing: -0.5px;">ตั้งค่าระบบ</h2>
+                    <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: clamp(0.9rem, 3vw, 1rem); font-weight: 500;">กำหนด PIN 4 หลักสำหรับผู้ดูแล</p>
                 </div>
             `;
-            // ดึง Numpad มาไว้ที่ Thumb Zone
             thumbDiv.innerHTML = `
-                <div class="thumb-actions" style="padding-bottom: max(1.5rem, env(safe-area-inset-bottom));">
+                <div class="thumb-actions" style="background: transparent; border: none; box-shadow: none;">
                     ${getNumpadHTML()}
                 </div>
             `;
@@ -525,19 +525,26 @@
 
         function renderLogin() {
             currentPin = ""; pinTargetId = null; thumbDiv.innerHTML = '';
-            // Content ดูแค่เวลา
+            
             contentDiv.innerHTML = `
-                <div style="text-align: center; padding-top: 1.5rem;">
-                    <h2 style="margin: 0; color: var(--text-main); font-weight: 800; font-size: 1.8rem;">ยินดีต้อนรับ 👋</h2>
-                    <p style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500; margin-top: 0.5rem;">กรุณากดรหัสประจำตัวเพื่อเข้าระบบ</p>
-                    <div class="live-clock" id="clockDisplay" style="margin-top: 1.5rem;">00:00</div>
+                <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding-top: 2rem;">
+                    <!-- นาฬิกาขนาดใหญ่แบบ Lock Screen -->
+                    <div class="live-clock" id="clockDisplay">00:00</div>
+                    <div class="live-date" id="dateDisplay">--</div>
+                    
+                    <div style="margin-top: clamp(2rem, 6vh, 3rem);">
+                        <div style="margin: 0 auto 1rem auto; width: 54px; height: 54px; border-radius: 50%; background: #fff; box-shadow: 0 6px 15px rgba(0,0,0,0.05); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="28" height="28" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        </div>
+                        <h2 style="margin: 0; color: var(--text-main); font-weight: 800; font-size: clamp(1.4rem, 6vw, 1.8rem); letter-spacing: -0.5px;">ลงเวลาทำงาน</h2>
+                        <p style="color: var(--text-muted); font-size: clamp(0.9rem, 3.5vw, 1rem); font-weight: 500; margin-top: 0.5rem;">กดรหัส PIN 4 หลักของคุณ</p>
+                    </div>
                 </div>
             `;
             startClock();
             
-            // Thumb Zone เป็น Numpad เต็มรูปแบบ (ถ้าไม่มี Bottom Nav ให้เผื่อพื้นที่ขอบล่างด้วย)
             thumbDiv.innerHTML = `
-                <div class="thumb-actions" style="padding-bottom: max(1.5rem, env(safe-area-inset-bottom));">
+                <div class="thumb-actions" style="background: transparent; border: none; box-shadow: none; padding-top: 0;">
                     ${getNumpadHTML()}
                 </div>
             `;
@@ -553,8 +560,8 @@
 
             let statusHTML = isClockedIn ? `<span style="color: #059669; font-weight:800;">กำลังทำงาน</span>` : `<span style="color: var(--text-muted); font-weight:800;">ยังไม่เข้างาน</span>`;
             let buttonHTML = isClockedIn 
-                ? `<button class="btn btn-danger" style="padding: 1.5rem; font-size: 1.25rem;" onclick="recordTime('OUT')">บันทึกเวลาออกงาน</button>`
-                : `<button class="btn btn-success" style="padding: 1.5rem; font-size: 1.25rem;" onclick="recordTime('IN')">บันทึกเวลาเข้างาน</button>`;
+                ? `<button class="btn btn-danger" style="padding: 1.2rem; font-size: 1.1rem;" onclick="recordTime('OUT')">บันทึกเวลาออกงาน</button>`
+                : `<button class="btn btn-success" style="padding: 1.2rem; font-size: 1.1rem;" onclick="recordTime('IN')">บันทึกเวลาเข้างาน</button>`;
 
             const myRecords = records.filter(r => r.empId === currentUser.id).reverse().slice(0, 3);
             let recentHistoryHTML = '';
@@ -563,26 +570,24 @@
                 myRecords.forEach(rec => {
                     const isTypeIn = rec.type === 'IN';
                     listItems += `
-                        <div class="list-item" style="padding: 1rem; margin-bottom: 0.5rem;">
-                            <span style="font-weight: 600; font-size: 0.95rem;">${rec.dateString} ${rec.timeString}</span>
-                            <span style="color: ${isTypeIn ? '#059669' : 'var(--text-muted)'}; font-weight: 700; font-size: 0.85rem; background: rgba(0,0,0,0.03); padding: 4px 10px; border-radius: var(--radius-pill);">${isTypeIn ? 'เข้างาน' : 'ออกงาน'}</span>
+                        <div class="list-item" style="padding: 0.8rem 1rem; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 600; font-size: 0.9rem;">${rec.dateString} ${rec.timeString}</span>
+                            <span style="color: ${isTypeIn ? '#059669' : 'var(--text-muted)'}; font-weight: 700; font-size: 0.8rem; background: rgba(0,0,0,0.03); padding: 4px 10px; border-radius: var(--radius-pill);">${isTypeIn ? 'เข้างาน' : 'ออกงาน'}</span>
                         </div>`;
                 });
-                recentHistoryHTML = `<div class="section-title">ประวัติการลงเวลาล่าสุด</div>${listItems}`;
+                recentHistoryHTML = `<div class="section-title">ประวัติลงเวลาล่าสุด</div>${listItems}`;
             }
 
-            // เนื้อหา (เลื่อนได้)
             contentDiv.innerHTML = `
-                <div class="card" style="padding-top: 2rem;">
-                    <h3 style="margin:0; color: var(--text-muted); font-weight: 500;">สวัสดี, ${currentUser.name}</h3>
-                    <div style="margin-top: 0.5rem;">สถานะ: ${statusHTML}</div>
-                    <div class="live-clock" id="clockDisplay" style="font-size:3.5rem; margin:1rem 0;">00:00</div>
+                <div style="text-align:center; padding-top: 1rem;">
+                    <h3 style="margin:0; color: var(--text-muted); font-weight: 500; font-size: 1rem;">สวัสดี, ${currentUser.name}</h3>
+                    <div style="margin-top: 0.25rem; font-size: 0.9rem;">สถานะ: ${statusHTML}</div>
+                    <div class="live-clock" id="clockDisplay" style="margin: 0.5rem 0;">00:00</div>
                 </div>
                 ${recentHistoryHTML}
             `;
             startClock();
 
-            // ปุ่มกดลงเวลา ย้ายมาอยู่ที่ Thumb Zone (ปลายนิ้ว)
             thumbDiv.innerHTML = `
                 <div class="thumb-actions">
                     ${buttonHTML}
@@ -606,32 +611,30 @@
             });
             if(myLeaves.length > 0) historyHtml += `</div>`;
 
-            // แสดงเฉพาะประวัติให้เลื่อนอ่านด้านบน
             contentDiv.innerHTML = `
                 <div class="section-title">ประวัติการลาของคุณ</div>
                 ${historyHtml}
             `;
 
-            // ย้ายฟอร์มกรอกทั้งหมดมาไว้ที่ Thumb Zone แบบกะทัดรัด
             thumbDiv.innerHTML = `
                 <div class="thumb-actions">
-                    <div style="font-weight: 800; color: var(--text-main); font-size: 1.1rem; margin-bottom: 0.25rem;">ส่งแบบฟอร์มลางาน</div>
+                    <div style="font-weight: 800; color: var(--text-main); font-size: clamp(1rem, 4vw, 1.1rem); margin-bottom: 0.25rem;">ส่งคำขอลางาน</div>
                     <div style="display:flex; gap:0.5rem;">
                         <select id="leaveType" class="native-select" style="flex:1;">
                             <option value="" disabled selected>ประเภท</option>
                             <option value="ลาป่วย">ลาป่วย</option><option value="ลากิจ">ลากิจ</option><option value="พักร้อน">พักร้อน</option>
                         </select>
-                        <input type="date" id="leaveDate" class="native-input" style="flex:1;">
+                        <input type="date" id="leaveDate" class="native-input" style="flex:1; padding-left: 0.5rem; padding-right: 0.5rem; text-align:center;">
                     </div>
                     <input type="text" id="leaveReason" class="native-input" placeholder="ระบุเหตุผลสั้นๆ (ถ้ามี)">
-                    <button class="btn btn-primary" onclick="submitLeave()">ยืนยันการส่งคำขอ</button>
+                    <button class="btn btn-primary" onclick="submitLeave()">ยืนยันส่งคำขอ</button>
                 </div>
             `;
         }
 
         function renderEmpSwap() {
             thumbDiv.innerHTML = '';
-            let empOptions = '<option value="" disabled selected>เลือกเพื่อนที่ต้องการสลับด้วย</option>';
+            let empOptions = '<option value="" disabled selected>เลือกเพื่อนที่ต้องการสลับ</option>';
             employees.filter(e => e.id !== currentUser.id).forEach(e => {
                 empOptions += `<option value="${e.id}">${e.name}</option>`;
             });
@@ -650,22 +653,20 @@
             });
             if(mySwaps.length > 0) historyHtml += `</div>`;
 
-            // แสดงเฉพาะประวัติให้เลื่อนอ่านด้านบน
             contentDiv.innerHTML = `
-                <div class="section-title">ประวัติการขอสลับวันหยุด</div>
+                <div class="section-title">ประวัติขอสลับวันหยุด</div>
                 ${historyHtml}
             `;
 
-            // ย้ายฟอร์มกรอกทั้งหมดมาไว้ที่ Thumb Zone
             thumbDiv.innerHTML = `
                 <div class="thumb-actions">
-                    <div style="font-weight: 800; color: var(--text-main); font-size: 1.1rem; margin-bottom: 0.25rem;">ขอสลับวันหยุด</div>
+                    <div style="font-weight: 800; color: var(--text-main); font-size: clamp(1rem, 4vw, 1.1rem); margin-bottom: 0.25rem;">ขอสลับวันหยุด</div>
                     <select id="swapEmp" class="native-select">${empOptions}</select>
                     <div style="display:flex; gap:0.5rem; align-items:center;">
-                        <span style="font-size:0.85rem; color:var(--text-muted); white-space:nowrap; font-weight:600;">วันที่เพื่อนต้องมาแทน:</span>
-                        <input type="date" id="swapDate" class="native-input" style="flex:1;">
+                        <span style="font-size:0.8rem; color:var(--text-muted); white-space:nowrap; font-weight:600;">วันที่เพื่อนแทน:</span>
+                        <input type="date" id="swapDate" class="native-input" style="flex:1; padding-left: 0.5rem; padding-right: 0.5rem; text-align:center;">
                     </div>
-                    <button class="btn btn-primary" style="background: var(--warning-gradient);" onclick="submitSwap()">ส่งคำขอสลับวันหยุด</button>
+                    <button class="btn btn-primary" style="background: var(--warning-gradient);" onclick="submitSwap()">ส่งคำขอสลับวัน</button>
                 </div>
             `;
         }
@@ -680,22 +681,22 @@
 
             contentDiv.innerHTML = `
                 <div class="section-title">ภาพรวมวันนี้</div>
-                <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-                    <div class="card" style="flex: 1; padding: 1.5rem 1rem; margin: 0;">
-                        <div style="font-size: 2.5rem; font-weight: 800; color: var(--primary); letter-spacing: -1px;">${employees.length}</div>
-                        <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">พนักงานรวม</div>
+                <div style="display: flex; gap: 0.75rem; margin-bottom: 1rem;">
+                    <div class="card" style="flex: 1; padding: 1.2rem 1rem; margin: 0;">
+                        <div style="font-size: clamp(2rem, 8vw, 2.5rem); font-weight: 800; color: var(--primary); letter-spacing: -1px;">${employees.length}</div>
+                        <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">พนักงานรวม</div>
                     </div>
-                    <div class="card" style="flex: 1; padding: 1.5rem 1rem; margin: 0;">
-                        <div style="font-size: 2.5rem; font-weight: 800; color: #059669; letter-spacing: -1px;">${workingCount}</div>
-                        <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">เข้างานแล้ว</div>
+                    <div class="card" style="flex: 1; padding: 1.2rem 1rem; margin: 0;">
+                        <div style="font-size: clamp(2rem, 8vw, 2.5rem); font-weight: 800; color: #059669; letter-spacing: -1px;">${workingCount}</div>
+                        <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">เข้างานแล้ว</div>
                     </div>
                 </div>
-                <div class="card" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="navigateTo('admin-req')">
+                <div class="card" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding: 1.2rem;" onclick="navigateTo('admin-req')">
                     <div style="text-align:left;">
-                        <div style="font-weight:800; font-size:1.1rem; color:var(--text-main);">คำขอรอดำเนินการ</div>
-                        <div style="font-size:0.85rem; color:var(--text-muted);">ลางาน / สลับวันหยุด</div>
+                        <div style="font-weight:800; font-size:1.05rem; color:var(--text-main);">คำขอรอดำเนินการ</div>
+                        <div style="font-size:0.8rem; color:var(--text-muted);">ลางาน / สลับวันหยุด</div>
                     </div>
-                    <div style="background: #fef3c7; color: #d97706; font-weight:800; font-size:1.5rem; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center;">${pendingCount}</div>
+                    <div style="background: #fef3c7; color: #d97706; font-weight:800; font-size:1.2rem; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center;">${pendingCount}</div>
                 </div>
             `;
         }
@@ -709,21 +710,19 @@
                         <div class="item-main">
                             <span class="item-title" style="margin:0;">${emp.name}</span><span class="item-subtitle">PIN: ${emp.pin}</span>
                         </div>
-                        <button class="btn" style="width: auto; padding: 0.6rem 1.2rem; font-size: 0.85rem; background: var(--danger-gradient); color: white; border-radius: var(--radius-pill); margin: 0;" onclick="handleDeleteEmployee('${emp.id}')">ลบ</button>
+                        <button class="btn" style="width: auto; padding: 0.5rem 1rem; font-size: 0.8rem; background: var(--danger-gradient); color: white; border-radius: var(--radius-pill); margin: 0;" onclick="handleDeleteEmployee('${emp.id}')">ลบ</button>
                     </div>`;
             });
             if(employees.length > 0) listHTML += `</div>`;
 
-            // แสดงเฉพาะรายชื่อ
             contentDiv.innerHTML = `
                 <div class="section-title">รายชื่อพนักงาน</div>
                 ${listHTML}
             `;
 
-            // ย้ายฟอร์มเพิ่มพนักงานมาไว้ปลายนิ้วโป้ง
             thumbDiv.innerHTML = `
                 <div class="thumb-actions">
-                    <div style="font-weight: 800; color: var(--text-main); font-size: 1.1rem; margin-bottom: 0.25rem;">+ เพิ่มพนักงานใหม่</div>
+                    <div style="font-weight: 800; color: var(--text-main); font-size: clamp(1rem, 4vw, 1.1rem); margin-bottom: 0.25rem;">+ เพิ่มพนักงานใหม่</div>
                     <div style="display:flex; gap:0.5rem;">
                         <input type="text" id="newEmpName" class="native-input" placeholder="ชื่อพนักงาน" style="flex:2;">
                         <input type="password" id="newEmpPin" class="native-input" placeholder="PIN 4 หลัก" maxlength="4" pattern="[0-9]*" inputmode="numeric" style="flex:1; text-align:center;">
@@ -736,15 +735,14 @@
         function renderAdminRequests() {
             clearInterval(clockInterval); thumbDiv.innerHTML = '';
             
-            let listHTML = requests.length === 0 ? `<div class="empty-state">ยังไม่มีคำขอใดๆ</div>` : `<div class="list-group">`;
+            let listHTML = requests.length === 0 ? `<div class="empty-state">ไม่มีคำขอรอดำเนินการ</div>` : `<div class="list-group">`;
             requests.forEach(req => {
                 let details = req.reqType === 'LEAVE' ? `${req.leaveType} (${req.date})` : `ขอสลับวันหยุดกับ ${req.targetEmpName} (${req.date})`;
                 
-                // ปรับปุ่มอนุมัติ/ปฏิเสธ ให้เป็นบล็อคใหญ่กดง่ายในแต่ละคำขอ
                 let actionBtns = req.status === 'PENDING' ? `
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem; margin-top:1rem;">
-                        <button class="btn btn-success" style="padding:0.8rem; font-size:0.9rem;" onclick="updateReqStatus('${req.id}', 'APPROVED')">อนุมัติ</button>
-                        <button class="btn btn-outline" style="padding:0.8rem; font-size:0.9rem; color:#f43f5e; border-color:#f43f5e;" onclick="updateReqStatus('${req.id}', 'REJECTED')">ปฏิเสธ</button>
+                    <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+                        <button class="btn btn-success" style="padding:0.7rem; font-size:0.9rem; border-radius:10px;" onclick="updateReqStatus('${req.id}', 'APPROVED')">อนุมัติ</button>
+                        <button class="btn btn-outline" style="padding:0.7rem; font-size:0.9rem; color:#f43f5e; border-color:#f43f5e; border-radius:10px; background:rgba(244,63,94,0.05);" onclick="updateReqStatus('${req.id}', 'REJECTED')">ปฏิเสธ</button>
                     </div>
                 ` : '';
 
@@ -764,7 +762,7 @@
             if(requests.length > 0) listHTML += `</div>`;
 
             contentDiv.innerHTML = `
-                <div class="section-title">จัดการคำขอรอดำเนินการ</div>
+                <div class="section-title">จัดการคำขอ</div>
                 ${listHTML}
             `;
         }
