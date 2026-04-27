@@ -40,55 +40,14 @@
             <p class="font-medium animate-pulse text-sm">Connecting to cloud...</p>
         </div>
 
-        <!-- 2. ROLE SELECTION VIEW -->
-        <div id="view-roles" class="view-hidden flex-col h-full p-6 justify-center bg-slate-50 absolute inset-0 z-40">
-            <div class="text-center mb-10 -mt-10">
-                <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-200">
+        <!-- 2. PIN PAD VIEW (Default Entry) -->
+        <div id="view-pin" class="view-hidden flex-col h-full bg-white absolute inset-0 z-40">
+            <div class="flex-1 flex flex-col items-center justify-center p-6 mt-8">
+                <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-indigo-200">
                     <i class="fa-solid fa-clock text-3xl text-white"></i>
                 </div>
-                <h1 class="text-3xl font-bold text-slate-900 tracking-tight">TimeTracker</h1>
-                <p class="text-slate-500 mt-1 flex items-center justify-center gap-1.5 text-sm">
-                    <i class="fa-solid fa-cloud text-indigo-400"></i> Cloud Synced Kiosk
-                </p>
-            </div>
-
-            <div class="space-y-4">
-                <button onclick="selectRole('EMPLOYEE')" class="w-full bg-white p-5 rounded-2xl border border-slate-200 flex items-center gap-4 active:scale-95 transition-transform shadow-sm text-left">
-                    <div class="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-user-group text-xl text-indigo-600"></i>
-                    </div>
-                    <div class="flex-1">
-                        <h2 class="text-lg font-bold text-slate-900">Employee Portal</h2>
-                        <p class="text-xs text-slate-500">Track time & breaks</p>
-                    </div>
-                    <i class="fa-solid fa-chevron-right text-slate-300"></i>
-                </button>
-
-                <button onclick="selectRole('OWNER')" class="w-full bg-slate-900 p-5 rounded-2xl border border-slate-800 flex items-center gap-4 active:scale-95 transition-transform shadow-md text-left">
-                    <div class="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-briefcase text-xl text-slate-300"></i>
-                    </div>
-                    <div class="flex-1">
-                        <h2 class="text-lg font-bold text-white">Owner Dashboard</h2>
-                        <p class="text-xs text-slate-400">Manage team</p>
-                    </div>
-                    <i class="fa-solid fa-chevron-right text-slate-600"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- 3. PIN PAD VIEW -->
-        <div id="view-pin" class="view-hidden flex-col h-full bg-white absolute inset-0 z-40">
-            <button onclick="cancelPin()" class="absolute top-4 left-4 p-3 text-slate-400 active:bg-slate-100 rounded-full z-10">
-                <i class="fa-solid fa-arrow-left text-xl"></i>
-            </button>
-
-            <div class="flex-1 flex flex-col items-center justify-center p-6 mt-8">
-                <div id="pin-icon-container" class="w-14 h-14 rounded-full flex items-center justify-center mb-4">
-                    <i class="fa-solid fa-lock text-2xl"></i>
-                </div>
-                <h2 class="text-2xl font-bold text-slate-900 mb-1">Enter PIN</h2>
-                <span id="pin-hint" class="font-mono text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded mt-1"></span>
+                <h2 class="text-2xl font-bold text-slate-900 mb-1">TimeTracker</h2>
+                <span class="font-mono text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded mt-1">Enter your 4-digit PIN</span>
 
                 <div id="pin-dots" class="flex gap-4 mt-8">
                     <div class="w-4 h-4 rounded-full bg-slate-200 transition-colors"></div>
@@ -293,7 +252,6 @@
         // --- View Management ---
         const views = {
             loading: document.getElementById('view-loading'),
-            roles: document.getElementById('view-roles'),
             pin: document.getElementById('view-pin'),
             main: document.getElementById('view-main'),
             modal: document.getElementById('modal-employee')
@@ -333,7 +291,9 @@
             if (user) {
                 state.user = user;
                 setupFirestoreListeners();
-                showView('roles');
+                renderNumpad();
+                updatePinDots();
+                showView('pin');
                 startGlobalTimer();
             }
         });
@@ -443,32 +403,6 @@
         }
 
         // --- Global Navigation Functions ---
-        window.selectRole = function(role) {
-            state.selectedRole = role;
-            state.pinBuffer = '';
-            
-            const iconContainer = document.getElementById('pin-icon-container');
-            const pinHint = document.getElementById('pin-hint');
-            
-            if (role === 'EMPLOYEE') {
-                iconContainer.className = 'w-14 h-14 rounded-full flex items-center justify-center mb-4 bg-indigo-50 text-indigo-600';
-                pinHint.innerText = 'Please enter your unique 4-digit PIN';
-            } else if (role === 'OWNER') {
-                iconContainer.className = 'w-14 h-14 rounded-full flex items-center justify-center mb-4 bg-slate-100 text-slate-700';
-                pinHint.innerText = 'Owner PIN: 8888';
-            }
-            
-            renderNumpad();
-            updatePinDots();
-            showView('pin');
-        };
-
-        window.cancelPin = function() {
-            state.selectedRole = null;
-            state.pinBuffer = '';
-            showView('roles');
-        };
-
         window.handleNumClick = function(num) {
             if (state.pinBuffer.length < 4) {
                 state.pinBuffer += num;
@@ -502,17 +436,15 @@
         }
 
         function verifyPin() {
-            if (state.selectedRole === 'OWNER') {
-                if (state.pinBuffer === '8888') {
-                    state.isUnlocked = true;
-                    setTimeout(() => { initMainView(); showView('main'); }, 150);
-                } else {
-                    pinError();
-                }
-            } else if (state.selectedRole === 'EMPLOYEE') {
+            if (state.pinBuffer === '8888') {
+                state.selectedRole = 'OWNER';
+                state.isUnlocked = true;
+                setTimeout(() => { initMainView(); showView('main'); }, 150);
+            } else {
                 // Find employee by their custom PIN
                 const emp = state.teamEmployees.find(e => e.pin === state.pinBuffer);
                 if (emp) {
+                    state.selectedRole = 'EMPLOYEE';
                     state.currentEmployee = emp;
                     state.isUnlocked = true;
                     setupEmployeeLogsListener(emp.id); // Load specific user's logs
@@ -528,8 +460,10 @@
             state.isUnlocked = false;
             state.currentEmployee = null;
             state.currentEmployeeLogs = [];
+            state.pinBuffer = '';
             if (unsubEmployeeLogs) { unsubEmployeeLogs(); unsubEmployeeLogs = null; }
-            showView('roles');
+            updatePinDots();
+            showView('pin');
         };
 
         // --- Employee Action Engine ---
