@@ -48,17 +48,17 @@
                 </div>
                 <h1 class="text-3xl font-bold text-slate-900 tracking-tight">TimeTracker</h1>
                 <p class="text-slate-500 mt-1 flex items-center justify-center gap-1.5 text-sm">
-                    <i class="fa-solid fa-cloud text-indigo-400"></i> Cloud Synced
+                    <i class="fa-solid fa-cloud text-indigo-400"></i> Cloud Synced Kiosk
                 </p>
             </div>
 
             <div class="space-y-4">
                 <button onclick="selectRole('EMPLOYEE')" class="w-full bg-white p-5 rounded-2xl border border-slate-200 flex items-center gap-4 active:scale-95 transition-transform shadow-sm text-left">
                     <div class="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-user text-xl text-indigo-600"></i>
+                        <i class="fa-solid fa-user-group text-xl text-indigo-600"></i>
                     </div>
                     <div class="flex-1">
-                        <h2 class="text-lg font-bold text-slate-900">Employee</h2>
+                        <h2 class="text-lg font-bold text-slate-900">Employee Portal</h2>
                         <p class="text-xs text-slate-500">Track time & breaks</p>
                     </div>
                     <i class="fa-solid fa-chevron-right text-slate-300"></i>
@@ -66,10 +66,10 @@
 
                 <button onclick="selectRole('OWNER')" class="w-full bg-slate-900 p-5 rounded-2xl border border-slate-800 flex items-center gap-4 active:scale-95 transition-transform shadow-md text-left">
                     <div class="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-shield-halved text-xl text-slate-300"></i>
+                        <i class="fa-solid fa-briefcase text-xl text-slate-300"></i>
                     </div>
                     <div class="flex-1">
-                        <h2 class="text-lg font-bold text-white">Owner</h2>
+                        <h2 class="text-lg font-bold text-white">Owner Dashboard</h2>
                         <p class="text-xs text-slate-400">Manage team</p>
                     </div>
                     <i class="fa-solid fa-chevron-right text-slate-600"></i>
@@ -88,7 +88,7 @@
                     <i class="fa-solid fa-lock text-2xl"></i>
                 </div>
                 <h2 class="text-2xl font-bold text-slate-900 mb-1">Enter PIN</h2>
-                <span id="pin-hint" class="font-mono text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded mt-1">Hint: 1234</span>
+                <span id="pin-hint" class="font-mono text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded mt-1"></span>
 
                 <div id="pin-dots" class="flex gap-4 mt-8">
                     <div class="w-4 h-4 rounded-full bg-slate-200 transition-colors"></div>
@@ -126,10 +126,10 @@
                     <div class="px-6 py-5 bg-white flex items-center justify-between border-b border-slate-100 shadow-sm shrink-0">
                         <div class="flex items-center gap-3">
                             <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center overflow-hidden">
-                                <i class="fa-solid fa-user text-slate-400 text-xl"></i>
+                                <span id="emp-avatar-initial" class="text-xl font-bold text-slate-500">?</span>
                             </div>
                             <div>
-                                <h2 class="font-bold text-slate-900 text-lg leading-tight">John Doe</h2>
+                                <h2 class="font-bold text-slate-900 text-lg leading-tight" id="emp-profile-name">Loading...</h2>
                                 <p class="text-xs text-slate-500" id="emp-current-date">--</p>
                             </div>
                         </div>
@@ -232,7 +232,8 @@
                     <input type="text" id="form-emp-role" required placeholder="Role (e.g. Designer)" class="w-full bg-slate-50 px-4 py-4 rounded-xl border border-slate-200 outline-none focus:border-indigo-500 focus:bg-white transition-colors text-slate-900">
                     
                     <div class="pt-2">
-                        <input type="text" id="form-emp-pin" maxlength="4" pattern="\d*" placeholder="4-Digit PIN (Optional)" class="w-full bg-slate-50 px-4 py-4 rounded-xl border border-slate-200 outline-none focus:border-indigo-500 focus:bg-white transition-colors text-slate-900 font-mono tracking-widest">
+                        <input type="text" id="form-emp-pin" required maxlength="4" pattern="\d{4}" placeholder="4-Digit PIN (Required)" class="w-full bg-slate-50 px-4 py-4 rounded-xl border border-slate-200 outline-none focus:border-indigo-500 focus:bg-white transition-colors text-slate-900 font-mono tracking-widest">
+                        <p class="text-[11px] text-slate-500 mt-1">Employees use this PIN to access their portal.</p>
                     </div>
 
                     <div class="pt-4 flex gap-3">
@@ -253,7 +254,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- App State ---
         const state = {
@@ -262,23 +263,16 @@
             isUnlocked: false,
             pinBuffer: '',
             
-            // Private State
-            userStatus: 'OUT',
-            userLogs: [],
-            userWorkedSeconds: 0,
-            
-            // Public Team State
+            // Public Team Directory
             teamEmployees: [],
+            
+            // Logged in Employee Session state
+            currentEmployee: null,
+            currentEmployeeLogs: [],
             
             // Owner UI State
             ownerActiveTab: 'LIVE',
-            editingEmployeeId: null,
-
-            // Mock fallback
-            mockTeam: [
-                { id: 'mock1', name: 'Sarah Smith', role: 'UI/UX Designer', status: 'IN', secondsWorked: 14400, lastAction: 'CLOCK_IN', pin: '1111' },
-                { id: 'mock2', name: 'Mike Johnson', role: 'Product Manager', status: 'BREAK', secondsWorked: 18000, lastAction: 'BREAK_START', pin: '2222' }
-            ]
+            editingEmployeeId: null
         };
 
         // --- Setup Firebase ---
@@ -319,8 +313,6 @@
         // --- Authentication ---
         async function initAuth() {
             try {
-                // If a token is provided by the environment, try it, but catch custom-token mismatches
-                // which happen when the injected token doesn't match the custom firebaseConfig.
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     try {
                         await signInWithCustomToken(auth, __initial_auth_token);
@@ -349,95 +341,90 @@
         // --- Firestore Listeners ---
         function setupFirestoreListeners() {
             if (!state.user) return;
-            const uid = state.user.uid;
-
-            // 1. Private Logs
-            onSnapshot(collection(db, 'artifacts', appId, 'users', uid, 'logs'), (snapshot) => {
-                state.userLogs = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-                calculateWorkedHours();
-                updateUI();
-            }, (error) => console.error("Error fetching logs", error));
-
-            // 2. Private Status
-            onSnapshot(doc(db, 'artifacts', appId, 'users', uid, 'settings', 'currentStatus'), (docSnap) => {
-                if (docSnap.exists()) {
-                    state.userStatus = docSnap.data().status;
-                } else {
-                    state.userStatus = 'OUT';
-                }
-                calculateWorkedHours();
-                updateUI();
-            }, (error) => console.error("Error fetching status", error));
-
-            // 3. Public Team
+            
+            // Master listener for public team directory
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'employees'), (snapshot) => {
                 state.teamEmployees = snapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
                 }));
+                
+                // If an employee is logged in, sync their local profile data
+                if (state.currentEmployee) {
+                    const latestProfile = state.teamEmployees.find(e => e.id === state.currentEmployee.id);
+                    if (latestProfile) {
+                        state.currentEmployee = latestProfile;
+                    } else {
+                        // Profile deleted by owner while logged in
+                        logout();
+                        return;
+                    }
+                }
                 updateUI();
             }, (error) => console.error("Error fetching team", error));
         }
 
-        // --- Logic & Calculations ---
-        function calculateWorkedHours() {
-            let total = 0;
-            let currentStartTime = null;
-            const sortedLogs = [...state.userLogs].sort((a, b) => a.timestamp - b.timestamp);
-
-            sortedLogs.forEach((log) => {
-                if (log.type === 'CLOCK_IN' || log.type === 'BREAK_END') {
-                    currentStartTime = log.timestamp;
-                } else if (log.type === 'CLOCK_OUT' || log.type === 'BREAK_START') {
-                    if (currentStartTime) {
-                        total += Math.floor((log.timestamp - currentStartTime) / 1000);
-                        currentStartTime = null;
-                    }
-                }
-            });
-
-            if (state.userStatus === 'IN' && currentStartTime) {
-                total += Math.floor((Date.now() - currentStartTime) / 1000);
-            }
-
-            state.userWorkedSeconds = total;
-            
-            // Update UI elements directly to avoid full re-renders every second
-            const empHoursEl = document.getElementById('emp-worked-hours');
-            if (empHoursEl) empHoursEl.innerText = formatDuration(state.userWorkedSeconds) + ' Active';
+        let unsubEmployeeLogs = null;
+        function setupEmployeeLogsListener(empId) {
+            if (unsubEmployeeLogs) unsubEmployeeLogs();
+            unsubEmployeeLogs = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'employees', empId, 'logs'), (snapshot) => {
+                state.currentEmployeeLogs = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                updateUI();
+            }, (error) => console.error("Error fetching logs", error));
         }
 
+        // --- Logic & Global Timer ---
         let globalTimer;
         function startGlobalTimer() {
             if (globalTimer) clearInterval(globalTimer);
             globalTimer = setInterval(() => {
-                calculateWorkedHours();
+                const now = Date.now();
                 
-                // Update specific clock elements
-                const now = new Date();
+                // Refresh Top Clocks
                 const clockTime = document.getElementById('emp-clock-time');
                 const clockAmPm = document.getElementById('emp-clock-ampm');
                 const clockDate = document.getElementById('emp-current-date');
                 
+                const dateObj = new Date();
                 if (clockTime && clockAmPm) {
-                    const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+                    const timeString = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
                     const parts = timeString.split(' ');
                     clockTime.innerText = parts[0];
                     clockAmPm.innerText = parts[1];
                 }
                 if (clockDate) {
-                    clockDate.innerText = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                    clockDate.innerText = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
                 }
 
-                // If owner live tab is active, we might want to update it periodically, 
-                // but for simplicity, we let firestore updates drive major redraws.
+                // If Employee UI is active, tick their worked hours
+                if (state.selectedRole === 'EMPLOYEE' && state.currentEmployee) {
+                    let displaySeconds = state.currentEmployee.secondsWorked || 0;
+                    if (state.currentEmployee.status === 'IN' && state.currentEmployee.lastActionTimestamp) {
+                        displaySeconds += Math.floor((now - state.currentEmployee.lastActionTimestamp) / 1000);
+                    }
+                    const empHoursEl = document.getElementById('emp-worked-hours');
+                    if (empHoursEl) empHoursEl.innerText = formatDuration(displaySeconds) + ' Active';
+                }
+
+                // If Owner Live Dashboard is active, tick everyone's active hours
+                if (state.selectedRole === 'OWNER' && state.ownerActiveTab === 'LIVE') {
+                    state.teamEmployees.forEach(emp => {
+                        const timeEl = document.getElementById(`own-time-${emp.id}`);
+                        if (timeEl) {
+                            let displaySeconds = emp.secondsWorked || 0;
+                            if (emp.status === 'IN' && emp.lastActionTimestamp) {
+                                displaySeconds += Math.floor((now - emp.lastActionTimestamp) / 1000);
+                            }
+                            timeEl.innerText = formatDuration(displaySeconds);
+                        }
+                    });
+                }
             }, 1000);
         }
 
-        // --- Formatting Helpers ---
         function formatDuration(totalSeconds) {
             const h = Math.floor(totalSeconds / 3600);
             const m = Math.floor((totalSeconds % 3600) / 60);
@@ -455,16 +442,21 @@
             return map[type] || type.replace('_', ' ');
         }
 
-        // --- Global Functions (Attached to window for inline HTML onclick) ---
-        
+        // --- Global Navigation Functions ---
         window.selectRole = function(role) {
             state.selectedRole = role;
             state.pinBuffer = '';
             
-            // Update PIN UI
             const iconContainer = document.getElementById('pin-icon-container');
-            iconContainer.className = `w-14 h-14 rounded-full flex items-center justify-center mb-4 ${role === 'OWNER' ? 'bg-slate-100 text-slate-700' : 'bg-indigo-50 text-indigo-600'}`;
-            document.getElementById('pin-hint').innerText = `Hint: ${role === 'EMPLOYEE' ? '1234' : '8888'}`;
+            const pinHint = document.getElementById('pin-hint');
+            
+            if (role === 'EMPLOYEE') {
+                iconContainer.className = 'w-14 h-14 rounded-full flex items-center justify-center mb-4 bg-indigo-50 text-indigo-600';
+                pinHint.innerText = 'Please enter your unique 4-digit PIN';
+            } else if (role === 'OWNER') {
+                iconContainer.className = 'w-14 h-14 rounded-full flex items-center justify-center mb-4 bg-slate-100 text-slate-700';
+                pinHint.innerText = 'Owner PIN: 8888';
+            }
             
             renderNumpad();
             updatePinDots();
@@ -499,53 +491,89 @@
             }
         }
 
+        function pinError() {
+            const dots = document.getElementById('pin-dots').children;
+            for (let i = 0; i < 4; i++) { dots[i].classList.replace('bg-slate-800', 'bg-rose-500'); }
+            document.getElementById('pin-error').style.opacity = '1';
+            setTimeout(() => {
+                state.pinBuffer = '';
+                updatePinDots();
+            }, 500);
+        }
+
         function verifyPin() {
-            const expected = state.selectedRole === 'EMPLOYEE' ? '1234' : '8888';
-            if (state.pinBuffer === expected) {
-                state.isUnlocked = true;
-                setTimeout(() => {
-                    initMainView();
-                    showView('main');
-                }, 150);
-            } else {
-                const dots = document.getElementById('pin-dots').children;
-                for (let i = 0; i < 4; i++) { dots[i].classList.replace('bg-slate-800', 'bg-rose-500'); }
-                document.getElementById('pin-error').style.opacity = '1';
-                setTimeout(() => {
-                    state.pinBuffer = '';
-                    updatePinDots();
-                }, 500);
+            if (state.selectedRole === 'OWNER') {
+                if (state.pinBuffer === '8888') {
+                    state.isUnlocked = true;
+                    setTimeout(() => { initMainView(); showView('main'); }, 150);
+                } else {
+                    pinError();
+                }
+            } else if (state.selectedRole === 'EMPLOYEE') {
+                // Find employee by their custom PIN
+                const emp = state.teamEmployees.find(e => e.pin === state.pinBuffer);
+                if (emp) {
+                    state.currentEmployee = emp;
+                    state.isUnlocked = true;
+                    setupEmployeeLogsListener(emp.id); // Load specific user's logs
+                    setTimeout(() => { initMainView(); showView('main'); }, 150);
+                } else {
+                    pinError();
+                }
             }
         }
 
         window.logout = function() {
             state.selectedRole = null;
             state.isUnlocked = false;
+            state.currentEmployee = null;
+            state.currentEmployeeLogs = [];
+            if (unsubEmployeeLogs) { unsubEmployeeLogs(); unsubEmployeeLogs = null; }
             showView('roles');
         };
 
-        // --- Employee Actions ---
+        // --- Employee Action Engine ---
         window.handleAction = async function(actionType) {
-            if (!state.user) return;
+            if (!state.user || !state.currentEmployee) return;
             const now = Date.now();
-            let newStatus = state.userStatus;
+            const emp = state.currentEmployee;
+
+            let newStatus = emp.status;
+            let newSecondsWorked = emp.secondsWorked || 0;
+            
+            // If they are clocking out or taking a break, calculate time spent in 'IN' state
+            if (emp.status === 'IN' && emp.lastActionTimestamp) {
+                newSecondsWorked += Math.floor((now - emp.lastActionTimestamp) / 1000);
+            }
+
             if (actionType === 'CLOCK_IN' || actionType === 'BREAK_END') newStatus = 'IN';
             if (actionType === 'CLOCK_OUT') newStatus = 'OUT';
             if (actionType === 'BREAK_START') newStatus = 'BREAK';
 
             // Optimistic Update
-            state.userStatus = newStatus;
+            state.currentEmployee.status = newStatus;
             updateUI(); 
 
             try {
-                await addDoc(collection(db, 'artifacts', appId, 'users', state.user.uid, 'logs'), { type: actionType, timestamp: now });
-                await setDoc(doc(db, 'artifacts', appId, 'users', state.user.uid, 'settings', 'currentStatus'), { status: newStatus, updatedAt: now });
+                // Save specific punch log
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'employees', emp.id, 'logs'), { 
+                    type: actionType, 
+                    timestamp: now 
+                });
+                
+                // Save updated summary on employee doc
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'employees', emp.id), { 
+                    status: newStatus, 
+                    lastAction: friendlyActionName(actionType),
+                    lastActionTimestamp: now,
+                    secondsWorked: newSecondsWorked
+                });
             } catch (err) {
                 console.error("Action error", err);
             }
         };
 
-        // --- Owner Actions ---
+        // --- Owner UI Engine ---
         window.switchOwnerTab = function(tab) {
             state.ownerActiveTab = tab;
             
@@ -560,13 +588,13 @@
                 btnTeam.className = "flex-1 py-2 text-sm font-bold rounded-lg transition-colors text-slate-500 hover:text-slate-700";
                 tabLive.classList.replace('tab-hidden', 'tab-active');
                 tabTeam.classList.replace('tab-active', 'tab-hidden');
-                fab.classList.add('hidden');
+                if (fab) fab.classList.add('hidden');
             } else {
                 btnTeam.className = "flex-1 py-2 text-sm font-bold rounded-lg transition-colors bg-white text-slate-900 shadow-sm";
                 btnLive.className = "flex-1 py-2 text-sm font-bold rounded-lg transition-colors text-slate-500 hover:text-slate-700";
                 tabTeam.classList.replace('tab-hidden', 'tab-active');
                 tabLive.classList.replace('tab-active', 'tab-hidden');
-                fab.classList.remove('hidden');
+                if (fab) fab.classList.remove('hidden');
             }
             updateUI();
         };
@@ -605,6 +633,11 @@
                 pin: document.getElementById('form-emp-pin').value
             };
 
+            if(data.pin.length !== 4) {
+                alert("PIN must be exactly 4 digits.");
+                return;
+            }
+
             closeModal();
 
             try {
@@ -629,7 +662,7 @@
             }
         };
 
-        // --- Render Functions ---
+        // --- Core UI Renderers ---
         
         function renderNumpad() {
             const pad = document.querySelector('#view-pin .bg-slate-50.grid');
@@ -644,7 +677,6 @@
         }
 
         function initMainView() {
-            // Setup Nav
             const navTitle = document.getElementById('nav-title-area');
             const navBg = document.getElementById('top-nav');
             const navBtn = document.getElementById('nav-logout-btn');
@@ -652,7 +684,8 @@
             if (state.selectedRole === 'OWNER') {
                 navBg.className = "px-4 py-3 flex items-center justify-between shadow-sm z-20 shrink-0 bg-slate-900 text-white";
                 navBtn.className = "p-2 rounded-full active:bg-slate-800 transition-colors text-slate-300";
-                navTitle.innerHTML = `<i class="fa-solid fa-shield-halved text-indigo-400 text-lg"></i> <span class="font-bold text-md tracking-tight">Admin Dashboard</span>`;
+                
+                navTitle.innerHTML = `<i class="fa-solid fa-briefcase text-indigo-400 text-lg"></i> <span class="font-bold text-md tracking-tight">Owner Dashboard</span>`;
                 
                 document.getElementById('interface-employee').classList.replace('tab-active', 'tab-hidden');
                 document.getElementById('interface-owner').classList.replace('tab-hidden', 'tab-active');
@@ -674,18 +707,24 @@
         }
 
         function renderEmployeeUI() {
+            if (!state.currentEmployee) return;
+            const emp = state.currentEmployee;
+
             const statusBadge = document.getElementById('emp-status-badge');
             const clockRing = document.getElementById('emp-clock-ring');
             const actionBtns = document.getElementById('emp-action-buttons');
             const logsContainer = document.getElementById('emp-logs-container');
             const logCount = document.getElementById('emp-log-count');
 
-            const isOut = state.userStatus === 'OUT';
-            const isIn = state.userStatus === 'IN';
-            const isBreak = state.userStatus === 'BREAK';
+            // Apply Employee Profile info
+            document.getElementById('emp-profile-name').innerText = emp.name;
+            document.getElementById('emp-avatar-initial').innerText = emp.name.charAt(0).toUpperCase();
 
-            // Badge & Ring
-            statusBadge.innerText = state.userStatus;
+            const isOut = emp.status === 'OUT';
+            const isIn = emp.status === 'IN';
+            const isBreak = emp.status === 'BREAK';
+
+            statusBadge.innerText = emp.status;
             if (isIn) {
                 statusBadge.className = "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-green-100 text-green-700";
                 clockRing.classList.remove('hidden');
@@ -697,7 +736,6 @@
                 clockRing.classList.add('hidden');
             }
 
-            // Action Buttons
             let btnsHtml = '';
             if (isOut) {
                 btnsHtml = `<button onclick="handleAction('CLOCK_IN')" class="w-full h-14 bg-indigo-600 active:bg-indigo-700 text-white rounded-2xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg shadow-indigo-200 transition-colors"><i class="fa-solid fa-play"></i> Clock In</button>`;
@@ -711,8 +749,7 @@
             }
             actionBtns.innerHTML = btnsHtml;
 
-            // Logs
-            const sorted = [...state.userLogs].sort((a, b) => b.timestamp - a.timestamp);
+            const sorted = [...(state.currentEmployeeLogs || [])].sort((a, b) => b.timestamp - a.timestamp);
             logCount.innerText = sorted.length;
             if (sorted.length === 0) {
                 logsContainer.innerHTML = `<div class="p-4 text-center text-sm text-slate-400">No activity yet.</div>`;
@@ -734,23 +771,7 @@
         }
 
         function renderOwnerUI() {
-            // Combine real user data + DB team data + Mock fallback (if empty)
-            let sortedLogs = [...state.userLogs].sort((a, b) => b.timestamp - a.timestamp);
-            let mainUserLastAction = sortedLogs.length > 0 ? friendlyActionName(sortedLogs[0].type) : 'No activity';
-            
-            const mainUser = {
-                id: state.user?.uid || 'admin',
-                name: 'John Doe (You)',
-                role: 'System Administrator',
-                status: state.userStatus,
-                secondsWorked: state.userWorkedSeconds,
-                lastAction: mainUserLastAction,
-                isMainUser: true
-            };
-
-            // Use DB team, or fallback to mock if DB is completely empty (just for demo visuals)
-            const activeTeam = state.teamEmployees.length > 0 ? state.teamEmployees : state.mockTeam;
-            const allStaff = [mainUser, ...activeTeam];
+            const allStaff = state.teamEmployees;
 
             if (state.ownerActiveTab === 'LIVE') {
                 const activeCount = allStaff.filter(e => e.status === 'IN').length;
@@ -764,23 +785,33 @@
                     if(emp.status === 'IN') { borderClass = 'border-green-500 text-green-700 bg-green-50'; statusColor = 'text-green-600'; }
                     if(emp.status === 'BREAK') { borderClass = 'border-amber-400 text-amber-700 bg-amber-50'; statusColor = 'text-amber-500'; }
 
+                    let displaySeconds = emp.secondsWorked || 0;
+                    if (emp.status === 'IN' && emp.lastActionTimestamp) {
+                        displaySeconds += Math.floor((Date.now() - emp.lastActionTimestamp) / 1000);
+                    }
+
                     html += `
                     <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-3">
                         <div class="w-12 h-12 rounded-full flex flex-col items-center justify-center shrink-0 border-2 ${borderClass}">
-                            <span class="font-bold text-lg leading-none">${emp.name.charAt(0)}</span>
+                            <span class="font-bold text-lg leading-none">${emp.name.charAt(0).toUpperCase()}</span>
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="font-bold text-slate-900 truncate flex items-center gap-1.5">
-                                ${emp.name} ${emp.isMainUser ? '<i class="fa-solid fa-lock text-[10px] text-slate-400"></i>' : ''}
+                                ${emp.name}
                             </p>
-                            <p class="text-xs text-slate-500 truncate">${emp.lastAction || 'Active'}</p>
+                            <p class="text-xs text-slate-500 truncate">${emp.lastAction || 'Account Created'}</p>
                         </div>
                         <div class="text-right shrink-0">
                             <p class="text-xs font-bold uppercase ${statusColor}">${emp.status}</p>
-                            <p class="text-sm font-mono font-medium text-slate-700">${formatDuration(emp.secondsWorked || 0)}</p>
+                            <p id="own-time-${emp.id}" class="text-sm font-mono font-medium text-slate-700">${formatDuration(displaySeconds)}</p>
                         </div>
                     </div>`;
                 });
+
+                if (allStaff.length === 0) {
+                    html = `<div class="p-8 text-center text-slate-500 flex flex-col items-center"><i class="fa-solid fa-user-xmark text-4xl text-slate-300 mb-3"></i> No team members. Go to Directory to add staff.</div>`;
+                }
+
                 document.getElementById('own-live-list').innerHTML = html;
             } else {
                 let html = '';
@@ -790,24 +821,28 @@
                     <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600">
-                                ${emp.name.charAt(0)}
+                                ${emp.name.charAt(0).toUpperCase()}
                             </div>
                             <div>
                                 <p class="font-bold text-slate-900 leading-tight">${emp.name}</p>
                                 <p class="text-xs text-slate-500">${emp.role}</p>
                             </div>
                         </div>
-                        ${emp.isMainUser 
-                            ? `<span class="text-[10px] uppercase font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded">Admin</span>`
-                            : `<button onclick="openModal('${empJson}')" class="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 active:bg-slate-100"><i class="fa-solid fa-pen"></i></button>`
-                        }
+                        <div class="flex items-center gap-3">
+                            <span class="font-mono text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded border border-slate-200">PIN: ${emp.pin}</span>
+                            <button onclick="openModal('${empJson}')" class="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 active:bg-slate-100"><i class="fa-solid fa-pen"></i></button>
+                        </div>
                     </div>`;
                 });
+
+                if (allStaff.length === 0) {
+                    html = `<div class="p-8 text-center text-slate-500 flex flex-col items-center"><i class="fa-solid fa-users text-4xl text-slate-300 mb-3"></i> Directory Empty</div>`;
+                }
+
                 document.getElementById('own-team-list').innerHTML = html;
             }
         }
 
-        // Initialize Firebase on load
         initAuth();
 
     </script>
