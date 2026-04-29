@@ -1,794 +1,312 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ระบบลงเวลาพนักงาน (Time Tracking)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        body {
-            font-family: 'Prompt', sans-serif;
-            background-color: #f3f4f6;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        /* ซ่อนลูกศรใน input type number */
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { 
-            -webkit-appearance: none; 
-            margin: 0; 
-        }
-    </style>
-</head>
-<body class="flex justify-center min-h-screen text-gray-800">
+import React, { useState, useEffect, useRef } from 'react';
+import { Calendar, LogIn, LogOut, Clock, CheckCircle2, Navigation2, Fingerprint, Sun, Moon, Coffee, History as HistoryIcon } from 'lucide-react';
 
-    <div class="w-full max-w-md bg-white shadow-2xl relative flex flex-col h-[100dvh] overflow-hidden">
+// 1. Import Firebase SDK
+import { initializeApp } from "firebase/app";
+import { 
+  getFirestore, 
+  collection, 
+  addDoc, 
+  serverTimestamp,
+  onSnapshot
+} from "firebase/firestore";
+import { 
+  getAuth, 
+  signInAnonymously, 
+  signInWithCustomToken, 
+  onAuthStateChanged 
+} from "firebase/auth";
+
+// 2. Firebase Configuration (รองรับทั้ง Canvas Environment และ Local)
+const firebaseConfig = typeof __firebase_config !== 'undefined' 
+  ? JSON.parse(__firebase_config) 
+  : {
+      apiKey: "AIzaSyBHuZGyY1F3v4rCrhrpt9YB90C0Ahh-stE",
+      authDomain: "my-company-time-tracking.firebaseapp.com",
+      projectId: "my-company-time-tracking",
+      storageBucket: "my-company-time-tracking.firebasestorage.app",
+      messagingSenderId: "758524847747",
+      appId: "1:758524847747:web:2e5a49e4064334f1265db6",
+      measurementId: "G-50SYJKTRT1"
+    };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+export default function App() {
+  // --- States ---
+  const [user, setUser] = useState(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [isCheckedIn, setIsCheckedIn] = useState(false);
+  const [logs, setLogs] = useState([]);
+  const [checkInTime, setCheckInTime] = useState(null);
+  const [elapsedTime, setElapsedTime] = useState('00:00:00');
+  
+  const [holdProgress, setHoldProgress] = useState(0);
+  const [isHolding, setIsHolding] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const holdIntervalRef = useRef(null);
+
+  // ข้อมูลพนักงาน
+  const employeeId = "EMP-1042";
+
+  // --- Effects ---
+
+  // A. จัดการ Authentication (ต้องทำก่อนดึงข้อมูล Firestore เพื่อป้องกัน Permission Denied)
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+      } catch (error) {
+        console.error("Authentication Error:", error);
+      }
+    };
+    
+    initAuth();
+    const unsubscribe = onAuthStateChanged(auth, setUser);
+    return () => unsubscribe();
+  }, []);
+
+  // B. โหลดข้อมูลจาก Firestore เมื่อยืนยันตัวตนสำเร็จ
+  useEffect(() => {
+    if (!user) return; // รอให้ User ยืนยันตัวตนก่อน
+
+    // ใช้ Path แบบ Private สำหรับเก็บข้อมูลพนักงานแต่ละคนแยกกัน
+    const logsRef = collection(db, 'artifacts', appId, 'users', user.uid, 'attendance_logs');
+
+    // ดึงข้อมูลทั้งหมดมาจัดเรียงใน Memory เพื่อหลีกเลี่ยงการใช้ Index แบบซับซ้อน (ป้องก้น Error)
+    const unsubscribe = onSnapshot(logsRef, (snapshot) => {
+      const fetchedLogs = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        // แปลง Firebase Timestamp เป็น JS Date
+        time: doc.data().timestamp?.toDate() || new Date()
+      }));
+
+      // เรียงลำดับจากใหม่ไปเก่า และดึงมาแค่ 10 รายการล่าสุด
+      fetchedLogs.sort((a, b) => b.time - a.time);
+      const limitedLogs = fetchedLogs.slice(0, 10);
+      
+      setLogs(limitedLogs);
+
+      // ตรวจสอบสถานะล่าสุดว่า "เข้างาน" ค้างไว้หรือไม่
+      if (limitedLogs.length > 0 && limitedLogs[0].type === 'IN') {
+        setIsCheckedIn(true);
+        setCheckInTime(limitedLogs[0].time);
+      } else {
+        setIsCheckedIn(false);
+        setCheckInTime(null);
+      }
+    }, (error) => {
+      console.error("Snapshot error:", error);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
+  // C. อัปเดตนาฬิกาหลักและตัวจับเวลาทำงาน
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date();
+      setCurrentTime(now);
+      
+      if (isCheckedIn && checkInTime) {
+        const diff = Math.floor((now - checkInTime) / 1000);
+        const hours = String(Math.floor(diff / 3600)).padStart(2, '0');
+        const minutes = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
+        const seconds = String(diff % 60).padStart(2, '0');
+        setElapsedTime(`${hours}:${minutes}:${seconds}`);
+      }
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [isCheckedIn, checkInTime]);
+
+  // --- Logic Functions ---
+
+  const handlePunch = async () => {
+    if (!user) return;
+    const type = isCheckedIn ? 'OUT' : 'IN';
+    
+    try {
+      const logsRef = collection(db, 'artifacts', appId, 'users', user.uid, 'attendance_logs');
+      await addDoc(logsRef, {
+        employeeId: employeeId,
+        type: type,
+        timestamp: serverTimestamp(),
+        location: 'สำนักงานใหญ่ HQ (GPS Verified)',
+        device: 'Web Browser'
+      });
+      // หมายเหตุ: State logs และ isCheckedIn จะถูกอัปเดตอัตโนมัติผ่าน onSnapshot ใน useEffect B
+    } catch (error) {
+      console.error("Error saving to Firestore: ", error);
+    }
+  };
+
+  // --- UI Helper Functions ---
+  const timeString = currentTime.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+  const dateString = currentTime.toLocaleDateString('th-TH', { weekday: 'long', day: 'numeric', month: 'long' });
+  const currentHour = currentTime.getHours();
+
+  let greeting = 'สวัสดี';
+  let GreetingIcon = Sun;
+  if (currentHour < 12) { greeting = 'อรุณสวัสดิ์'; GreetingIcon = Sun; }
+  else if (currentHour < 18) { greeting = 'สวัสดีตอนบ่าย'; GreetingIcon = Coffee; }
+  else { greeting = 'สวัสดีตอนเย็น'; GreetingIcon = Moon; }
+
+  const startHold = (e) => {
+    e.preventDefault(); 
+    if (showSuccess) return;
+    setIsHolding(true);
+    let progress = 0;
+    holdIntervalRef.current = setInterval(() => {
+      progress += 2;
+      if (progress >= 100) {
+        clearInterval(holdIntervalRef.current);
+        setShowSuccess(true);
+        handlePunch(); // เรียกฟังก์ชันบันทึกข้อมูล
+        setTimeout(() => {
+          setShowSuccess(false);
+          setHoldProgress(0);
+          setIsHolding(false);
+        }, 1500);
+      } else { setHoldProgress(progress); }
+    }, 10);
+  };
+
+  const endHold = () => {
+    if (showSuccess) return;
+    clearInterval(holdIntervalRef.current);
+    setHoldProgress(0);
+    setIsHolding(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-100 flex flex-col items-center justify-center sm:p-6 font-sans select-none relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className={`absolute -top-[10%] -left-[10%] w-96 h-96 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob transition-colors duration-1000 ${isCheckedIn ? 'bg-emerald-400' : 'bg-blue-400'}`}></div>
+        <div className={`absolute top-[20%] -right-[10%] w-96 h-96 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob animation-delay-2000 transition-colors duration-1000 ${isCheckedIn ? 'bg-teal-300' : 'bg-indigo-400'}`}></div>
+      </div>
+
+      <div className="w-full max-w-[420px] h-[100dvh] sm:h-[850px] bg-white/70 backdrop-blur-3xl sm:rounded-[40px] shadow-2xl border border-white/80 flex flex-col relative overflow-hidden z-10">
         
-        <!-- Header -->
-        <header class="bg-blue-600 text-white p-6 rounded-b-3xl shadow-lg z-10 relative transition-all duration-300">
-            <div class="flex justify-between items-center mb-4">
-                <h1 class="text-xl font-semibold flex items-center gap-2">
-                    <i data-lucide="clock" class="w-6 h-6"></i>
-                    ระบบลงเวลา
-                </h1>
-                <div class="flex gap-2">
-                    <button id="exportCsvBtn" class="hidden p-2 bg-blue-500 hover:bg-blue-400 rounded-full transition" title="ส่งออก CSV">
-                        <i data-lucide="download" class="w-5 h-5"></i>
-                    </button>
-                    <button id="logoutBtn" class="hidden p-2 bg-rose-500 hover:bg-rose-400 rounded-full transition" title="ออกจากระบบ">
-                        <i data-lucide="log-out" class="w-5 h-5"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="text-center mt-6 mb-2">
-                <div id="currentDate" class="text-blue-100 text-sm font-medium mb-1">กำลังโหลดวันที่...</div>
-                <div id="currentTime" class="text-5xl font-bold tracking-wider font-mono">--:--:--</div>
-                <div id="userGreeting" class="hidden mt-3 text-sm font-medium bg-white/20 inline-block px-4 py-1 rounded-full text-white"></div>
-            </div>
-        </header>
-
-        <!-- Login Screen -->
-        <main id="loginScreen" class="flex-1 overflow-y-auto no-scrollbar p-6 relative z-0 flex flex-col justify-center">
-            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden">
-                <!-- Badge for Admin Mode -->
-                <div id="adminBadge" class="hidden absolute top-0 right-0 bg-purple-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg">
-                    โหมดผู้ดูแลระบบ
-                </div>
-
-                <h2 class="text-2xl font-bold text-gray-800 mb-2 text-center" id="authTitle">เข้าสู่ระบบ</h2>
-                <p class="text-sm text-gray-500 text-center mb-6" id="authSubtitle">กรุณาระบุรหัสพนักงานและ PIN</p>
-
-                <form id="authForm" class="space-y-4" onsubmit="return false;">
-                    <div id="nameField" class="hidden">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อ-นามสกุลพนักงาน</label>
-                        <input type="text" id="regName" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="เช่น สมชาย ใจดี">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">รหัสพนักงาน</label>
-                        <input type="text" id="authEmpId" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition uppercase" placeholder="เช่น EMP001">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">รหัส PIN (4 หลัก)</label>
-                        <input type="password" id="authPin" inputmode="numeric" pattern="[0-9]*" maxlength="4" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-center tracking-[0.5em] text-lg font-mono" placeholder="••••">
-                    </div>
-                    <button id="authSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition shadow-md mt-2">
-                        เข้าสู่ระบบ
-                    </button>
-                </form>
-
-                <div class="mt-6 text-center text-sm text-gray-600 border-t border-gray-100 pt-4">
-                    <span id="authToggleText">สำหรับผู้ดูแลระบบ:</span>
-                    <button id="authToggleBtn" class="text-purple-600 font-semibold hover:underline ml-1">เพิ่มพนักงานใหม่</button>
-                </div>
-            </div>
-        </main>
-
-        <!-- Main Content -->
-        <main id="appScreen" class="hidden flex-1 overflow-y-auto no-scrollbar p-6 pb-24 relative z-0 -mt-4 pt-8">
-            
-            <div class="mb-4 bg-gray-50 p-4 rounded-2xl border border-gray-100 shadow-sm">
-                <label class="block text-sm font-medium text-gray-600 mb-2">พนักงานที่เข้าสู่ระบบ</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i data-lucide="user-check" class="w-5 h-5 text-blue-500"></i>
-                    </div>
-                    <div id="loggedInUserName" class="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl bg-gray-100 text-gray-700 font-medium overflow-hidden text-ellipsis whitespace-nowrap">
-                        กำลังโหลด...
-                    </div>
-                </div>
-            </div>
-
-            <div class="mb-6 bg-gray-50 p-4 rounded-2xl border border-gray-100 shadow-sm">
-                <label class="block text-sm font-medium text-gray-600 mb-2" for="remark">หมายเหตุเวลาเข้า-ออก (ถ้ามี)</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i data-lucide="file-text" class="w-5 h-5 text-gray-400"></i>
-                    </div>
-                    <input type="text" id="remark" class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="เช่น ทำงานนอกสถานที่, ลืมลงเวลา...">
-                </div>
-            </div>
-
-            <!-- Action Buttons: Clock In / Clock Out -->
-            <div class="grid grid-cols-2 gap-4 mb-4">
-                <button id="btnClockIn" class="flex flex-col items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white py-6 rounded-2xl shadow-md shadow-green-200 transition transform active:scale-95">
-                    <div class="bg-white/20 p-3 rounded-full">
-                        <i data-lucide="log-in" class="w-8 h-8"></i>
-                    </div>
-                    <span class="font-semibold text-lg">เข้างาน</span>
-                </button>
-                
-                <button id="btnClockOut" class="flex flex-col items-center justify-center gap-2 bg-rose-500 hover:bg-rose-600 text-white py-6 rounded-2xl shadow-md shadow-rose-200 transition transform active:scale-95">
-                    <div class="bg-white/20 p-3 rounded-full">
-                        <i data-lucide="log-out" class="w-8 h-8"></i>
-                    </div>
-                    <span class="font-semibold text-lg">ออกงาน</span>
-                </button>
-            </div>
-
-            <!-- Action Buttons: Extra Features -->
-            <div class="grid grid-cols-2 gap-4 mb-8">
-                <button id="btnOpenLeave" class="flex items-center justify-center gap-2 bg-purple-50 hover:bg-purple-100 text-purple-700 py-3 rounded-xl border border-purple-200 transition transform active:scale-95">
-                    <i data-lucide="calendar-off" class="w-5 h-5"></i>
-                    <span class="font-medium text-sm">แจ้งลางาน</span>
-                </button>
-                
-                <button id="btnOpenSwap" class="flex items-center justify-center gap-2 bg-orange-50 hover:bg-orange-100 text-orange-700 py-3 rounded-xl border border-orange-200 transition transform active:scale-95">
-                    <i data-lucide="arrow-right-left" class="w-5 h-5"></i>
-                    <span class="font-medium text-sm">สลับวันหยุด</span>
-                </button>
-            </div>
-
-            <!-- History Tabs -->
-            <div>
-                <div class="flex border-b border-gray-200 mb-4">
-                    <button id="tabTimeLog" class="flex-1 py-3 text-sm font-semibold text-blue-600 border-b-2 border-blue-600 transition">ประวัติของวันนี้</button>
-                    <button id="tabRequest" class="flex-1 py-3 text-sm font-semibold text-gray-400 border-b-2 border-transparent transition hover:text-gray-600">สถานะคำขอ</button>
-                </div>
-
-                <!-- Tab Content: Time Logs -->
-                <div id="historyList" class="space-y-3">
-                    <div class="text-center text-gray-400 py-4 text-sm">กำลังเชื่อมต่อข้อมูล...</div>
-                </div>
-
-                <!-- Tab Content: Requests -->
-                <div id="requestList" class="space-y-3 hidden">
-                    <div class="text-center text-gray-400 py-4 text-sm">กำลังเชื่อมต่อข้อมูล...</div>
-                </div>
-            </div>
-            
-        </main>
-        
-        <!-- Loading Overlay -->
-        <div id="loadingOverlay" class="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center hidden">
-            <i data-lucide="loader-2" class="w-10 h-10 text-blue-500 animate-spin mb-4"></i>
-            <p class="text-gray-600 font-medium">กำลังประมวลผล...</p>
+        {/* Header */}
+        <div className="p-6 pb-2 flex justify-between items-center">
+          <div>
+            <p className="text-slate-500 font-medium text-xs flex items-center gap-1.5 uppercase tracking-wider">
+              {greeting} <GreetingIcon size={12} className="text-orange-400" />
+            </p>
+            <h2 className="text-xl font-bold text-slate-800 tracking-tight">สมชาย ใจดี</h2>
+          </div>
+          <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm">
+            <img src="https://ui-avatars.com/api/?name=Somchai&background=eff6ff&color=2563eb&bold=true" alt="Profile" />
+          </div>
         </div>
 
-        <!-- LEAVE MODAL OVERLAY -->
-        <div id="leaveModal" class="fixed inset-0 z-40 bg-white flex flex-col transform translate-y-full transition-transform duration-300">
-            <header class="bg-purple-600 text-white p-4 flex justify-between items-center shadow-md">
-                <h2 class="text-lg font-semibold flex items-center gap-2"><i data-lucide="calendar-off" class="w-5 h-5"></i> แบบฟอร์มลางาน</h2>
-                <button id="btnCloseLeave" class="p-1 hover:bg-purple-500 rounded-full"><i data-lucide="x" class="w-6 h-6"></i></button>
-            </header>
-            <main class="flex-1 p-6 overflow-y-auto no-scrollbar">
-                <form id="leaveForm" class="space-y-4" onsubmit="return false;">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทการลา</label>
-                        <select id="leaveType" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-purple-500 focus:border-purple-500 bg-white">
-                            <option value="ลาป่วย">ลาป่วย</option>
-                            <option value="ลากิจ">ลากิจ</option>
-                            <option value="ลาพักร้อน">ลาพักร้อน</option>
-                            <option value="อื่นๆ">อื่นๆ</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">ตั้งแต่วันที่</label>
-                            <input type="date" id="leaveStartDate" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-purple-500 focus:border-purple-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">ถึงวันที่</label>
-                            <input type="date" id="leaveEndDate" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-purple-500 focus:border-purple-500">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">เหตุผลการลา</label>
-                        <textarea id="leaveReason" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-purple-500 focus:border-purple-500 placeholder-gray-400" placeholder="ระบุเหตุผล..."></textarea>
-                    </div>
-                    <button id="submitLeaveBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-xl transition shadow-md mt-6">
-                        ส่งคำขอลางาน
-                    </button>
-                </form>
-            </main>
+        {/* Chips */}
+        <div className="px-6 flex gap-2 mt-1">
+          <div className="bg-white/80 px-3 py-1.5 rounded-full text-[11px] font-bold text-slate-500 shadow-sm border border-white">
+            {dateString}
+          </div>
+          <div className={`px-3 py-1.5 rounded-full text-[11px] font-bold shadow-sm transition-colors ${user ? 'bg-emerald-500 text-white' : 'bg-slate-300 text-slate-600'}`}>
+            {user ? 'CONNECTED TO CLOUD' : 'CONNECTING...'}
+          </div>
         </div>
 
-        <!-- SWAP SHIFT MODAL OVERLAY -->
-        <div id="swapModal" class="fixed inset-0 z-40 bg-white flex flex-col transform translate-y-full transition-transform duration-300">
-            <header class="bg-orange-500 text-white p-4 flex justify-between items-center shadow-md">
-                <h2 class="text-lg font-semibold flex items-center gap-2"><i data-lucide="arrow-right-left" class="w-5 h-5"></i> แบบฟอร์มสลับวันหยุด</h2>
-                <button id="btnCloseSwap" class="p-1 hover:bg-orange-400 rounded-full"><i data-lucide="x" class="w-6 h-6"></i></button>
-            </header>
-            <main class="flex-1 p-6 overflow-y-auto no-scrollbar">
-                <form id="swapForm" class="space-y-4" onsubmit="return false;">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">วันหยุดเดิมของคุณ</label>
-                        <input type="date" id="swapOriginalDate" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-orange-500 focus:border-orange-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">วันที่ต้องการขอหยุดแทน</label>
-                        <input type="date" id="swapNewDate" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-orange-500 focus:border-orange-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">เหตุผลในการสลับวันหยุด</label>
-                        <textarea id="swapReason" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-orange-500 focus:border-orange-500 placeholder-gray-400" placeholder="ระบุเหตุผล..."></textarea>
-                    </div>
-                    <button id="submitSwapBtn" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl transition shadow-md mt-6">
-                        ส่งคำขอสลับวันหยุด
-                    </button>
-                </form>
-            </main>
+        {/* Clock & Timer */}
+        <div className="flex flex-col items-center justify-center flex-grow text-center">
+          <h1 className="text-[5.5rem] font-light tracking-tighter text-slate-800 leading-none tabular-nums">
+            {timeString}
+          </h1>
+          
+          <div className={`mt-6 h-20 transition-all duration-500 ${isCheckedIn ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
+            <span className="text-emerald-600 font-black text-xs tracking-widest uppercase bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
+              Working Now
+            </span>
+            <div className="text-4xl font-black text-slate-800 mt-2 tabular-nums">{elapsedTime}</div>
+          </div>
         </div>
 
+        {/* Hold Button */}
+        <div className="py-10 flex justify-center items-center">
+          <div 
+            className="relative w-[180px] h-[180px] flex items-center justify-center cursor-pointer"
+            onMouseDown={startHold} onMouseUp={endHold} onMouseLeave={endHold} onTouchStart={startHold} onTouchEnd={endHold}
+            style={{ WebkitTapHighlightColor: 'transparent' }}
+          >
+            <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none">
+              <circle cx="90" cy="90" r="82" className="text-slate-200/50" strokeWidth="8" fill="none" />
+              <circle 
+                cx="90" cy="90" r="82" 
+                className={`stroke-current transition-all duration-75 ${isCheckedIn ? 'text-rose-500' : 'text-blue-600'}`} 
+                strokeWidth="8" fill="none" strokeDasharray="515" 
+                strokeDashoffset={515 - (515 * holdProgress / 100)} strokeLinecap="round" 
+              />
+            </svg>
+
+            <div className={`w-[136px] h-[136px] rounded-full flex flex-col items-center justify-center transition-all duration-300 shadow-xl
+              ${!user ? 'bg-slate-200 text-slate-400 cursor-not-allowed opacity-70' : showSuccess ? 'bg-emerald-500 text-white scale-110' : isCheckedIn ? 'bg-white text-rose-500' : 'bg-white text-blue-600'}`}>
+              {showSuccess ? (
+                <CheckCircle2 size={48} className="animate-bounce" />
+              ) : (
+                <>
+                  {isCheckedIn ? <LogOut size={36} /> : <Fingerprint size={42} />}
+                  <span className="mt-2 font-bold text-slate-800">{isCheckedIn ? 'เลิกงาน' : 'เข้างาน'}</span>
+                  <span className="text-[10px] text-slate-400 font-bold uppercase">{!user ? 'Connecting...' : isHolding ? 'Recording...' : 'Hold Me'}</span>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* History Area */}
+        <div className="bg-white/90 backdrop-blur-md flex-1 px-6 pt-5 pb-8 rounded-t-[40px] shadow-[0_-20px_50px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col h-[30%]">
+          <div className="w-10 h-1 bg-slate-200 rounded-full mx-auto mb-4" />
+          <h3 className="font-bold text-slate-800 flex items-center gap-2 mb-4 text-sm uppercase tracking-wider">
+            <HistoryIcon size={16} className="text-slate-400" /> ประวัติ 10 รายการล่าสุด
+          </h3>
+          <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+            {logs.length === 0 ? (
+              <p className="text-center text-slate-400 text-xs py-10 italic">No cloud logs found...</p>
+            ) : (
+              logs.map((log) => (
+                <div key={log.id} className="flex items-center justify-between p-3.5 rounded-2xl bg-white border border-slate-100 shadow-sm transition-all hover:shadow-md">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${log.type === 'IN' ? 'bg-blue-50 text-blue-600' : 'bg-rose-50 text-rose-500'}`}>
+                      {log.type === 'IN' ? <LogIn size={18} /> : <LogOut size={18} />}
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-700 text-sm">{log.type === 'IN' ? 'Clock In' : 'Clock Out'}</p>
+                      <p className="text-[10px] text-slate-400 font-medium">{log.location}</p>
+                    </div>
+                  </div>
+                  <div className="font-bold text-slate-800 text-sm tabular-nums">
+                    {log.time.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes blob {
+          0% { transform: translate(0px, 0px) scale(1); }
+          33% { transform: translate(30px, -50px) scale(1.1); }
+          66% { transform: translate(-20px, 20px) scale(0.9); }
+          100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob { animation: blob 10s infinite; }
+        .animation-delay-2000 { animation-delay: 2s; }
+      `}} />
     </div>
-
-    <!-- Custom Modal -->
-    <div id="customModal" class="fixed inset-0 z-50 flex items-center justify-center px-4 bg-gray-900/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl transform scale-95 transition-transform duration-300" id="modalContent">
-            <div class="text-center">
-                <div id="modalIcon" class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
-                    <i data-lucide="info" class="w-6 h-6 text-blue-600"></i>
-                </div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2" id="modalTitle">ข้อความ</h3>
-                <p class="text-sm text-gray-500 mb-6" id="modalMessage">รายละเอียด</p>
-                <button id="modalBtn" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-4 py-3 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none transition">
-                    ตกลง
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // ==========================================
-        // 1. CONFIGURATION
-        // ==========================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyBHuZGyY1F3v4rCrhrpt9YB90C0Ahh-stE",
-            authDomain: "my-company-time-tracking.firebaseapp.com",
-            projectId: "my-company-time-tracking",
-            storageBucket: "my-company-time-tracking.firebasestorage.app",
-            messagingSenderId: "758524847747",
-            appId: "1:758524847747:web:2e5a49e4064334f1265db6",
-            measurementId: "G-50SYJKTRT1"
-        };
-        
-        const GOOGLE_SHEETS_WEBHOOK_URL = ""; 
-        
-        // ==========================================
-        // 2. INITIALIZATION
-        // ==========================================
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        const collectionPath = 'timelogs'; 
-        const requestPath = 'requests'; 
-
-        let currentUser = null;
-        let allLogs = [];
-        let allRequests = [];
-
-        lucide.createIcons();
-
-        // ==========================================
-        // 3. UI FUNCTIONS
-        // ==========================================
-        const timeDisplay = document.getElementById('currentTime');
-        const dateDisplay = document.getElementById('currentDate');
-        const remarkInput = document.getElementById('remark');
-        const historyList = document.getElementById('historyList');
-        const requestList = document.getElementById('requestList');
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        
-        const loginScreen = document.getElementById('loginScreen');
-        const appScreen = document.getElementById('appScreen');
-        const exportCsvBtn = document.getElementById('exportCsvBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const userGreeting = document.getElementById('userGreeting');
-        const loggedInUserName = document.getElementById('loggedInUserName');
-        
-        // Auth UI
-        const authTitle = document.getElementById('authTitle');
-        const authSubtitle = document.getElementById('authSubtitle');
-        const nameField = document.getElementById('nameField');
-        const regName = document.getElementById('regName');
-        const authEmpId = document.getElementById('authEmpId');
-        const authPin = document.getElementById('authPin');
-        const authSubmitBtn = document.getElementById('authSubmitBtn');
-        const authToggleText = document.getElementById('authToggleText');
-        const authToggleBtn = document.getElementById('authToggleBtn');
-        const adminBadge = document.getElementById('adminBadge');
-
-        // Tab UI
-        const tabTimeLog = document.getElementById('tabTimeLog');
-        const tabRequest = document.getElementById('tabRequest');
-
-        // Feature UI
-        const leaveModal = document.getElementById('leaveModal');
-        const swapModal = document.getElementById('swapModal');
-        const btnOpenLeave = document.getElementById('btnOpenLeave');
-        const btnOpenSwap = document.getElementById('btnOpenSwap');
-        const btnCloseLeave = document.getElementById('btnCloseLeave');
-        const btnCloseSwap = document.getElementById('btnCloseSwap');
-        
-        let isLoginMode = true;
-
-        // Tabs Logic
-        tabTimeLog.addEventListener('click', () => {
-            tabTimeLog.className = 'flex-1 py-3 text-sm font-semibold text-blue-600 border-b-2 border-blue-600 transition';
-            tabRequest.className = 'flex-1 py-3 text-sm font-semibold text-gray-400 border-b-2 border-transparent transition hover:text-gray-600';
-            historyList.classList.remove('hidden');
-            requestList.classList.add('hidden');
-        });
-
-        tabRequest.addEventListener('click', () => {
-            tabRequest.className = 'flex-1 py-3 text-sm font-semibold text-blue-600 border-b-2 border-blue-600 transition';
-            tabTimeLog.className = 'flex-1 py-3 text-sm font-semibold text-gray-400 border-b-2 border-transparent transition hover:text-gray-600';
-            requestList.classList.remove('hidden');
-            historyList.classList.add('hidden');
-        });
-
-        // Modals Logic
-        btnOpenLeave.addEventListener('click', () => leaveModal.classList.remove('translate-y-full'));
-        btnCloseLeave.addEventListener('click', () => leaveModal.classList.add('translate-y-full'));
-        btnOpenSwap.addEventListener('click', () => swapModal.classList.remove('translate-y-full'));
-        btnCloseSwap.addEventListener('click', () => swapModal.classList.add('translate-y-full'));
-
-        function updateClock() {
-            const now = new Date();
-            timeDisplay.textContent = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            dateDisplay.textContent = now.toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        const modal = document.getElementById('customModal');
-        const modalContent = document.getElementById('modalContent');
-        const modalIcon = document.getElementById('modalIcon');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalMessage = document.getElementById('modalMessage');
-        
-        function showModal(title, message, type = 'info') {
-            modalTitle.textContent = title;
-            modalMessage.textContent = message;
-            
-            if (type === 'success') {
-                modalIcon.innerHTML = `<i data-lucide="check-circle" class="w-6 h-6 text-green-600"></i>`;
-                modalIcon.className = "mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4";
-            } else if (type === 'error') {
-                modalIcon.innerHTML = `<i data-lucide="alert-circle" class="w-6 h-6 text-red-600"></i>`;
-                modalIcon.className = "mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4";
-            } else {
-                modalIcon.innerHTML = `<i data-lucide="info" class="w-6 h-6 text-blue-600"></i>`;
-                modalIcon.className = "mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4";
-            }
-            lucide.createIcons();
-            
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-            modalContent.classList.remove('scale-95');
-        }
-
-        document.getElementById('modalBtn').addEventListener('click', () => {
-            modal.classList.add('opacity-0', 'pointer-events-none');
-            modalContent.classList.add('scale-95');
-        });
-
-        // ------------------------------------------
-        // RENDER DATA FUNCTIONS
-        // ------------------------------------------
-        function renderHistory(data) {
-            historyList.innerHTML = '';
-            const todayStr = new Date().toLocaleDateString('th-TH');
-            
-            // กรองข้อมูลเฉพาะของคนที่ล็อกอิน และเป็นของวันนี้
-            let myTodayLogs = data.filter(log => log.uid === currentUser?.uid && log.date === todayStr);
-            myTodayLogs.sort((a, b) => b.timestamp - a.timestamp);
-
-            if (myTodayLogs.length === 0) {
-                historyList.innerHTML = `<div class="text-center text-gray-400 py-4 text-sm bg-gray-50 rounded-xl border border-dashed border-gray-200">ไม่มีประวัติการลงเวลาในวันนี้</div>`;
-                return;
-            }
-
-            myTodayLogs.forEach(log => {
-                const isClockIn = log.type === 'IN';
-                const iconColor = isClockIn ? 'text-green-500' : 'text-rose-500';
-                const bgColor = isClockIn ? 'bg-green-50' : 'bg-rose-50';
-                const iconName = isClockIn ? 'log-in' : 'log-out';
-                const typeText = isClockIn ? 'เข้างาน' : 'ออกงาน';
-
-                let extraInfoHtml = '';
-                if (log.remark) extraInfoHtml += `<p class="text-xs text-gray-500 mt-1"><i data-lucide="file-text" class="w-3 h-3 inline"></i> ${log.remark}</p>`;
-                if (log.location) extraInfoHtml += `<a href="https://maps.google.com/?q=${log.location.lat},${log.location.lng}" target="_blank" class="text-xs text-blue-500 hover:underline mt-1 flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> ดูพิกัดแผนที่</a>`;
-
-                const logEl = document.createElement('div');
-                logEl.className = 'flex items-center justify-between p-3 bg-white border border-gray-100 rounded-xl shadow-sm';
-                logEl.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <div class="p-2 rounded-lg ${bgColor}">
-                            <i data-lucide="${iconName}" class="w-5 h-5 ${iconColor}"></i>
-                        </div>
-                        <div>
-                            <p class="font-medium text-gray-800">${log.empName}</p>
-                            <p class="text-xs text-gray-500">${typeText}</p>
-                            ${extraInfoHtml}
-                        </div>
-                    </div>
-                    <div class="text-right"><p class="font-semibold text-gray-900">${log.time}</p></div>
-                `;
-                historyList.appendChild(logEl);
-            });
-            lucide.createIcons();
-        }
-
-        function renderRequests(data) {
-            requestList.innerHTML = '';
-            
-            // กรองคำขอเฉพาะของพนักงานคนนี้
-            let myRequests = data.filter(req => req.uid === currentUser?.uid);
-            myRequests.sort((a, b) => b.timestamp - a.timestamp); // ล่าสุดขึ้นก่อน
-
-            if (myRequests.length === 0) {
-                requestList.innerHTML = `<div class="text-center text-gray-400 py-4 text-sm bg-gray-50 rounded-xl border border-dashed border-gray-200">ยังไม่มีรายการคำขอของคุณ</div>`;
-                return;
-            }
-
-            myRequests.forEach(req => {
-                const isLeave = req.requestType === 'LEAVE';
-                const iconName = isLeave ? 'calendar-off' : 'arrow-right-left';
-                const titleText = isLeave ? `ลางาน (${req.leaveType})` : 'สลับวันหยุด';
-                const colorTheme = isLeave ? 'purple' : 'orange';
-                
-                const formatD = (d) => new Date(d).toLocaleDateString('th-TH', { day:'numeric', month:'short' });
-                const detailText = isLeave 
-                    ? `${formatD(req.startDate)} - ${formatD(req.endDate)}` 
-                    : `จาก ${formatD(req.originalDate)} เป็น ${formatD(req.requestedDate)}`;
-
-                let statusHtml = '';
-                if (req.status === 'PENDING') statusHtml = `<span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-[10px] rounded-full font-medium">รออนุมัติ</span>`;
-                else if (req.status === 'APPROVED') statusHtml = `<span class="px-2 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-medium">อนุมัติแล้ว</span>`;
-                else if (req.status === 'REJECTED') statusHtml = `<span class="px-2 py-1 bg-red-100 text-red-700 text-[10px] rounded-full font-medium">ไม่อนุมัติ</span>`;
-
-                const el = document.createElement('div');
-                el.className = 'p-3 bg-white border border-gray-100 rounded-xl shadow-sm';
-                el.innerHTML = `
-                    <div class="flex justify-between items-start mb-2">
-                        <div class="flex items-center gap-2">
-                            <div class="p-1.5 rounded-md bg-${colorTheme}-50 text-${colorTheme}-600">
-                                <i data-lucide="${iconName}" class="w-4 h-4"></i>
-                            </div>
-                            <span class="font-medium text-gray-800 text-sm">${titleText}</span>
-                        </div>
-                        ${statusHtml}
-                    </div>
-                    <p class="text-xs text-gray-600 mb-1"><i data-lucide="clock" class="w-3 h-3 inline"></i> วันที่: ${detailText}</p>
-                    <p class="text-xs text-gray-500 italic">"${req.reason}"</p>
-                `;
-                requestList.appendChild(el);
-            });
-            lucide.createIcons();
-        }
-
-        // ------------------------------------------
-        // ACTIONS & DB FUNCTIONS
-        // ------------------------------------------
-        async function syncToGoogleSheets(logData) {
-            if (!GOOGLE_SHEETS_WEBHOOK_URL) return;
-            try {
-                await fetch(GOOGLE_SHEETS_WEBHOOK_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(logData)
-                });
-            } catch (err) { console.error("Error syncing to sheets:", err); }
-        }
-
-        async function handleClockEvent(type) {
-            const remark = remarkInput.value.trim();
-            if (!currentUser) { showModal('ข้อผิดพลาด', 'ไม่พบข้อมูลผู้ใช้งาน กรุณาเข้าสู่ระบบใหม่', 'error'); return; }
-
-            const empName = currentUser.displayName || currentUser.email.split('@')[0];
-            loadingOverlay.classList.remove('hidden');
-            
-            let locationData = null;
-            try {
-                if (navigator.geolocation) {
-                    const position = await new Promise((resolve, reject) => { navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000, enableHighAccuracy: true }); });
-                    locationData = { lat: position.coords.latitude, lng: position.coords.longitude };
-                }
-            } catch (geoError) {}
-            
-            try {
-                const now = new Date();
-                const logData = {
-                    uid: currentUser.uid,
-                    empName: empName,
-                    remark: remark,
-                    location: locationData,
-                    type: type,
-                    timestamp: now.getTime(),
-                    date: now.toLocaleDateString('th-TH'),
-                    time: now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
-                    isoString: now.toISOString()
-                };
-
-                await addDoc(collection(db, collectionPath), logData);
-                syncToGoogleSheets(logData);
-                remarkInput.value = '';
-                loadingOverlay.classList.add('hidden');
-                showModal('สำเร็จ', `ลงเวลา${type === 'IN' ? 'เข้างาน' : 'ออกงาน'}เรียบร้อยแล้วเวลา ${logData.time} น.`, 'success');
-            } catch (error) {
-                loadingOverlay.classList.add('hidden');
-                if (error.code === 'permission-denied') showModal('สิทธิ์การเข้าถึงถูกปฏิเสธ', 'กรุณาตรวจสอบ Firestore Rules', 'error');
-                else showModal('ข้อผิดพลาด', 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่', 'error');
-            }
-        }
-
-        document.getElementById('submitLeaveBtn').addEventListener('click', async () => {
-            const leaveType = document.getElementById('leaveType').value;
-            const startDate = document.getElementById('leaveStartDate').value;
-            const endDate = document.getElementById('leaveEndDate').value;
-            const reason = document.getElementById('leaveReason').value.trim();
-
-            if(!startDate || !endDate || !reason) { showModal('แจ้งเตือน', 'กรุณากรอกวันที่และเหตุผลให้ครบถ้วน', 'error'); return; }
-            if (new Date(startDate) > new Date(endDate)) { showModal('แจ้งเตือน', 'วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่มต้น', 'error'); return; }
-
-            loadingOverlay.classList.remove('hidden');
-            try {
-                await addDoc(collection(db, requestPath), {
-                    uid: currentUser.uid,
-                    empName: currentUser.displayName || currentUser.email.split('@')[0],
-                    requestType: 'LEAVE',
-                    leaveType: leaveType,
-                    startDate: startDate,
-                    endDate: endDate,
-                    reason: reason,
-                    status: 'PENDING',
-                    timestamp: Date.now()
-                });
-                
-                loadingOverlay.classList.add('hidden');
-                leaveModal.classList.add('translate-y-full'); 
-                document.getElementById('leaveForm').reset(); 
-                tabRequest.click(); 
-                showModal('สำเร็จ', 'ส่งคำขอลางานเรียบร้อยแล้ว กรุณารอการอนุมัติ', 'success');
-            } catch(e) {
-                loadingOverlay.classList.add('hidden');
-                showModal('ข้อผิดพลาด', 'ไม่สามารถส่งคำขอได้ กรุณาลองใหม่', 'error');
-            }
-        });
-
-        document.getElementById('submitSwapBtn').addEventListener('click', async () => {
-            const originalDate = document.getElementById('swapOriginalDate').value;
-            const newDate = document.getElementById('swapNewDate').value;
-            const reason = document.getElementById('swapReason').value.trim();
-
-            if(!originalDate || !newDate || !reason) { showModal('แจ้งเตือน', 'กรุณากรอกวันที่และเหตุผลให้ครบถ้วน', 'error'); return; }
-
-            loadingOverlay.classList.remove('hidden');
-            try {
-                await addDoc(collection(db, requestPath), {
-                    uid: currentUser.uid,
-                    empName: currentUser.displayName || currentUser.email.split('@')[0],
-                    requestType: 'SWAP',
-                    originalDate: originalDate,
-                    requestedDate: newDate,
-                    reason: reason,
-                    status: 'PENDING',
-                    timestamp: Date.now()
-                });
-                
-                loadingOverlay.classList.add('hidden');
-                swapModal.classList.add('translate-y-full'); 
-                document.getElementById('swapForm').reset(); 
-                tabRequest.click(); 
-                showModal('สำเร็จ', 'ส่งคำขอสลับวันหยุดเรียบร้อยแล้ว กรุณารอการอนุมัติ', 'success');
-            } catch(e) {
-                loadingOverlay.classList.add('hidden');
-                showModal('ข้อผิดพลาด', 'ไม่สามารถส่งคำขอได้ กรุณาลองใหม่', 'error');
-            }
-        });
-
-        document.getElementById('btnClockIn').addEventListener('click', () => handleClockEvent('IN'));
-        document.getElementById('btnClockOut').addEventListener('click', () => handleClockEvent('OUT'));
-
-        // ------------------------------------------
-        // LISTENERS & AUTH (EMP_ID + PIN System)
-        // ------------------------------------------
-        let unsubLogs = null;
-        let unsubRequests = null;
-
-        function startDataListeners() {
-            if (!currentUser) return;
-            
-            unsubLogs = onSnapshot(collection(db, collectionPath), (snapshot) => {
-                allLogs = [];
-                snapshot.forEach((doc) => allLogs.push({ id: doc.id, ...doc.data() }));
-                renderHistory(allLogs);
-            }, (error) => console.error("Error fetching logs:", error));
-
-            unsubRequests = onSnapshot(collection(db, requestPath), (snapshot) => {
-                allRequests = [];
-                snapshot.forEach((doc) => allRequests.push({ id: doc.id, ...doc.data() }));
-                renderRequests(allRequests);
-            }, (error) => console.error("Error fetching requests:", error));
-        }
-
-        function stopDataListeners() {
-            if(unsubLogs) unsubLogs();
-            if(unsubRequests) unsubRequests();
-        }
-
-        // Toggle ระหว่างหน้า Login ปกติ กับ หน้า Add Employee (Admin)
-        authToggleBtn.addEventListener('click', () => {
-            isLoginMode = !isLoginMode;
-            if (isLoginMode) {
-                authTitle.textContent = 'เข้าสู่ระบบ';
-                authSubtitle.textContent = 'กรุณาระบุรหัสพนักงานและ PIN';
-                nameField.classList.add('hidden');
-                authSubmitBtn.textContent = 'เข้าสู่ระบบ';
-                authSubmitBtn.classList.replace('bg-purple-600', 'bg-blue-600');
-                authSubmitBtn.classList.replace('hover:bg-purple-700', 'hover:bg-blue-700');
-                authToggleText.textContent = 'สำหรับผู้ดูแลระบบ:';
-                authToggleBtn.textContent = 'เพิ่มพนักงานใหม่';
-                adminBadge.classList.add('hidden');
-            } else {
-                authTitle.textContent = 'เพิ่มพนักงานใหม่';
-                authSubtitle.textContent = 'สร้างรหัสและ PIN สำหรับพนักงาน';
-                nameField.classList.remove('hidden');
-                authSubmitBtn.textContent = 'บันทึกพนักงาน';
-                authSubmitBtn.classList.replace('bg-blue-600', 'bg-purple-600');
-                authSubmitBtn.classList.replace('hover:bg-blue-700', 'hover:bg-purple-700');
-                authToggleText.textContent = 'กลับไปหน้า:';
-                authToggleBtn.textContent = 'เข้าสู่ระบบของพนักงาน';
-                adminBadge.classList.remove('hidden');
-            }
-        });
-
-        // จำกัดความยาว PIN ให้อยู่ที่ 4 หลัก
-        authPin.addEventListener('input', function() {
-            if (this.value.length > 4) {
-                this.value = this.value.slice(0, 4);
-            }
-        });
-
-        authSubmitBtn.addEventListener('click', async () => {
-            const rawEmpId = authEmpId.value.trim().toLowerCase();
-            const pin = authPin.value;
-            const name = regName.value.trim();
-
-            if (!rawEmpId || !pin) { showModal('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบถ้วน', 'error'); return; }
-            if (pin.length < 4) { showModal('แจ้งเตือน', 'รหัส PIN ต้องมี 4 หลัก', 'error'); return; }
-
-            // แปลงรหัสพนักงานให้เป็น Email format เพื่อใช้กับ Firebase Auth
-            const mockEmail = `${rawEmpId}@timeapp.local`;
-
-            loadingOverlay.classList.remove('hidden');
-
-            try {
-                if (isLoginMode) {
-                    // Login
-                    await signInWithEmailAndPassword(auth, mockEmail, pin);
-                } else {
-                    // Add Employee (Register)
-                    if (!name) { loadingOverlay.classList.add('hidden'); showModal('แจ้งเตือน', 'กรุณากรอกชื่อ-นามสกุลพนักงาน', 'error'); return; }
-                    const userCred = await createUserWithEmailAndPassword(auth, mockEmail, pin);
-                    await updateProfile(userCred.user, { displayName: name });
-                    currentUser = auth.currentUser;
-                    showModal('เพิ่มพนักงานสำเร็จ', `สร้างรหัสพนักงาน ${rawEmpId.toUpperCase()} เรียบร้อยแล้ว`, 'success');
-                    
-                    // หลังจากแอดเสร็จ ให้กลับไปหน้าล็อกอินปกติ
-                    authToggleBtn.click();
-                }
-                
-                authEmpId.value = ''; authPin.value = ''; regName.value = '';
-            } catch (error) {
-                let errorMsg = error.message;
-                if (error.code.includes('invalid-credential') || error.code.includes('wrong-password') || error.code.includes('user-not-found')) {
-                    errorMsg = 'รหัสพนักงาน หรือ PIN ไม่ถูกต้อง';
-                } else if (error.code === 'auth/email-already-in-use') {
-                    errorMsg = 'รหัสพนักงานนี้ถูกใช้งานแล้ว';
-                }
-                showModal('ข้อผิดพลาด', errorMsg, 'error');
-            } finally { loadingOverlay.classList.add('hidden'); }
-        });
-
-        logoutBtn.addEventListener('click', async () => {
-            try {
-                stopDataListeners();
-                await signOut(auth);
-            } catch (error) { console.error("Logout error:", error); }
-        });
-
-        function updateUIState(user) {
-            if (user) {
-                loginScreen.classList.add('hidden');
-                appScreen.classList.remove('hidden');
-                exportCsvBtn.classList.remove('hidden');
-                logoutBtn.classList.remove('hidden');
-                userGreeting.classList.remove('hidden');
-                
-                // ใช้ DisplayName หรือ เอารหัสพนักงานมาโชว์ถ้ายอมให้ไม่มีชื่อ
-                const displayName = user.displayName || user.email.split('@')[0].toUpperCase();
-                userGreeting.textContent = `สวัสดี, ${displayName}`;
-                loggedInUserName.textContent = displayName;
-            } else {
-                loginScreen.classList.remove('hidden');
-                appScreen.classList.add('hidden');
-                exportCsvBtn.classList.add('hidden');
-                logoutBtn.classList.add('hidden');
-                userGreeting.classList.add('hidden');
-                leaveModal.classList.add('translate-y-full');
-                swapModal.classList.add('translate-y-full');
-            }
-        }
-
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            updateUIState(user);
-            if (user) {
-                startDataListeners();
-            } else {
-                historyList.innerHTML = `<div class="text-center text-gray-400 py-4 text-sm bg-gray-50 rounded-xl border border-dashed border-gray-200">กรุณาเข้าสู่ระบบเพื่อดูประวัติ</div>`;
-                requestList.innerHTML = '';
-                allLogs = []; allRequests = [];
-            }
-        });
-
-        // ------------------------------------------
-        // EXPORT CSV
-        // ------------------------------------------
-        document.getElementById('exportCsvBtn').addEventListener('click', () => {
-            if (allLogs.length === 0 && allRequests.length === 0) { showModal('แจ้งเตือน', 'ยังไม่มีข้อมูลสำหรับส่งออก', 'info'); return; }
-            
-            let csvContent = "\uFEFF"; 
-            csvContent += "=== ประวัติลงเวลา ===\nวันที่,เวลา,ประเภท,ชื่อพนักงาน,หมายเหตุ,ละติจูด,ลองจิจูด\n";
-            allLogs.sort((a, b) => b.timestamp - a.timestamp).forEach(row => {
-                const lat = row.location ? row.location.lat : "";
-                const lng = row.location ? row.location.lng : "";
-                csvContent += `${row.date},${row.time},${row.type === 'IN'?'เข้างาน':'ออกงาน'},"${row.empName}",${row.remark?`"${row.remark}"`:""},${lat},${lng}\n`;
-            });
-
-            csvContent += "\n=== ประวัติคำขอลางาน/สลับวันหยุด ===\nประเภท,ชื่อพนักงาน,สถานะ,เหตุผล,รายละเอียดเพิ่มเติม\n";
-            allRequests.sort((a, b) => b.timestamp - a.timestamp).forEach(req => {
-                let statusTh = req.status === 'PENDING' ? 'รออนุมัติ' : req.status === 'APPROVED' ? 'อนุมัติแล้ว' : 'ไม่อนุมัติ';
-                let details = req.requestType === 'LEAVE' 
-                    ? `ลา${req.leaveType} (${req.startDate} ถึง ${req.endDate})` 
-                    : `สลับหยุด (จาก ${req.originalDate} เป็น ${req.requestedDate})`;
-                csvContent += `${req.requestType === 'LEAVE' ? 'ลางาน' : 'สลับหยุด'},"${req.empName}",${statusTh},"${req.reason}","${details}"\n`;
-            });
-            
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.setAttribute("href", url);
-            link.setAttribute("download", `ข้อมูลพนักงาน_${new Date().toLocaleDateString('th-TH')}.csv`);
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
-        });
-
-    </script>
-</body>
-</html>
+  );
+}
