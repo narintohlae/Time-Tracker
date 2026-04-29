@@ -342,11 +342,10 @@
         let employeeLogs = [];
         let checkInTime = null;
         
-        let currentEmpId = null;   // ID ปัจจุบันที่ล็อกอินอยู่
+        let currentEmpId = null;
         let currentEmpName = null;
         
-        // PIN Auth State
-        let pinMode = 'employee'; // ใช้แยกโหมด 'employee' หรือ 'owner'
+        let pinMode = 'employee'; 
         let pendingEmpId = null;
         let pendingEmpName = null;
         let expectedPin = "0000";
@@ -416,7 +415,6 @@
         const modalEmpName = document.getElementById('modal-emp-name');
         const modalEmpPin = document.getElementById('modal-emp-pin');
 
-        // PIN Elements
         const pinOverlay = document.getElementById('pin-overlay');
         const pinModalContent = document.getElementById('pin-modal-content');
         const pinEmpName = document.getElementById('pin-emp-name');
@@ -428,25 +426,28 @@
 
         lucide.createIcons();
 
-        // --- Navigation & Tabs Logic ---
-        
+        // --- Navigation Logic ---
         function openOwnerView() {
-            employeeView.classList.add('-translate-x-full', 'opacity-0');
+            employeeView.classList.add('-translate-x-full', 'opacity-0', 'pointer-events-none');
             ownerView.classList.remove('translate-x-full', 'opacity-0');
+            ownerView.classList.add('z-40');
             if(!currentEmpId) {
                 loginOverlay.classList.add('opacity-0', 'pointer-events-none');
             }
         }
+
         function closeOwnerView() {
             ownerView.classList.add('translate-x-full', 'opacity-0');
-            employeeView.classList.remove('-translate-x-full', 'opacity-0');
+            employeeView.classList.remove('-translate-x-full', 'opacity-0', 'pointer-events-none');
+            setTimeout(() => ownerView.classList.remove('z-40'), 300);
+            
             if(!currentEmpId) {
                 loginOverlay.classList.remove('opacity-0', 'pointer-events-none');
             }
         }
 
-        btnGoOwner.addEventListener('click', () => promptOwnerPin());
-        btnGoOwnerFromLogin.addEventListener('click', () => promptOwnerPin());
+        btnGoOwner.addEventListener('click', () => window.promptOwnerPin());
+        btnGoOwnerFromLogin.addEventListener('click', () => window.promptOwnerPin());
         btnBackEmployee.addEventListener('click', closeOwnerView);
 
         tabOverview.addEventListener('click', () => {
@@ -467,70 +468,12 @@
             ownerContentOverview.classList.remove('flex');
         });
 
-        // --- Employee Selection (Login) ---
-        
-        function loginAs(empId, empName) {
-            currentEmpId = empId;
-            currentEmpName = empName;
-            
-            currentEmpNameEl.textContent = empName;
-            currentEmpAvatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(empName)}&background=eff6ff&color=2563eb&bold=true`;
-            
-            loginOverlay.classList.add('opacity-0', 'pointer-events-none');
-            
-            // Recalculate local state for this specific user
-            refreshCurrentUserState();
-        }
-
-        btnLogout.addEventListener('click', () => {
-            currentEmpId = null;
-            currentEmpName = null;
-            isCheckedIn = false;
-            checkInTime = null;
-            updateUIState();
-            loginOverlay.classList.remove('opacity-0', 'pointer-events-none');
-        });
-
-        // Make login globally available for the dynamically generated buttons
-        window.loginAs = loginAs;
-
-        function renderEmployeeSelector() {
-            if (allEmployees.length === 0) {
-                empSelectList.innerHTML = `
-                    <div class="text-center bg-rose-50 border border-rose-100 p-4 rounded-2xl">
-                        <p class="text-rose-600 font-bold text-sm mb-1">ยังไม่มีข้อมูลพนักงานในระบบ</p>
-                        <p class="text-rose-500/80 text-xs">กรุณากดไอคอนมุมขวาบนเพื่อเข้าสู่โหมดเจ้าของร้าน และเพิ่มพนักงาน</p>
-                    </div>`;
-                return;
-            }
-
-            let html = '';
-            allEmployees.forEach(emp => {
-                const pin = emp.empPin || '0000'; // Default
-                html += `
-                <button onclick="promptPin('${emp.empId}', '${emp.empName}', '${pin}')" class="w-full flex items-center p-3.5 bg-white border border-slate-100 shadow-sm rounded-2xl hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5 transition-all group">
-                    <div class="w-12 h-12 bg-slate-100 text-slate-600 rounded-full flex items-center justify-center mr-4 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">
-                        <i data-lucide="user" class="w-5 h-5"></i>
-                    </div>
-                    <div class="text-left flex-1">
-                        <p class="font-bold text-slate-800">${emp.empName}</p>
-                        <p class="text-xs text-slate-500 font-medium">${emp.empId}</p>
-                    </div>
-                    <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300 group-hover:text-blue-500 transition-colors"></i>
-                </button>
-                `;
-            });
-            empSelectList.innerHTML = html;
-            lucide.createIcons();
-        }
-
         // --- PIN Logic ---
-
         window.promptPin = (empId, empName, pin) => {
             pinMode = 'employee';
             pendingEmpId = empId;
             pendingEmpName = empName;
-            expectedPin = pin || '0000';
+            expectedPin = String(pin).trim() || '0000';
             currentEnteredPin = '';
             
             pinEmpName.textContent = empName;
@@ -539,14 +482,12 @@
             updatePinDotsUI();
 
             pinOverlay.classList.remove('opacity-0', 'pointer-events-none');
-            setTimeout(() => {
-                pinModalContent.classList.remove('translate-y-full', 'sm:scale-95');
-            }, 10);
+            setTimeout(() => pinModalContent.classList.remove('translate-y-full', 'sm:scale-95'), 10);
         };
 
         window.promptOwnerPin = () => {
             pinMode = 'owner';
-            expectedPin = '9999'; // ตั้งค่ารหัสผ่านเจ้าของร้านตรงนี้
+            expectedPin = '9999';
             currentEnteredPin = '';
             
             pinEmpName.textContent = 'ผู้ดูแลระบบ (Owner)';
@@ -555,20 +496,18 @@
             updatePinDotsUI();
 
             pinOverlay.classList.remove('opacity-0', 'pointer-events-none');
-            setTimeout(() => {
-                pinModalContent.classList.remove('translate-y-full', 'sm:scale-95');
-            }, 10);
+            setTimeout(() => pinModalContent.classList.remove('translate-y-full', 'sm:scale-95'), 10);
         };
 
-        function closePinOverlay() {
+        window.closePinOverlay = () => {
             pinModalContent.classList.add('translate-y-full', 'sm:scale-95');
             setTimeout(() => {
                 pinOverlay.classList.add('opacity-0', 'pointer-events-none');
+                pinOverlay.classList.remove('opacity-100');
                 pendingEmpId = null;
             }, 300);
-        }
-
-        btnClosePin.addEventListener('click', closePinOverlay);
+        };
+        btnClosePin.addEventListener('click', window.closePinOverlay);
 
         window.handlePinInput = (num) => {
             if (currentEnteredPin.length < 4) {
@@ -577,7 +516,7 @@
                 pinErrorMsg.classList.remove('opacity-100');
                 
                 if (currentEnteredPin.length === 4) {
-                    setTimeout(verifyPin, 150); // slight delay to show the 4th dot
+                    setTimeout(() => window.verifyPin(), 150);
                 }
             }
         };
@@ -599,33 +538,93 @@
             });
         }
 
-        function verifyPin() {
-            if (currentEnteredPin === expectedPin) {
-                // Success
-                if (pinMode === 'employee') {
-                    loginAs(pendingEmpId, pendingEmpName);
-                } else if (pinMode === 'owner') {
-                    openOwnerView();
+        window.verifyPin = () => {
+            try {
+                if (currentEnteredPin === expectedPin) {
+                    if (pinMode === 'employee') {
+                        window.loginAs(pendingEmpId, pendingEmpName);
+                    } else if (pinMode === 'owner') {
+                        openOwnerView();
+                    }
+                    window.closePinOverlay();
+                } else {
+                    // รหัสผิด
+                    pinErrorMsg.classList.add('opacity-100');
+                    pinDotsContainer.classList.remove('animate-shake');
+                    void pinDotsContainer.offsetWidth; // trigger reflow
+                    pinDotsContainer.classList.add('animate-shake');
+                    
+                    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                    
+                    setTimeout(() => {
+                        currentEnteredPin = '';
+                        updatePinDotsUI();
+                    }, 400);
                 }
-                closePinOverlay();
-            } else {
-                // Fail
-                pinErrorMsg.classList.add('opacity-100');
-                pinDotsContainer.classList.remove('animate-shake');
-                void pinDotsContainer.offsetWidth; // trigger reflow
-                pinDotsContainer.classList.add('animate-shake');
-                
-                if (navigator.vibrate) navigator.vibrate([100, 50, 100]); // Error vibration
-                
-                setTimeout(() => {
-                    currentEnteredPin = '';
-                    updatePinDotsUI();
-                }, 400);
+            } catch (err) {
+                console.error("PIN Verification Error: ", err);
             }
+        };
+
+        // --- Employee Session Logic ---
+        window.loginAs = (empId, empName) => {
+            currentEmpId = empId;
+            currentEmpName = empName;
+            
+            currentEmpNameEl.textContent = empName;
+            currentEmpAvatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(empName)}&background=eff6ff&color=2563eb&bold=true`;
+            
+            loginOverlay.classList.remove('opacity-100');
+            loginOverlay.classList.add('opacity-0', 'pointer-events-none');
+            
+            refreshCurrentUserState();
+        };
+
+        btnLogout.addEventListener('click', () => {
+            currentEmpId = null;
+            currentEmpName = null;
+            isCheckedIn = false;
+            checkInTime = null;
+            updateUIState();
+            loginOverlay.classList.remove('opacity-0', 'pointer-events-none');
+            loginOverlay.classList.add('opacity-100');
+        });
+
+        function renderEmployeeSelector() {
+            if (allEmployees.length === 0) {
+                empSelectList.innerHTML = `
+                    <div class="text-center bg-rose-50 border border-rose-100 p-4 rounded-2xl">
+                        <p class="text-rose-600 font-bold text-sm mb-1">ยังไม่มีข้อมูลพนักงานในระบบ</p>
+                        <p class="text-rose-500/80 text-xs">กรุณากดไอคอนมุมขวาบนเพื่อเข้าสู่โหมดเจ้าของร้าน และเพิ่มพนักงาน</p>
+                    </div>`;
+                return;
+            }
+
+            let html = '';
+            allEmployees.forEach(emp => {
+                const pin = emp.empPin || '0000';
+                // Escape string variables to prevent HTML onClick parsing errors
+                const safeId = String(emp.empId).replace(/'/g, "\\'");
+                const safeName = String(emp.empName).replace(/'/g, "\\'");
+                const safePin = String(pin).replace(/'/g, "\\'");
+                
+                html += `
+                <button onclick="promptPin('${safeId}', '${safeName}', '${safePin}')" class="w-full flex items-center p-3.5 bg-white border border-slate-100 shadow-sm rounded-2xl hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5 transition-all group">
+                    <div class="w-12 h-12 bg-slate-100 text-slate-600 rounded-full flex items-center justify-center mr-4 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">
+                        <i data-lucide="user" class="w-5 h-5"></i>
+                    </div>
+                    <div class="text-left flex-1">
+                        <p class="font-bold text-slate-800">${emp.empName}</p>
+                        <p class="text-xs text-slate-500 font-medium">${emp.empId}</p>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300 group-hover:text-blue-500 transition-colors"></i>
+                </button>`;
+            });
+            empSelectList.innerHTML = html;
+            lucide.createIcons();
         }
 
-        // --- Employee CRUD (Owner Mode) ---
-
+        // --- Employee CRUD ---
         function openModal(docId = null, empId = '', empName = '', empPin = '') {
             modalDocId.value = docId || '';
             modalEmpId.value = empId;
@@ -658,7 +657,7 @@
 
         window.deleteEmployee = async (docId) => {
             if(confirm('คุณต้องการลบพนักงานคนนี้ออกจากระบบใช่หรือไม่?')) {
-                if(!user) return;
+                if(!user) { alert('กำลังเชื่อมต่อฐานข้อมูล กรุณารอสักครู่'); return; }
                 try {
                     await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'employees', docId));
                 } catch(e) { console.error("Error deleting employee:", e); }
@@ -666,7 +665,7 @@
         };
 
         btnSaveEmployee.addEventListener('click', async () => {
-            if(!user) return;
+            if(!user) { alert('กำลังเชื่อมต่อฐานข้อมูล กรุณารอสักครู่'); return; }
             const docId = modalDocId.value;
             const empId = modalEmpId.value.trim();
             const empName = modalEmpName.value.trim();
@@ -685,24 +684,15 @@
 
             try {
                 if (docId) {
-                    // Update existing
                     await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'employees', docId), {
-                        empId: empId,
-                        empName: empName,
-                        empPin: empPin
+                        empId: empId, empName: empName, empPin: empPin
                     });
                 } else {
-                    // Add new
                     await addDoc(empRef, {
-                        empId: empId,
-                        empName: empName,
-                        empPin: empPin,
-                        createdAt: serverTimestamp()
+                        empId: empId, empName: empName, empPin: empPin, createdAt: serverTimestamp()
                     });
                 }
                 closeModal();
-                
-                // Update current user name if edited themselves
                 if(currentEmpId === empId) {
                     currentEmpName = empName;
                     currentEmpNameEl.textContent = empName;
@@ -732,6 +722,10 @@
 
             let html = '';
             allEmployees.forEach(emp => {
+                const safeId = String(emp.empId).replace(/'/g, "\\'");
+                const safeName = String(emp.empName).replace(/'/g, "\\'");
+                const safePin = String(emp.empPin || '0000').replace(/'/g, "\\'");
+                
                 html += `
                 <div class="flex justify-between items-center p-4 bg-white rounded-2xl shadow-sm border border-slate-100 hover:border-blue-100 transition-colors">
                     <div class="flex items-center gap-3 overflow-hidden">
@@ -744,7 +738,7 @@
                         </div>
                     </div>
                     <div class="flex gap-1.5 shrink-0">
-                        <button onclick="editEmployee('${emp.id}', '${emp.empId}', '${emp.empName}', '${emp.empPin || '0000'}')" class="w-8 h-8 flex items-center justify-center text-blue-500 bg-blue-50 rounded-lg hover:bg-blue-500 hover:text-white transition-colors">
+                        <button onclick="editEmployee('${emp.id}', '${safeId}', '${safeName}', '${safePin}')" class="w-8 h-8 flex items-center justify-center text-blue-500 bg-blue-50 rounded-lg hover:bg-blue-500 hover:text-white transition-colors">
                             <i data-lucide="edit-2" class="w-4 h-4"></i>
                         </button>
                         <button onclick="deleteEmployee('${emp.id}')" class="w-8 h-8 flex items-center justify-center text-rose-500 bg-rose-50 rounded-lg hover:bg-rose-500 hover:text-white transition-colors">
@@ -757,8 +751,7 @@
             lucide.createIcons();
         }
 
-        // --- Real-time Logic & Updating ---
-
+        // --- View Updates ---
         function updateTime() {
             const now = new Date();
             clockDisplay.textContent = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
@@ -800,7 +793,6 @@
                 connStatus.className = 'px-3 py-1.5 rounded-full text-[11px] font-bold shadow-sm transition-colors bg-slate-300 text-slate-600';
             }
 
-            // Only show active states if a user is logged in
             const showActive = isCheckedIn && currentEmpId !== null;
 
             if (showActive) {
@@ -848,7 +840,6 @@
 
             btnInner.className = btnClasses;
             lucide.createIcons();
-            
             const offset = 515 - (515 * holdProgress / 100);
             progressRing.style.strokeDashoffset = offset;
         }
@@ -876,7 +867,6 @@
                 historyList.innerHTML = '<p class="text-center text-slate-400 text-xs py-10 italic">กรุณาเลือกพนักงานเพื่อดูประวัติ</p>';
                 return;
             }
-
             if (employeeLogs.length === 0) {
                 historyList.innerHTML = '<p class="text-center text-slate-400 text-xs py-10 italic">ไม่มีข้อมูลการบันทึก...</p>';
                 return;
@@ -899,9 +889,7 @@
                             <p class="text-[11px] text-slate-400 font-medium mt-0.5">${log.location}</p>
                         </div>
                     </div>
-                    <div class="font-bold text-slate-800 text-base tabular-nums tracking-tight">
-                        ${timeStr}
-                    </div>
+                    <div class="font-bold text-slate-800 text-base tabular-nums tracking-tight">${timeStr}</div>
                 </div>`;
             });
             historyList.innerHTML = html;
@@ -920,9 +908,7 @@
                 if (log.time >= todayStart) todayCount++;
                 if (!latestStatusByEmployee[log.employeeId]) {
                     latestStatusByEmployee[log.employeeId] = log;
-                    if (log.type === 'IN') {
-                        activeEmployees.add(log.employeeId);
-                    }
+                    if (log.type === 'IN') activeEmployees.add(log.employeeId);
                 }
             });
 
@@ -961,8 +947,7 @@
             lucide.createIcons();
         }
 
-        // --- Interaction Logic ---
-
+        // --- Clock In / Out Action ---
         async function handlePunch() {
             if (!user || !currentEmpId) return;
             const type = isCheckedIn ? 'OUT' : 'IN';
@@ -979,6 +964,7 @@
                 });
             } catch (error) {
                 console.error("Error saving to Firestore: ", error);
+                alert("บันทึกข้อมูลไม่สำเร็จ: " + error.message);
             }
         }
 
@@ -1026,7 +1012,6 @@
         holdArea.addEventListener('touchend', endHold);
 
         // --- App Initialization ---
-
         async function initAuth() {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -1044,7 +1029,6 @@
             updateUIState();
 
             if (user) {
-                // Subscribe to Logs
                 const logsRef = collection(db, 'artifacts', appId, 'public', 'data', 'attendance_logs');
                 if (unsubscribeLogs) unsubscribeLogs();
                 unsubscribeLogs = onSnapshot(logsRef, (snapshot) => {
@@ -1060,23 +1044,19 @@
                     renderOwnerDashboard();
                 }, (error) => console.error("Logs Snapshot error:", error));
 
-                // Subscribe to Employees
                 const empRef = collection(db, 'artifacts', appId, 'public', 'data', 'employees');
                 if (unsubscribeEmps) unsubscribeEmps();
                 unsubscribeEmps = onSnapshot(empRef, (snapshot) => {
                     const emps = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     
-                    // Add default employee if collection is completely empty (For demo purposes)
                     if(emps.length === 0 && snapshot.metadata.hasPendingWrites === false) {
-                        addDoc(empRef, { empId: 'EMP-1042', empName: 'สมชาย ใจดี', createdAt: serverTimestamp() });
+                        addDoc(empRef, { empId: 'EMP-1042', empName: 'สมชาย ใจดี', empPin: '0000', createdAt: serverTimestamp() });
                         return;
                     }
 
-                    // Sort by name or creation
-                    emps.sort((a, b) => a.empId.localeCompare(b.empId));
+                    emps.sort((a, b) => String(a.empId).localeCompare(String(b.empId)));
                     allEmployees = emps;
 
-                    // If logged in user was deleted, log them out
                     if(currentEmpId && !emps.find(e => e.empId === currentEmpId)) {
                         btnLogout.click(); 
                     }
@@ -1093,7 +1073,6 @@
 
         initAuth();
         updateUIState();
-
     </script>
 </body>
 </html>
