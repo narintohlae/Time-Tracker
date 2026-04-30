@@ -368,6 +368,30 @@
                                 <input type="number" id="modal-emp-ot" placeholder="เช่น 50" class="w-full px-2 sm:px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-medium tabular-nums text-sm">
                             </div>
                         </div>
+
+                        <!-- โควต้าวันหยุด (Leave Quotas) -->
+                        <hr class="border-slate-100 my-1">
+                        <div>
+                            <label class="block text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                                โควต้าวันหยุด (วัน/ปี)
+                            </label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div>
+                                    <label class="block text-[9px] font-bold text-slate-400 mb-1">ลาป่วย</label>
+                                    <input type="number" id="modal-emp-sick" placeholder="30" class="w-full px-2 sm:px-3 py-2 sm:py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-medium tabular-nums text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-[9px] font-bold text-slate-400 mb-1">ลากิจ</label>
+                                    <input type="number" id="modal-emp-personal" placeholder="6" class="w-full px-2 sm:px-3 py-2 sm:py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-medium tabular-nums text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-[9px] font-bold text-slate-400 mb-1">พักร้อน</label>
+                                    <input type="number" id="modal-emp-annual" placeholder="6" class="w-full px-2 sm:px-3 py-2 sm:py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-medium tabular-nums text-sm">
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="border-slate-100 my-1">
                         <div>
                             <label class="block text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center justify-between">
                                 วันหยุดประจำสัปดาห์<span class="text-[9px] font-normal text-rose-500 bg-rose-50 px-1.5 py-0.5 rounded">แตะเพื่อกำหนด</span>
@@ -738,13 +762,15 @@
             }
         };
 
-
-        window.openModal = function(docId = '', empId = '', empName = '', empPin = '0000', wage = '', otRate = '', offDaysStr = null) {
+        window.openModal = function(docId = '', empId = '', empName = '', empPin = '0000', wage = '', otRate = '', offDaysStr = null, sick = 30, personal = 6, annual = 6) {
             document.getElementById('modal-doc-id').value = docId; document.getElementById('modal-emp-id').value = empId; document.getElementById('modal-emp-name').value = empName;
             document.getElementById('modal-emp-pin').value = empPin; document.getElementById('modal-emp-wage').value = wage; document.getElementById('modal-emp-ot').value = otRate;
+            document.getElementById('modal-emp-sick').value = sick; document.getElementById('modal-emp-personal').value = personal; document.getElementById('modal-emp-annual').value = annual;
+            
             try { currentModalOffDays = offDaysStr ? JSON.parse(decodeURIComponent(offDaysStr)) : {0:true, 1:false, 2:false, 3:false, 4:false, 5:false, 6:false}; } 
             catch(e){ currentModalOffDays = {0:true, 1:false, 2:false, 3:false, 4:false, 5:false, 6:false}; }
             renderModalOffDays();
+            
             document.getElementById('modal-title').textContent = docId ? 'แก้ไขพนักงาน' : 'เพิ่มพนักงาน';
             const m = document.getElementById('employee-modal'), c = document.getElementById('employee-modal-content');
             m.classList.remove('opacity-0', 'pointer-events-none'); setTimeout(() => { c.classList.remove('scale-95'); c.classList.add('scale-100'); }, 10);
@@ -926,14 +952,23 @@
 
         document.getElementById('btn-add-employee').addEventListener('click', () => window.openModal());
         document.getElementById('btn-close-modal').addEventListener('click', window.closeModal);
+        
         document.getElementById('btn-save-employee').addEventListener('click', async () => {
             if(!user) return;
-            const docId = document.getElementById('modal-doc-id').value, empId = document.getElementById('modal-emp-id').value.trim(), empName = document.getElementById('modal-emp-name').value.trim();
-            const empPin = document.getElementById('modal-emp-pin').value.trim() || '0000', wage = Number(document.getElementById('modal-emp-wage').value)||0, otRate = Number(document.getElementById('modal-emp-ot').value)||0;
+            const docId = document.getElementById('modal-doc-id').value;
+            const empId = document.getElementById('modal-emp-id').value.trim();
+            const empName = document.getElementById('modal-emp-name').value.trim();
+            const empPin = document.getElementById('modal-emp-pin').value.trim() || '0000';
+            const wage = Number(document.getElementById('modal-emp-wage').value)||0;
+            const otRate = Number(document.getElementById('modal-emp-ot').value)||0;
+            const sickQuota = Number(document.getElementById('modal-emp-sick').value)||0;
+            const personalQuota = Number(document.getElementById('modal-emp-personal').value)||0;
+            const annualQuota = Number(document.getElementById('modal-emp-annual').value)||0;
+
             if(!empId || !empName || empPin.length !== 4) return alert('กรอกข้อมูลให้ครบและ PIN 4 หลัก');
             
             const btn = document.getElementById('btn-save-employee'); btn.disabled=true; btn.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> บันทึก...'; lucide.createIcons();
-            const data = { empId, empName, empPin, wage, otRate, offDays: currentModalOffDays };
+            const data = { empId, empName, empPin, wage, otRate, sickQuota, personalQuota, annualQuota, offDays: currentModalOffDays };
             try {
                 if(docId) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'employees', docId), data);
                 else await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'employees'), {...data, createdAt: serverTimestamp()});
@@ -1078,7 +1113,11 @@
             else ol.innerHTML = allEmployees.map(e => {
                 const safeId = String(e.empId).replace(/'/g, "\\'"), safeName = String(e.empName).replace(/'/g, "\\'"), safePin = String(e.empPin||'0000').replace(/'/g, "\\'");
                 const safeOffDays = encodeURIComponent(JSON.stringify(e.offDays || {0:true,1:false,2:false,3:false,4:false,5:false,6:false}));
-                return `<div class="flex justify-between items-center p-3 sm:p-4 bg-white rounded-xl sm:rounded-2xl shadow-sm border border-slate-100 hover:border-blue-100 transition-colors"><div class="flex items-center gap-2 sm:gap-3 overflow-hidden"><div class="w-8 h-8 sm:w-10 sm:h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 shrink-0"><i data-lucide="user" class="w-4 h-4"></i></div><div class="truncate"><p class="font-bold text-slate-800 text-xs sm:text-sm truncate">${e.empName}</p><p class="text-[9px] sm:text-[11px] text-slate-500">${e.empId} | PIN: ${e.empPin||'0000'} | ฿${e.wage||0}</p></div></div><div class="flex gap-1 shrink-0"><button onclick="window.openModal('${e.id}', '${safeId}', '${safeName}', '${safePin}', '${e.wage||0}', '${e.otRate||0}', '${safeOffDays}')" class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-blue-500 bg-blue-50 rounded-lg hover:bg-blue-500 hover:text-white"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button><button onclick="window.deleteEmployee('${e.id}')" class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-rose-500 bg-rose-50 rounded-lg hover:bg-rose-500 hover:text-white"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></div></div>`;
+                const safeSick = e.sickQuota !== undefined ? e.sickQuota : 30;
+                const safePersonal = e.personalQuota !== undefined ? e.personalQuota : 6;
+                const safeAnnual = e.annualQuota !== undefined ? e.annualQuota : 6;
+                
+                return `<div class="flex justify-between items-center p-3 sm:p-4 bg-white rounded-xl sm:rounded-2xl shadow-sm border border-slate-100 hover:border-blue-100 transition-colors"><div class="flex items-center gap-2 sm:gap-3 overflow-hidden"><div class="w-8 h-8 sm:w-10 sm:h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 shrink-0"><i data-lucide="user" class="w-4 h-4"></i></div><div class="truncate"><p class="font-bold text-slate-800 text-xs sm:text-sm truncate">${e.empName}</p><p class="text-[9px] sm:text-[11px] text-slate-500">${e.empId} | PIN: ${e.empPin||'0000'} | ฿${e.wage||0}</p></div></div><div class="flex gap-1 shrink-0"><button onclick="window.openModal('${e.id}', '${safeId}', '${safeName}', '${safePin}', '${e.wage||0}', '${e.otRate||0}', '${safeOffDays}', '${safeSick}', '${safePersonal}', '${safeAnnual}')" class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-blue-500 bg-blue-50 rounded-lg hover:bg-blue-500 hover:text-white"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button><button onclick="window.deleteEmployee('${e.id}')" class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-rose-500 bg-rose-50 rounded-lg hover:bg-rose-500 hover:text-white"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></div></div>`;
             }).join('');
             
             const ts = new Date(); ts.setHours(0,0,0,0);
@@ -1111,7 +1150,6 @@
             lucide.createIcons();
             refreshCurrentUserState();
             
-            // Re-calculate payroll if on payroll tab
             if (!document.getElementById('owner-content-payroll').classList.contains('hidden')) {
                 window.calculatePayroll();
             }
@@ -1176,7 +1214,7 @@
                 unsubscribeLogs = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'attendance_logs'), (s) => { allLogs = s.docs.map(d=>({id:d.id,...d.data(),time:d.data().timestamp?d.data().timestamp.toDate():new Date()})).sort((a,b)=>b.time-a.time); renderLists(); });
                 unsubscribeEmps = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'employees'), (s) => { 
                     allEmployees = s.docs.map(d=>({id:d.id,...d.data()})); 
-                    if(allEmployees.length===0 && !s.metadata.hasPendingWrites) { addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'employees'), {empId:'EMP-001',empName:'สมชาย ใจดี',empPin:'0000',wage:500,otRate:50,offDays:{0:true,1:false,2:false,3:false,4:false,5:false,6:false},createdAt:serverTimestamp()}); return; }
+                    if(allEmployees.length===0 && !s.metadata.hasPendingWrites) { addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'employees'), {empId:'EMP-001',empName:'สมชาย ใจดี',empPin:'0000',wage:500,otRate:50,sickQuota:30,personalQuota:6,annualQuota:6,offDays:{0:true,1:false,2:false,3:false,4:false,5:false,6:false},createdAt:serverTimestamp()}); return; }
                     allEmployees.sort((a,b)=>String(a.empId).localeCompare(String(b.empId)));
                     if(currentEmpId && !allEmployees.find(e => e.empId === currentEmpId)) document.getElementById('btn-logout').click();
                     renderLists();
